@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi nueva web</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --text:#1c2430; --muted:#5b6b7c;
+    --line:#dde3ea; --accent:#1f7a4d; --accent-soft:#e3f3ea;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1418; --card:#171e25; --text:#e8edf2; --muted:#9aa8b6;
+      --line:#2a333d; --accent:#4fbf82; --accent-soft:#16301f;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5; padding:16px;
+  }
+  main{max-width:640px; margin:0 auto}
+  header{padding:32px 0 16px}
+  h1{margin:0 0 6px; font-size:2rem; letter-spacing:-.02em}
+  header p{margin:0; color:var(--muted)}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px; margin-top:16px;
+  }
+  .card h2{margin:0 0 10px; font-size:1.05rem}
+  .badge{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
+    border-radius:999px; background:var(--accent-soft); color:var(--accent);
+    font-weight:600; font-size:.95rem;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  input{
+    flex:1; min-width:180px; padding:10px 12px; border-radius:10px;
+    border:1px solid var(--line); background:var(--bg); color:var(--text);
+    font:inherit;
+  }
+  button{
+    padding:10px 16px; border:0; border-radius:10px; background:var(--accent);
+    color:#fff; font:inherit; font-weight:600; cursor:pointer;
+  }
+  button.secondary{background:transparent; color:var(--text); border:1px solid var(--line)}
+  .hint{color:var(--muted); font-size:.9rem; margin:10px 0 0}
+  .big{font-size:2.4rem; font-weight:700; margin:4px 0 0}
+  footer{color:var(--muted); font-size:.85rem; padding:24px 0; text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Mi nueva web</h1>
+    <p>Publicada en Vercel. Se abre en Chrome desde cualquier computador.</p>
+  </header>
+
+  <section class="card">
+    <span class="badge"><span class="dot"></span> Funcionando</span>
+    <p class="hint" id="reloj"></p>
+  </section>
+
+  <section class="card">
+    <h2>Prueba: una nota que se guarda</h2>
+    <div class="row">
+      <input id="nota" placeholder="Escriba algo y presione Guardar">
+      <button onclick="guardar()">Guardar</button>
+      <button class="secondary" onclick="borrar()">Borrar</button>
+    </div>
+    <p class="hint" id="estado">La nota queda guardada en este navegador y aparece al volver a abrir la página.</p>
+  </section>
+
+  <section class="card">
+    <h2>Prueba: un contador</h2>
+    <div class="big" id="num">0</div>
+    <div class="row" style="margin-top:10px">
+      <button onclick="sumar()">Sumar 1</button>
+      <button class="secondary" onclick="reiniciar()">Reiniciar</button>
+    </div>
+  </section>
+
+  <footer>Versión 1 · 25 de septiembre de 2026</footer>
+</main>
+
+<script>
+  function reloj(){
+    const f = new Date();
+    document.getElementById('reloj').textContent =
+      'Hora en su computador: ' + f.toLocaleString('es-CL');
+  }
+  reloj(); setInterval(reloj, 1000);
+
+  const $nota = document.getElementById('nota');
+  const $estado = document.getElementById('estado');
+  try { $nota.value = localStorage.getItem('nota') || ''; } catch(e){}
+  function guardar(){
+    try { localStorage.setItem('nota', $nota.value); } catch(e){}
+    $estado.textContent = 'Guardado. Cierre la pestaña, vuelva a abrir el enlace y la nota seguirá aquí.';
+  }
+  function borrar(){
+    $nota.value = '';
+    try { localStorage.removeItem('nota'); } catch(e){}
+    $estado.textContent = 'Nota borrada.';
+  }
+
+  const $num = document.getElementById('num');
+  let n = 0;
+  try { n = parseInt(localStorage.getItem('contador') || '0', 10) || 0; } catch(e){}
+  $num.textContent = n;
+  function sumar(){ n++; $num.textContent = n; try{ localStorage.setItem('contador', n); }catch(e){} }
+  function reiniciar(){ n = 0; $num.textContent = n; try{ localStorage.removeItem('contador'); }catch(e){} }
+</script>
+</body>
+</html>
