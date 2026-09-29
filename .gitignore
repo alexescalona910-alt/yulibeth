@@ -1,0 +1,8 @@
+# Datos de trabajo: nunca subir planillas con datos personales
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+~$*
+Thumbs.db
+.DS_Store

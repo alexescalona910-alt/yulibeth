@@ -3,116 +3,429 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yulibeth</title>
+<title>Yulibeth · Habilitaciones Codelco</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
-    --bg:#f4f6f8; --card:#ffffff; --text:#1c2430; --muted:#5b6b7c;
-    --line:#dde3ea; --accent:#1f7a4d; --accent-soft:#e3f3ea;
+    --bg:#f3f5f7; --card:#ffffff; --text:#1c2430; --muted:#5b6b7c; --line:#dde3ea;
+    --accent:#1f7a4d; --accent-soft:#e3f3ea;
+    --ok:#1f7a4d; --ok-soft:#e3f3ea; --warn:#c98a00; --warn-soft:#fff3d6; --bad:#c0392b; --bad-soft:#fde3e0; --na:#8a97a5; --na-soft:#eef1f4;
+    --thead:#f7f9fb;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#0f1418; --card:#171e25; --text:#e8edf2; --muted:#9aa8b6;
-      --line:#2a333d; --accent:#4fbf82; --accent-soft:#16301f;
+      --bg:#0f1418; --card:#171e25; --text:#e8edf2; --muted:#9aa8b6; --line:#2a333d;
+      --accent:#4fbf82; --accent-soft:#16301f;
+      --ok:#4fbf82; --ok-soft:#16301f; --warn:#f0b429; --warn-soft:#3a2d08; --bad:#ff6b5b; --bad-soft:#3d1a16; --na:#8a97a5; --na-soft:#222a33;
+      --thead:#1c242c;
     }
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    line-height:1.5; padding:16px;
-  }
-  main{max-width:640px; margin:0 auto}
-  header{padding:32px 0 16px}
-  h1{margin:0 0 6px; font-size:2rem; letter-spacing:-.02em}
-  header p{margin:0; color:var(--muted)}
-  .card{
-    background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:20px; margin-top:16px;
-  }
-  .card h2{margin:0 0 10px; font-size:1.05rem}
-  .badge{
-    display:inline-flex; align-items:center; gap:8px; padding:6px 12px;
-    border-radius:999px; background:var(--accent-soft); color:var(--accent);
-    font-weight:600; font-size:.95rem;
-  }
-  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
-  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  input{
-    flex:1; min-width:180px; padding:10px 12px; border-radius:10px;
-    border:1px solid var(--line); background:var(--bg); color:var(--text);
-    font:inherit;
-  }
-  button{
-    padding:10px 16px; border:0; border-radius:10px; background:var(--accent);
-    color:#fff; font:inherit; font-weight:600; cursor:pointer;
-  }
-  button.secondary{background:transparent; color:var(--text); border:1px solid var(--line)}
-  .hint{color:var(--muted); font-size:.9rem; margin:10px 0 0}
-  .big{font-size:2.4rem; font-weight:700; margin:4px 0 0}
-  footer{color:var(--muted); font-size:.85rem; padding:24px 0; text-align:center}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;padding:16px}
+  main{max-width:1280px;margin:0 auto}
+  header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;padding:12px 0 8px}
+  h1{margin:0;font-size:1.6rem;letter-spacing:-.02em}
+  header p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+  .card h2{margin:0 0 10px;font-size:1.05rem}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .grow{flex:1;min-width:200px}
+  input[type=text],select{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
+  input[type=text]{width:100%}
+  button{padding:9px 14px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+  button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
+  button:disabled{opacity:.5;cursor:default}
+  .hint{color:var(--muted);font-size:.88rem;margin:8px 0 0}
+  label.chk{display:inline-flex;gap:6px;align-items:center;font-size:.95rem}
+  /* zona de carga */
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+  .drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+  .drop strong{color:var(--text)}
+  .files{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:12px}
+  .file{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+  .file .st{width:10px;height:10px;border-radius:50%;background:var(--na);flex:none}
+  .file.ok .st{background:var(--ok)}
+  .file b{display:block;font-size:.95rem}
+  .file span{color:var(--muted);font-size:.85rem}
+  /* kpis */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .kpi .v{font-size:1.6rem;font-weight:700;line-height:1.1}
+  .kpi .l{color:var(--muted);font-size:.85rem}
+  .kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--warn)} .kpi.bad .v{color:var(--bad)}
+  /* tabla */
+  .tw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:960px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  td:nth-child(3){min-width:170px} td:nth-child(4){min-width:150px} td:nth-child(5){min-width:190px}
+  th{background:var(--thead);position:sticky;top:0;font-weight:600;font-size:.82rem;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none}
+  th .arr{opacity:.5;font-size:.75rem}
+  tr:last-child td{border-bottom:0}
+  tr.r-bad td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
+  tr.r-warn td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
+  tr.r-ok td:first-child{box-shadow:inset 4px 0 0 var(--ok)}
+  .sub{display:block;color:var(--muted);font-size:.8rem}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:6px;flex:none}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)} .dot.na{background:var(--na)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:.8rem;font-weight:600;white-space:nowrap}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.na{background:var(--na-soft);color:var(--na)}
+  .st{display:flex;align-items:center;gap:0;font-size:.85rem;white-space:nowrap}
+  .st .txt{font-weight:600}
+  .st.ok .txt{color:var(--ok)} .st.warn .txt{color:var(--warn)} .st.bad .txt{color:var(--bad)} .st.na .txt{color:var(--na)}
+  .plate{font-family:ui-monospace,Consolas,monospace;font-weight:600;letter-spacing:.02em}
+  .empty{padding:28px;text-align:center;color:var(--muted)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.85rem;margin-top:8px}
+  /* buscador */
+  .res{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+  .res h3{margin:0 0 6px;font-size:1rem}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.85rem}
+  .chip b{font-weight:700}
+  .res table{min-width:0}
+  footer{color:var(--muted);font-size:.82rem;padding:22px 0;text-align:center}
+  @media (max-width:700px){ body{padding:12px} h1{font-size:1.3rem} }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Yulibeth</h1>
-    <p>Publicada en internet. Se abre en Chrome desde cualquier computador.</p>
+    <div>
+      <h1>Yulibeth · Habilitaciones Codelco</h1>
+      <p>Cruce entre los servicios Punto a Punto y el informe de conductores y equipos habilitados por división.</p>
+    </div>
+    <div class="row">
+      <button class="secondary" onclick="exportar()" id="btnXls" disabled>Descargar Excel</button>
+      <button class="secondary" onclick="limpiarTodo()">Limpiar datos</button>
+    </div>
   </header>
 
+  <!-- CARGA -->
   <section class="card">
-    <span class="badge"><span class="dot"></span> Funcionando</span>
-    <p class="hint" id="reloj"></p>
+    <h2>1. Cargar archivos</h2>
+    <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
+      <strong>Suelte aquí los archivos Excel</strong> o haga clic para elegirlos.<br>
+      Se aceptan los dos a la vez: <em>Informe Habilitados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
+      <input type="file" id="fi" accept=".xlsx,.xlsm,.xls" multiple style="display:none" onchange="archivos(this.files)">
+    </div>
+    <div class="files">
+      <div class="file" id="fHab"><span class="st"></span><div><b>Informe Habilitados</b><span>Sin cargar</span></div></div>
+      <div class="file" id="fSrv"><span class="st"></span><div><b>Seguimiento Punto a Punto</b><span>Sin cargar</span></div></div>
+    </div>
+    <p class="hint">Los archivos se procesan en su navegador y quedan guardados solo en este equipo. Nada se envía a internet.</p>
   </section>
 
-  <section class="card">
-    <h2>Prueba: una nota que se guarda</h2>
+  <!-- RESUMEN -->
+  <section class="card" id="secRes" style="display:none">
+    <h2>2. Resumen de servicios activos a divisiones</h2>
+    <div class="kpis" id="kpis"></div>
+    <div class="legend">
+      <span><span class="dot ok"></span>Habilitado</span>
+      <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
+      <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
+      <span><span class="dot na"></span>No aplica</span>
+    </div>
+  </section>
+
+  <!-- CRUCE -->
+  <section class="card" id="secTab" style="display:none">
+    <h2>3. Cruce por servicio</h2>
     <div class="row">
-      <input id="nota" placeholder="Escriba algo y presione Guardar">
-      <button onclick="guardar()">Guardar</button>
-      <button class="secondary" onclick="borrar()">Borrar</button>
+      <div class="grow"><input type="text" id="q" placeholder="Filtrar: pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
+      <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
+      <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
+      <select id="fEst" onchange="render()">
+        <option value="activo">Solo viajes activos</option>
+        <option value="todos">Todos los estados</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
     </div>
-    <p class="hint" id="estado">La nota queda guardada en este navegador y aparece al volver a abrir la página.</p>
+    <div class="tw"><table id="tab">
+      <thead><tr>
+        <th data-k="id" onclick="ordenar('id')">Id pedido</th>
+        <th data-k="cat" onclick="ordenar('cat')">Categoría</th>
+        <th data-k="div" onclick="ordenar('div')">Destino / división</th>
+        <th data-k="emp" onclick="ordenar('emp')">Empresa de transporte</th>
+        <th data-k="cond" onclick="ordenar('cond')">Conductor</th>
+        <th data-k="condSt" onclick="ordenar('condSt')">Habilitado</th>
+        <th data-k="tracto" onclick="ordenar('tracto')">Patente tracto / camión</th>
+        <th data-k="tractoSt" onclick="ordenar('tractoSt')">Habilitado</th>
+        <th data-k="semi" onclick="ordenar('semi')">Patente semirremolque</th>
+        <th data-k="semiSt" onclick="ordenar('semiSt')">Habilitado</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table></div>
+    <p class="hint" id="tabHint"></p>
   </section>
 
-  <section class="card">
-    <h2>Prueba: un contador</h2>
-    <div class="big" id="num">0</div>
-    <div class="row" style="margin-top:10px">
-      <button onclick="sumar()">Sumar 1</button>
-      <button class="secondary" onclick="reiniciar()">Reiniciar</button>
+  <!-- BUSCADOR -->
+  <section class="card" id="secBus" style="display:none">
+    <h2>4. Buscador de habilitaciones</h2>
+    <div class="row">
+      <div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div>
     </div>
+    <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios activos donde aparece.</p>
+    <div id="bres"></div>
   </section>
 
-  <footer>Versión 1 · 25 de septiembre de 2026</footer>
+  <footer id="foot">Yulibeth · Los datos se guardan solo en este navegador.</footer>
 </main>
 
 <script>
-  function reloj(){
-    const f = new Date();
-    document.getElementById('reloj').textContent =
-      'Hora en su computador: ' + f.toLocaleString('es-CL');
-  }
-  reloj(); setInterval(reloj, 1000);
+/* ---------- utilidades ---------- */
+const DIV_MAP = { DTEN:'DET', DAN:'DAND', DSAL:'DSA', DVEN:'DVE' };
+const DIV_NOM = { DCH:'Chuquicamata', DRT:'Radomiro Tomic', DMH:'Ministro Hales', DGM:'Gabriela Mistral', DET:'El Teniente', DAND:'Andina', DSA:'Salvador', DVE:'Ventanas' };
+const KEY_HAB = 'yuli_hab', KEY_SRV = 'yuli_srv';
+const $ = id => document.getElementById(id);
+const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+const normRut = s => String(s ?? '').toUpperCase().replace(/[^0-9K]/g,'');
+const normPat = s => String(s ?? '').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const isSemi = t => /SEMI/i.test(String(t||''));
+const isHab = e => /^HABILITADO/i.test(String(e||'').trim());
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function fmtRut(r){ r = normRut(r); if(r.length<2) return r; const cuerpo=r.slice(0,-1), dv=r.slice(-1); return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+'-'+dv; }
+function fmtFecha(v){
+  if(v==null||v==='') return '';
+  if(v instanceof Date) return isNaN(v)?'':v.toLocaleDateString('es-CL');
+  if(typeof v==='number'){ const d=XLSX.SSF.parse_date_code(v); return d?`${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${d.y}`:''; }
+  const s=String(v).trim(); const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s); // viene como MM/dd/yyyy en el informe
+  if(m) return `${m[2].padStart(2,'0')}/${m[1].padStart(2,'0')}/${m[3]}`;
+  return s.split(' ')[0];
+}
+function num(v){ if(v==null||v==='') return null; const n=Number(String(v).replace(',','.')); return isNaN(n)?null:n; }
+function divDe(dest){ const m=/\(([A-Z]{2,5})\)\s*$/.exec(String(dest||'').trim()); if(!m) return ''; return DIV_MAP[m[1]]||m[1]; }
+function divLabel(code){ return DIV_NOM[code] ? `${DIV_NOM[code]} (${code})` : code; }
+function toast(msg){ let t=$('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.style.cssText='position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c2430;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:70;box-shadow:0 6px 20px rgba(0,0,0,.25)'; document.body.appendChild(t);} t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',3500); }
 
-  const $nota = document.getElementById('nota');
-  const $estado = document.getElementById('estado');
-  try { $nota.value = localStorage.getItem('nota') || ''; } catch(e){}
-  function guardar(){
-    try { localStorage.setItem('nota', $nota.value); } catch(e){}
-    $estado.textContent = 'Guardado. Cierre la pestaña, vuelva a abrir el enlace y la nota seguirá aquí.';
-  }
-  function borrar(){
-    $nota.value = '';
-    try { localStorage.removeItem('nota'); } catch(e){}
-    $estado.textContent = 'Nota borrada.';
-  }
+/* ---------- estado ---------- */
+let HAB = null;   // {file, fecha, cond:[], eq:[]}
+let SRV = null;   // {file, fecha, rows:[]}
+let CRUCE = [];   // filas calculadas
+let SORT = {k:'', dir:1};
 
-  const $num = document.getElementById('num');
-  let n = 0;
-  try { n = parseInt(localStorage.getItem('contador') || '0', 10) || 0; } catch(e){}
-  $num.textContent = n;
-  function sumar(){ n++; $num.textContent = n; try{ localStorage.setItem('contador', n); }catch(e){} }
-  function reiniciar(){ n = 0; $num.textContent = n; try{ localStorage.removeItem('contador'); }catch(e){} }
+/* ---------- lectura de Excel ---------- */
+function idxHeaders(hdr){ const m={}; hdr.forEach((h,i)=>{ const k=norm(h); if(k && m[k]===undefined) m[k]=i; }); return m; }
+function col(m, ...names){ for(const n of names){ const i=m[norm(n)]; if(i!==undefined) return i; } return -1; }
+
+function leerHabilitados(wb, name){
+  const wsC = wb.Sheets[Object.keys(wb.Sheets).find(n=>/conductor/i.test(n))];
+  const wsE = wb.Sheets[Object.keys(wb.Sheets).find(n=>/equipo/i.test(n))];
+  if(!wsC||!wsE) throw new Error('El informe debe tener las pestañas CONDUCTORES y EQUIPOS');
+  const aC = XLSX.utils.sheet_to_json(wsC,{header:1,defval:'',raw:true});
+  const aE = XLSX.utils.sheet_to_json(wsE,{header:1,defval:'',raw:true});
+  const mC = idxHeaders(aC[0]||[]), mE = idxHeaders(aE[0]||[]);
+  const cDiv=col(mC,'División','Division'), cRut=col(mC,'Identificador persona','RUT'), cNom=col(mC,'Nombre completo','Nombre'),
+        cEst=col(mC,'Estado habilitacion conductor','Estado habilitación conductor'), cDias=col(mC,'Días de vigencia restantes','Dias de vigencia restantes'),
+        cFec=col(mC,'Fecha vigencia'), cEmp=col(mC,'Identificador empresa','Nombre fantasía empresa');
+  const eDiv=col(mE,'División','Division'), ePat=col(mE,'Patente'), eTipo=col(mE,'Tipo Vehiculo','Tipo Vehículo'),
+        eEst=col(mE,'Estado habilitación equipo','Estado habilitacion equipo'), eDias=col(mE,'Dias de vigencia restantes','Días de vigencia restantes'),
+        eFec=col(mE,'Fecha expiracion','Fecha expiración'), eEmp=col(mE,'Nombre fantasía empresa');
+  if([cDiv,cRut,cNom,cEst,cDias].includes(-1)) throw new Error('CONDUCTORES: no encuentro las columnas División / Identificador persona / Nombre completo / Estado habilitacion conductor / Días de vigencia restantes');
+  if([eDiv,ePat,eTipo,eEst,eDias].includes(-1)) throw new Error('EQUIPOS: no encuentro las columnas División / Patente / Tipo Vehiculo / Estado habilitación equipo / Dias de vigencia restantes');
+  const cond=[], eq=[];
+  for(let i=1;i<aC.length;i++){ const r=aC[i]; const rut=normRut(r[cRut]); if(!rut) continue;
+    cond.push({div:String(r[cDiv]).trim().toUpperCase(), rut, nom:String(r[cNom]).trim(), est:String(r[cEst]).trim(), dias:num(r[cDias]), fecha:fmtFecha(r[cFec]), emp:cEmp>=0?String(r[cEmp]).trim():''}); }
+  for(let i=1;i<aE.length;i++){ const r=aE[i]; const pat=normPat(r[ePat]); if(!pat) continue;
+    eq.push({div:String(r[eDiv]).trim().toUpperCase(), pat, tipo:String(r[eTipo]).trim().toUpperCase(), est:String(r[eEst]).trim(), dias:num(r[eDias]), fecha:fmtFecha(r[eFec]), emp:eEmp>=0?String(r[eEmp]).trim():''}); }
+  return {file:name, fecha:new Date().toISOString(), cond, eq};
+}
+
+function leerServicios(wb, name){
+  let ws=null;
+  for(const n of Object.keys(wb.Sheets)){ const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,range:0,defval:''}); if(a[0] && idxHeaders(a[0])[norm('Id Pedido')]!==undefined){ ws=wb.Sheets[n]; break; } }
+  if(!ws) throw new Error('No encuentro una pestaña con la columna "Id Pedido"');
+  const a = XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+  const m = idxHeaders(a[0]);
+  const c = {
+    id:col(m,'Id Pedido'), cat:col(m,'Categoria','Categoría'), dest:col(m,'Bodega Destino'), estV:col(m,'Estado Viaje'), estP:col(m,'Estado Pedido'),
+    emp:col(m,'Proveedor TTE','Proveedor'), tracto:col(m,'Patente Principal'), semi:col(m,'Patente Secundaria'), chofer:col(m,'Chofer'),
+    rut:col(m,'Rut Conductor','RUT Conductor'), tipo:col(m,'Tipo Vehiculo Principal'), fcar:col(m,'Fecha Plan Carga'), fdes:col(m,'Fecha Plan Descarga'), orig:col(m,'Bodega Origen'), viaje:col(m,'Id Viaje')
+  };
+  const falta = Object.entries(c).filter(([k,v])=>v<0 && ['id','dest','estV','tracto','rut'].includes(k)).map(([k])=>k);
+  if(falta.length) throw new Error('Punto a Punto: faltan columnas: '+falta.join(', '));
+  const g=(r,i)=> i>=0 ? String(r[i]??'').trim() : '';
+  const rows=[];
+  for(let i=1;i<a.length;i++){ const r=a[i]; if(!g(r,c.id)) continue;
+    rows.push({ id:g(r,c.id), cat:g(r,c.cat), dest:g(r,c.dest), estV:g(r,c.estV), estP:g(r,c.estP), emp:g(r,c.emp), tracto:normPat(g(r,c.tracto)), semi:normPat(g(r,c.semi)),
+      chofer:g(r,c.chofer), rut:normRut(g(r,c.rut)), tipo:g(r,c.tipo), fcar:g(r,c.fcar), fdes:g(r,c.fdes), orig:g(r,c.orig), viaje:g(r,c.viaje) }); }
+  return {file:name, fecha:new Date().toISOString(), rows};
+}
+
+async function archivos(files){
+  if(!files||!files.length) return;
+  for(const f of files){
+    try{
+      const buf = await f.arrayBuffer();
+      await ingestBuffer(f.name, buf);
+    }catch(e){ console.error(e); toast('Error en '+f.name+': '+e.message); }
+  }
+  $('fi').value='';
+}
+async function ingestBuffer(name, buf){
+  const wb = XLSX.read(buf,{type:'array',cellDates:false});
+  const names = Object.keys(wb.Sheets);
+  if(names.some(n=>/conductor/i.test(n)) && names.some(n=>/equipo/i.test(n))){
+    HAB = leerHabilitados(wb, name); guardar(KEY_HAB, HAB); toast(`Habilitados: ${HAB.cond.length} conductores y ${HAB.eq.length} equipos`);
+  } else {
+    SRV = leerServicios(wb, name); guardar(KEY_SRV, SRV); toast(`Servicios: ${SRV.rows.length} filas`);
+  }
+  refrescar();
+}
+function guardar(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('No se pudo guardar en el navegador: '+e.message); } }
+function cargarGuardado(){ try{ HAB=JSON.parse(localStorage.getItem(KEY_HAB)||'null'); SRV=JSON.parse(localStorage.getItem(KEY_SRV)||'null'); }catch(e){} }
+function limpiarTodo(){ if(!confirm('¿Borrar los archivos cargados de este navegador?')) return; localStorage.removeItem(KEY_HAB); localStorage.removeItem(KEY_SRV); HAB=null; SRV=null; CRUCE=[]; refrescar(); }
+
+/* ---------- cruce ---------- */
+let IDX = {cond:new Map(), eq:new Map()};
+function indexar(){
+  IDX = {cond:new Map(), eq:new Map()};
+  if(!HAB) return;
+  for(const r of HAB.cond){ const k=r.div+'|'+r.rut; const p=IDX.cond.get(k); if(!p || mejor(r,p)) IDX.cond.set(k,r); }
+  for(const r of HAB.eq){ const k=r.div+'|'+r.pat; const p=IDX.eq.get(k); if(!p || mejor(r,p)) IDX.eq.set(k,r); }
+}
+function mejor(a,b){ const ha=isHab(a.est), hb=isHab(b.est); if(ha!==hb) return ha; return (a.dias??-1e9) > (b.dias??-1e9); }
+function estado(rec){
+  if(!rec) return {cls:'bad', txt:'No registrado', orden:0, dias:null};
+  if(!isHab(rec.est)) return {cls:'bad', txt:rec.est||'No habilitado', orden:0, dias:rec.dias};
+  if(rec.dias!=null && rec.dias<11) return {cls:'warn', txt:`Vence en ${rec.dias} día${rec.dias===1?'':'s'}`, orden:1, dias:rec.dias};
+  return {cls:'ok', txt: rec.dias!=null ? `OK · ${rec.dias} días` : 'OK', orden:2, dias:rec.dias};
+}
+function estadoEquipo(div, pat, quiereSemi){
+  if(!pat) return {cls:'na', txt: quiereSemi?'Sin semirremolque':'Sin patente', orden:3, dias:null, rec:null};
+  const rec = IDX.eq.get(div+'|'+pat);
+  if(rec && isSemi(rec.tipo)!==quiereSemi) return {cls:'bad', txt:'Registrado como '+rec.tipo.toLowerCase(), orden:0, dias:rec.dias, rec};
+  const s = estado(rec); s.rec=rec; return s;
+}
+function calcular(){
+  CRUCE=[]; indexar();
+  if(!HAB||!SRV) return;
+  for(const s of SRV.rows){
+    const div = divDe(s.dest); if(!div) continue;
+    const rc = IDX.cond.get(div+'|'+s.rut);
+    const condSt = estado(rc);
+    const tractoSt = estadoEquipo(div, s.tracto, false);
+    const semiSt = estadoEquipo(div, s.semi, true);
+    const peor = Math.min(condSt.orden, tractoSt.orden, semiSt.orden===3?9:semiSt.orden);
+    CRUCE.push({ ...s, div, divN:divLabel(div), cond: rc?rc.nom:(s.chofer||''), condRec:rc, condSt, tractoSt, semiSt, peor, activo: /^activo$/i.test(s.estV) });
+  }
+}
+
+/* ---------- render ---------- */
+function refrescar(){
+  const fh=$('fHab'), fs=$('fSrv');
+  fh.classList.toggle('ok',!!HAB); fs.classList.toggle('ok',!!SRV);
+  fh.querySelector('span:last-child').textContent = HAB ? `${HAB.file} · ${HAB.cond.length} conductores, ${HAB.eq.length} equipos · ${new Date(HAB.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
+  fs.querySelector('span:last-child').textContent = SRV ? `${SRV.file} · ${SRV.rows.length} servicios · ${new Date(SRV.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
+  calcular();
+  const listo = !!(HAB&&SRV);
+  $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none';
+  $('secBus').style.display = HAB?'':'none';
+  $('btnXls').disabled = !listo;
+  if(listo){ llenarFiltros(); render(); }
+  if(HAB) buscar();
+}
+function llenarFiltros(){
+  const sd=$('fDiv'), se=$('fEmp'); const vd=sd.value, ve=se.value;
+  const divs=[...new Set(CRUCE.map(r=>r.div))].sort(); const emps=[...new Set(CRUCE.map(r=>r.emp).filter(Boolean))].sort();
+  sd.innerHTML='<option value="">Todas las divisiones</option>'+divs.map(d=>`<option value="${d}">${esc(divLabel(d))}</option>`).join('');
+  se.innerHTML='<option value="">Todas las empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+  sd.value=vd; se.value=ve;
+}
+function stHTML(s, extra){ return `<div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${esc(s.txt)}</span></div>${extra?`<span class="sub">${esc(extra)}</span>`:''}`; }
+function filas(){
+  const q=norm($('q').value), fd=$('fDiv').value, fe=$('fEmp').value, fe2=$('fEst').value, al=$('fAl').checked;
+  let rows = CRUCE.filter(r => (fe2==='todos'||r.activo) && (!fd||r.div===fd) && (!fe||r.emp===fe) && (!al||r.peor<2));
+  if(q) rows = rows.filter(r => norm([r.id,r.cat,r.divN,r.emp,r.cond,r.chofer,fmtRut(r.rut),r.rut,r.tracto,r.semi,r.dest].join(' ')).includes(q));
+  const k=SORT.k;
+  if(k){ const val = r => k.endsWith('St') ? r[k].orden : (k==='div'? r.divN : (r[k]??'')); rows.sort((a,b)=>{ const va=val(a), vb=val(b); return (va>vb?1:va<vb?-1:0)*SORT.dir; }); }
+  else rows.sort((a,b)=> a.peor-b.peor || a.divN.localeCompare(b.divN) || String(a.id).localeCompare(String(b.id)));
+  return rows;
+}
+function render(){
+  const rows=filas();
+  const tb=$('tb');
+  if(!rows.length){ tb.innerHTML=`<tr><td colspan="10" class="empty">No hay servicios que coincidan con el filtro.</td></tr>`; }
+  else tb.innerHTML = rows.map(r=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">
+    <td><b>${esc(r.id)}</b><span class="sub">${esc(r.estV)}${r.fcar?' · carga '+esc(r.fcar):''}</span></td>
+    <td>${esc(r.cat)}</td>
+    <td>${esc(r.divN)}<span class="sub">${esc(r.dest.replace(/^\d+-/,''))}</span></td>
+    <td>${esc(r.emp)}</td>
+    <td>${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}${r.condRec&&r.chofer&&norm(r.condRec.nom)!==norm(r.chofer)?' · en servicio: '+esc(r.chofer):''}</span></td>
+    <td>${stHTML(r.condSt, r.condRec&&r.condRec.fecha?'vigencia '+r.condRec.fecha:'')}</td>
+    <td><span class="plate">${esc(r.tracto)||'—'}</span><span class="sub">${esc(r.tipo)}</span></td>
+    <td>${stHTML(r.tractoSt, r.tractoSt.rec&&r.tractoSt.rec.fecha?'vence '+r.tractoSt.rec.fecha:'')}</td>
+    <td><span class="plate">${esc(r.semi)||'—'}</span></td>
+    <td>${stHTML(r.semiSt, r.semiSt.rec&&r.semiSt.rec.fecha?'vence '+r.semiSt.rec.fecha:'')}</td>
+  </tr>`).join('');
+  document.querySelectorAll('#tab th').forEach(th=>{ th.innerHTML = th.textContent.replace(/[▲▼]$/,'').trim() + (th.dataset.k===SORT.k?` <span class="arr">${SORT.dir>0?'▲':'▼'}</span>`:''); });
+  const act = CRUCE.filter(r=>r.activo).length;
+  const sinDiv = SRV.rows.filter(r=>/^activo$/i.test(r.estV) && !divDe(r.dest)).length;
+  $('tabHint').textContent = `Mostrando ${rows.length} de ${act} servicios activos con destino a división. ${sinDiv} servicios activos van a destinos sin código de división y no se muestran porque no requieren acreditación. Haga clic en un encabezado para ordenar.`;
+  kpis();
+}
+function ordenar(k){ if(SORT.k===k) SORT.dir*=-1; else { SORT.k=k; SORT.dir=1; } render(); }
+function kpis(){
+  const a = CRUCE.filter(r=>r.activo);
+  const cnt = (sel, cls) => a.filter(r=>sel(r).cls===cls).length;
+  const tiene = (r,cls) => [r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls===cls);
+  const ok = a.filter(r=>r.peor>=2).length, warn=a.filter(r=>tiene(r,'warn')).length, bad=a.filter(r=>tiene(r,'bad')).length;
+  $('kpis').innerHTML = [
+    ['', a.length, 'Servicios activos a división'],
+    ['ok', ok, 'Servicios sin alertas'],
+    ['warn', warn, 'Con vencimiento < 11 días'],
+    ['bad', bad, 'Con algo no habilitado'],
+    ['bad', cnt(r=>r.condSt,'bad'), 'Conductores no habilitados'],
+    ['bad', cnt(r=>r.tractoSt,'bad'), 'Tractos / camiones no habilitados'],
+    ['bad', cnt(r=>r.semiSt,'bad'), 'Semirremolques no habilitados'],
+  ].map(([c,v,l])=>`<div class="kpi ${c}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+}
+
+/* ---------- buscador ---------- */
+function buscar(){
+  const out=$('bres'); if(!HAB){ out.innerHTML=''; return; }
+  const raw=$('bq').value.trim(); const q=norm(raw); const qr=normRut(raw); const qp=normPat(raw);
+  if(q.length<3){ out.innerHTML='<p class="hint">Escriba al menos 3 caracteres.</p>'; return; }
+  // conductores por RUT o nombre
+  const porRut = new Map();
+  for(const r of HAB.cond){ if((qr.length>=5 && r.rut.includes(qr)) || norm(r.nom).includes(q)){ if(!porRut.has(r.rut)) porRut.set(r.rut,{nom:r.nom, rut:r.rut, divs:[]}); porRut.get(r.rut).divs.push(r); } }
+  const porPat = new Map();
+  for(const r of HAB.eq){ if(qp.length>=3 && r.pat.includes(qp)){ if(!porPat.has(r.pat)) porPat.set(r.pat,{pat:r.pat, tipo:r.tipo, divs:[]}); porPat.get(r.pat).divs.push(r); } }
+  const conds=[...porRut.values()].slice(0,15), pats=[...porPat.values()].slice(0,15);
+  // servicios de la planilla donde aparece (activos primero)
+  const srvDe = (fn) => (SRV? SRV.rows.filter(fn) : []).sort((a,b)=> (/^activo$/i.test(b.estV)?1:0)-(/^activo$/i.test(a.estV)?1:0)).slice(0,8);
+  const chips = divs => `<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=estado(d); return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')}</div>`;
+  const tablaSrv = (rows, keyFn) => rows.length ? `<div class="tw" style="margin-top:8px"><table><thead><tr><th>Pedido</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Habilitado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st = div? keyFn(div,s) : {cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.id)}</b></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):s.dest.replace(/^\d+-/,''))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>` : '<p class="hint">No aparece en la planilla Punto a Punto.</p>';
+  let html='';
+  for(const c of conds){
+    html += `<div class="res"><h3>${esc(c.nom)} <span class="sub">RUT ${esc(fmtRut(c.rut))}</span></h3>${chips(c.divs)}${tablaSrv(srvDe(s=>s.rut===c.rut), (div,s)=>estado(IDX.cond.get(div+'|'+s.rut)))}</div>`;
+  }
+  for(const p of pats){
+    const semi = isSemi(p.tipo);
+    html += `<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat), (div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
+  }
+  // conductores que están en la planilla pero no en el informe
+  if(!conds.length && !pats.length && SRV){
+    const enSrv = SRV.rows.filter(s=> (qr.length>=5 && s.rut.includes(qr)) || norm(s.chofer).includes(q) || (qp.length>=3 && (s.tracto.includes(qp)||s.semi.includes(qp)))).slice(0,8);
+    if(enSrv.length) html += `<div class="res"><h3>No está en el informe de habilitados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está habilitado en ninguna división.</p>${tablaSrv(enSrv,(div,s)=>({cls:'bad',txt:'No registrado'}))}</div>`;
+  }
+  out.innerHTML = html || '<p class="hint">Sin resultados.</p>';
+}
+
+/* ---------- exportar ---------- */
+function exportar(){
+  const rows=filas();
+  const aoa=[['Id pedido','Estado viaje','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor habilitado','Vigencia conductor','Patente tracto/camión','Tipo','Tracto habilitado','Vence tracto','Patente semirremolque','Semirremolque habilitado','Vence semirremolque']];
+  for(const r of rows) aoa.push([r.id,r.estV,r.cat,r.divN,r.dest,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condRec?r.condRec.fecha:'',r.tracto,r.tipo,r.tractoSt.txt,r.tractoSt.rec?r.tractoSt.rec.fecha:'',r.semi,r.semiSt.txt,r.semiSt.rec?r.semiSt.rec.fecha:'']);
+  const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=aoa[0].map((h,i)=>({wch:Math.min(40,Math.max(10,...aoa.map(r=>String(r[i]??'').length)))}));
+  XLSX.utils.book_append_sheet(wb,ws,'Cruce'); XLSX.writeFile(wb,`cruce_habilitaciones_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ---------- drag & drop ---------- */
+const dz=$('drop');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over');}));
+dz.addEventListener('drop',e=>archivos(e.dataTransfer.files));
+
+cargarGuardado(); refrescar();
 </script>
 </body>
 </html>
