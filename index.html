@@ -10,19 +10,19 @@
     --bg:#f3f5f7; --card:#ffffff; --text:#1c2430; --muted:#5b6b7c; --line:#dde3ea;
     --accent:#1f7a4d; --accent-soft:#e3f3ea;
     --ok:#1f7a4d; --ok-soft:#e3f3ea; --warn:#c98a00; --warn-soft:#fff3d6; --bad:#c0392b; --bad-soft:#fde3e0; --na:#8a97a5; --na-soft:#eef1f4;
-    --thead:#f7f9fb;
+    --thead:#f7f9fb; --shadow:0 12px 40px rgba(0,0,0,.25);
   }
   @media (prefers-color-scheme: dark){
     :root{
       --bg:#0f1418; --card:#171e25; --text:#e8edf2; --muted:#9aa8b6; --line:#2a333d;
       --accent:#4fbf82; --accent-soft:#16301f;
       --ok:#4fbf82; --ok-soft:#16301f; --warn:#f0b429; --warn-soft:#3a2d08; --bad:#ff6b5b; --bad-soft:#3d1a16; --na:#8a97a5; --na-soft:#222a33;
-      --thead:#1c242c;
+      --thead:#1c242c; --shadow:0 12px 40px rgba(0,0,0,.6);
     }
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;padding:16px}
-  main{max-width:1280px;margin:0 auto}
+  main{max-width:1320px;margin:0 auto}
   header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;padding:12px 0 8px}
   h1{margin:0;font-size:1.6rem;letter-spacing:-.02em}
   header p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
@@ -37,8 +37,8 @@
   button:disabled{opacity:.5;cursor:default}
   .hint{color:var(--muted);font-size:.88rem;margin:8px 0 0}
   label.chk{display:inline-flex;gap:6px;align-items:center;font-size:.95rem}
-  /* zona de carga */
-  .drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+  /* carga */
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
   .drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
   .drop strong{color:var(--text)}
   .files{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:12px}
@@ -47,42 +47,62 @@
   .file.ok .st{background:var(--ok)}
   .file b{display:block;font-size:.95rem}
   .file span{color:var(--muted);font-size:.85rem}
+  /* tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+  .tab{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:600;cursor:pointer}
+  .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tab .n{display:inline-block;min-width:22px;padding:0 6px;border-radius:999px;background:rgba(0,0,0,.12);font-size:.8rem;margin-left:6px;text-align:center}
+  .tab.on .n{background:rgba(255,255,255,.25)}
+  .panel{display:none} .panel.on{display:block}
   /* kpis */
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
   .kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
   .kpi .v{font-size:1.6rem;font-weight:700;line-height:1.1}
   .kpi .l{color:var(--muted);font-size:.85rem}
   .kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--warn)} .kpi.bad .v{color:var(--bad)}
-  /* tabla */
-  .tw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px}
+  /* tablas */
+  .tw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px;max-height:72vh}
   table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:960px}
   th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-  td:nth-child(3){min-width:170px} td:nth-child(4){min-width:150px} td:nth-child(5){min-width:190px}
-  th{background:var(--thead);position:sticky;top:0;font-weight:600;font-size:.82rem;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none}
-  th .arr{opacity:.5;font-size:.75rem}
+  th{background:var(--thead);position:sticky;top:0;font-weight:600;font-size:.82rem;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;z-index:1}
+  th .arr{opacity:.6;font-size:.75rem}
   tr:last-child td{border-bottom:0}
   tr.r-bad td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
   tr.r-warn td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
   tr.r-ok td:first-child{box-shadow:inset 4px 0 0 var(--ok)}
+  td.dbl{cursor:pointer} td.dbl:hover{background:var(--accent-soft)}
   .sub{display:block;color:var(--muted);font-size:.8rem}
+  .why{display:block;font-size:.8rem;margin-top:2px}
+  .why.bad{color:var(--bad)} .why.warn{color:var(--warn)} .why.na{color:var(--muted)}
   .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:6px;flex:none}
   .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)} .dot.na{background:var(--na)}
-  .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:.8rem;font-weight:600;white-space:nowrap}
-  .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.na{background:var(--na-soft);color:var(--na)}
-  .st{display:flex;align-items:center;gap:0;font-size:.85rem;white-space:nowrap}
+  .st{display:flex;align-items:center;font-size:.85rem;white-space:nowrap}
   .st .txt{font-weight:600}
   .st.ok .txt{color:var(--ok)} .st.warn .txt{color:var(--warn)} .st.bad .txt{color:var(--bad)} .st.na .txt{color:var(--na)}
   .plate{font-family:ui-monospace,Consolas,monospace;font-weight:600;letter-spacing:.02em}
   .empty{padding:28px;text-align:center;color:var(--muted)}
   .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.85rem;margin-top:8px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.78rem;font-weight:600;margin:1px 3px 1px 0;white-space:nowrap}
+  .tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.na{background:var(--na-soft);color:var(--na)}
   /* buscador */
   .res{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
   .res h3{margin:0 0 6px;font-size:1rem}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
   .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.85rem}
   .chip b{font-weight:700}
-  .res table{min-width:0}
+  .res table,.modal table{min-width:0}
+  /* modal */
+  #modalBg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+  #modalBg.on{display:flex}
+  .modal{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:14px;max-width:820px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)}
+  .modal .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
+  .modal .mh h3{margin:0;font-size:1.05rem}
+  .modal .mb{padding:14px 16px}
+  .modal .x{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:4px 10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 14px;margin:6px 0 12px}
+  .kv div{font-size:.9rem} .kv b{display:block;color:var(--muted);font-weight:600;font-size:.78rem}
   footer{color:var(--muted);font-size:.82rem;padding:22px 0;text-align:center}
+  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c2430;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:70;box-shadow:0 6px 20px rgba(0,0,0,.25);display:none}
   @media (max-width:700px){ body{padding:12px} h1{font-size:1.3rem} }
 </style>
 </head>
@@ -94,16 +114,15 @@
       <p>Cruce entre los servicios Punto a Punto y el informe de conductores y equipos habilitados por división.</p>
     </div>
     <div class="row">
-      <button class="secondary" onclick="exportar()" id="btnXls" disabled>Descargar Excel</button>
       <button class="secondary" onclick="limpiarTodo()">Limpiar datos</button>
     </div>
   </header>
 
   <!-- CARGA -->
   <section class="card">
-    <h2>1. Cargar archivos</h2>
+    <h2>Cargar archivos</h2>
     <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
-      <strong>Suelte aquí los archivos Excel</strong> o haga clic para elegirlos.<br>
+      <strong>Suelte aquí los archivos Excel</strong> o haga clic para elegirlos.
       Se aceptan los dos a la vez: <em>Informe Habilitados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
       <input type="file" id="fi" accept=".xlsx,.xlsm,.xls" multiple style="display:none" onchange="archivos(this.files)">
     </div>
@@ -114,150 +133,276 @@
     <p class="hint">Los archivos se procesan en su navegador y quedan guardados solo en este equipo. Nada se envía a internet.</p>
   </section>
 
-  <!-- RESUMEN -->
-  <section class="card" id="secRes" style="display:none">
-    <h2>2. Resumen de servicios activos a divisiones</h2>
-    <div class="kpis" id="kpis"></div>
-    <div class="legend">
-      <span><span class="dot ok"></span>Habilitado</span>
-      <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
-      <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
-      <span><span class="dot na"></span>No aplica</span>
-    </div>
-  </section>
+  <div class="tabs" id="tabs" style="display:none">
+    <button class="tab on" data-t="cruce" onclick="verTab('cruce')">Cruce de habilitaciones<span class="n" id="nCruce">0</span></button>
+    <button class="tab" data-t="desv" onclick="verTab('desv')">Desviaciones<span class="n" id="nDesv">0</span></button>
+    <button class="tab" data-t="peaje" onclick="verTab('peaje')">Incidencia de peajes<span class="n" id="nPeaje">0</span></button>
+  </div>
 
-  <!-- CRUCE -->
-  <section class="card" id="secTab" style="display:none">
-    <h2>3. Cruce por servicio</h2>
-    <div class="row">
-      <div class="grow"><input type="text" id="q" placeholder="Filtrar: pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
-      <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
-      <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
-      <select id="fEst" onchange="render()">
-        <option value="activo">Solo viajes activos</option>
-        <option value="todos">Todos los estados</option>
-      </select>
-      <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
-    </div>
-    <div class="tw"><table id="tab">
-      <thead><tr>
-        <th data-k="id" onclick="ordenar('id')">Id pedido</th>
-        <th data-k="cat" onclick="ordenar('cat')">Categoría</th>
-        <th data-k="div" onclick="ordenar('div')">Destino / división</th>
-        <th data-k="emp" onclick="ordenar('emp')">Empresa de transporte</th>
-        <th data-k="cond" onclick="ordenar('cond')">Conductor</th>
-        <th data-k="condSt" onclick="ordenar('condSt')">Habilitado</th>
-        <th data-k="tracto" onclick="ordenar('tracto')">Patente tracto / camión</th>
-        <th data-k="tractoSt" onclick="ordenar('tractoSt')">Habilitado</th>
-        <th data-k="semi" onclick="ordenar('semi')">Patente semirremolque</th>
-        <th data-k="semiSt" onclick="ordenar('semiSt')">Habilitado</th>
-      </tr></thead>
-      <tbody id="tb"></tbody>
-    </table></div>
-    <p class="hint" id="tabHint"></p>
-  </section>
+  <!-- ===== CRUCE ===== -->
+  <div class="panel on" id="pCruce">
+    <section class="card" id="secRes" style="display:none">
+      <h2>Resumen de servicios activos a divisiones</h2>
+      <div class="kpis" id="kpis"></div>
+      <div class="legend">
+        <span><span class="dot ok"></span>Habilitado</span>
+        <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
+        <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
+        <span><span class="dot na"></span>No aplica</span>
+      </div>
+    </section>
 
-  <!-- BUSCADOR -->
-  <section class="card" id="secBus" style="display:none">
-    <h2>4. Buscador de habilitaciones</h2>
-    <div class="row">
-      <div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div>
-    </div>
-    <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios activos donde aparece.</p>
-    <div id="bres"></div>
-  </section>
+    <section class="card" id="secTab" style="display:none">
+      <h2>Cruce por servicio</h2>
+      <div class="row">
+        <div class="grow"><input type="text" id="q" placeholder="Filtrar: viaje, pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
+        <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
+        <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
+        <select id="fEst" onchange="render()">
+          <option value="activo">Solo viajes activos</option>
+          <option value="todos">Todos los estados</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
+        <button class="secondary" onclick="exportarCruce()">Descargar Excel</button>
+      </div>
+      <div class="tw"><table id="tab">
+        <thead><tr>
+          <th data-k="viaje">Id viaje</th>
+          <th data-k="cat">Categoría</th>
+          <th data-k="divN">Destino / división</th>
+          <th data-k="emp">Empresa de transporte</th>
+          <th data-k="cond">Conductor</th>
+          <th data-k="condSt">Habilitado</th>
+          <th data-k="tracto">Patente tracto / camión</th>
+          <th data-k="tractoSt">Habilitado</th>
+          <th data-k="semi">Patente semirremolque</th>
+          <th data-k="semiSt">Habilitado</th>
+        </tr></thead>
+        <tbody id="tb"></tbody>
+      </table></div>
+      <p class="hint" id="tabHint"></p>
+    </section>
 
-  <footer id="foot">Yulibeth · Los datos se guardan solo en este navegador.</footer>
+    <section class="card" id="secBus" style="display:none">
+      <h2>Buscador de habilitaciones</h2>
+      <div class="row"><div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div></div>
+      <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios donde aparece. Doble clic en una división abre el detalle.</p>
+      <div id="bres"></div>
+    </section>
+  </div>
+
+  <!-- ===== DESVIACIONES ===== -->
+  <div class="panel" id="pDesv">
+    <section class="card">
+      <h2>Viajes con desviaciones</h2>
+      <div class="kpis" id="kpisDesv"></div>
+      <div class="row" style="margin-top:12px">
+        <div class="grow"><input type="text" id="qd" placeholder="Filtrar: viaje, pedido, empresa, categoría…" oninput="renderDesv()"></div>
+        <select id="fEstD" onchange="renderDesv()">
+          <option value="todos">Todos los estados</option>
+          <option value="activo">Solo viajes activos</option>
+        </select>
+        <select id="fTipoD" onchange="renderDesv()"><option value="">Todas las desviaciones</option></select>
+        <button class="secondary" onclick="exportarDesv()">Descargar Excel</button>
+      </div>
+      <div class="tw"><table id="tabD">
+        <thead><tr>
+          <th data-k="viaje">Id viaje</th>
+          <th data-k="estV">Estado viaje</th>
+          <th data-k="fcar">Fecha carga</th>
+          <th data-k="verif">Verificación</th>
+          <th data-k="cat">Categoría</th>
+          <th data-k="prio">Prioridad</th>
+          <th data-k="tipoPlan">Tipo vehículo plan</th>
+          <th data-k="semi">Patente semirremolque</th>
+          <th data-k="emp">Empresa</th>
+          <th data-k="ndesv">Desviaciones</th>
+        </tr></thead>
+        <tbody id="tbD"></tbody>
+      </table></div>
+      <p class="hint" id="hintD"></p>
+      <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO". Doble clic en un viaje abre su detalle.</p>
+    </section>
+  </div>
+
+  <!-- ===== PEAJES ===== -->
+  <div class="panel" id="pPeaje">
+    <section class="card">
+      <h2>Viajes con incidencia de peajes</h2>
+      <div class="kpis" id="kpisPeaje"></div>
+      <div class="row" style="margin-top:12px">
+        <div class="grow"><input type="text" id="qp" placeholder="Filtrar: viaje, pedido, empresa, patente, origen, destino…" oninput="renderPeaje()"></div>
+        <select id="fEstP" onchange="renderPeaje()">
+          <option value="todos">Todos los estados</option>
+          <option value="activo">Solo viajes activos</option>
+        </select>
+        <select id="fMotP" onchange="renderPeaje()">
+          <option value="">Ambos motivos</option>
+          <option value="hacia">Hacia DCH / DRT / DMH</option>
+          <option value="desde">Desde DCH / DRT / DMH a Antofagasta</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="fSinP" onchange="renderPeaje()"> Solo sin peaje registrado</label>
+        <button class="secondary" onclick="exportarPeaje()">Descargar Excel</button>
+      </div>
+      <div class="tw"><table id="tabP">
+        <thead><tr>
+          <th data-k="viaje">Id viaje</th>
+          <th data-k="estV">Estado viaje</th>
+          <th data-k="fcar">Fecha carga</th>
+          <th data-k="origN">Origen</th>
+          <th data-k="destN">Destino</th>
+          <th data-k="emp">Empresa</th>
+          <th data-k="tracto">Patente</th>
+          <th data-k="motivo">Motivo</th>
+          <th data-k="peajeReg">Peaje registrado</th>
+        </tr></thead>
+        <tbody id="tbP"></tbody>
+      </table></div>
+      <p class="hint" id="hintP"></p>
+      <p class="hint">Se incluyen todos los viajes con destino a Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes que salen desde esas divisiones hacia cualquier destino de Antofagasta. "Peaje registrado" indica si la columna Incidencias Viaje ya trae Cobro o Pago de Peaje.</p>
+    </section>
+  </div>
+
+  <footer>Yulibeth · Los datos se guardan solo en este navegador.</footer>
 </main>
 
+<div id="modalBg" onclick="if(event.target===this) cerrarModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="mh"><h3 id="mTitle"></h3><button class="x" onclick="cerrarModal()">✕</button></div>
+    <div class="mb" id="mBody"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
 <script>
-/* ---------- utilidades ---------- */
+/* ---------- constantes ---------- */
 const DIV_MAP = { DTEN:'DET', DAN:'DAND', DSAL:'DSA', DVEN:'DVE' };
 const DIV_NOM = { DCH:'Chuquicamata', DRT:'Radomiro Tomic', DMH:'Ministro Hales', DGM:'Gabriela Mistral', DET:'El Teniente', DAND:'Andina', DSA:'Salvador', DVE:'Ventanas' };
-const KEY_HAB = 'yuli_hab', KEY_SRV = 'yuli_srv';
+const PEAJE_DIVS = ['DCH','DRT','DMH'];
+const KEY_HAB = 'yuli_hab2', KEY_SRV = 'yuli_srv2';
+// ítems del conductor: columnas W..AF (días) y su fecha de expiración asociada
+const ITEMS_COND = [
+  {id:'credencial', label:'Credencial',                         short:'Credencial',    dias:'dias por vencer credencial',           fecha:'fecha vigencia'},
+  {id:'licInt',     label:'Licencia interna',                   short:'Lic. interna',  dias:'dias por vencer lic interna',          fecha:'fecha expiracion licencia interna'},
+  {id:'defensiva',  label:'Curso de manejo a la defensiva',     short:'Manejo def.',   dias:'dias por vencer curso de manejo',      fecha:'fecha expiracion curso de manejo'},
+  {id:'indEsp',     label:'Inducción específica de áreas',      short:'Ind. específ.', dias:'dias por vencer induccion especifica', fecha:'fecha expiracion induccion especifica'},
+  {id:'licMun',     label:'Licencia municipal',                 short:'Lic. municipal',dias:'dias por vencer lic municipal',        fecha:'fecha expiracion licencia municipal'},
+  {id:'ci',         label:'Cédula de identidad',                short:'Cédula',        dias:'dias por vencer ci',                   fecha:'fecha expiracion ci'},
+  {id:'examen',     label:'Examen batería básica',              short:'Examen',        dias:'dias por vencer examen',               fecha:'fecha expiracion examen'},
+  {id:'psico',      label:'Psicosensométrico',                  short:'Psico',         dias:'dias por vencer psico',                fecha:'fecha expiracion psico'},
+  {id:'indGen',     label:'Inducción general',                  short:'Ind. general',  dias:'dias por vencer induccion general',    fecha:'fecha expiracion induccion general'},
+  {id:'contrato',   label:'Contrato laboral',                   short:'Contrato',      dias:'dias para termino contrato',           fecha:'fecha termino contrato'},
+];
+// patrón Verificación -> categorías permitidas
+const PATRON = {
+  'molibdeno': ['arriendo'],
+  'regular': ['retorno'],
+  'tte cod bc a division': ['directo','barra','catodo','urgencia'],
+  'tte cod de proveedor a division': ['catodo','barra','directo','urgencia'],
+  'tte cod de retiros': ['retiro'],
+  'tte cod de retorno': ['catodo','barra','retorno','retorno dedicado','urgencia'],
+  'tte cod mov. interno': ['mov. interno'],
+  'tte cod moviento entre divisiones': ['directo','retiro','urgencia','retorno dedicado'],
+  'tte cod movimiento entre divisiones': ['directo','retiro','urgencia','retorno dedicado'],
+  'tte cod puerto-bc': ['directo','retiro'],
+};
+
+/* ---------- utilidades ---------- */
 const $ = id => document.getElementById(id);
-const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
 const normRut = s => String(s ?? '').toUpperCase().replace(/[^0-9K]/g,'');
 const normPat = s => String(s ?? '').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const isSemi = t => /SEMI/i.test(String(t||''));
 const isHab = e => /^HABILITADO/i.test(String(e||'').trim());
+const esActivo = s => /^activo$/i.test(String(s||'').trim());
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sinPrefijo = s => String(s||'').replace(/^\d+-\s*/,'');
 function fmtRut(r){ r = normRut(r); if(r.length<2) return r; const cuerpo=r.slice(0,-1), dv=r.slice(-1); return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+'-'+dv; }
 function fmtFecha(v){
   if(v==null||v==='') return '';
   if(v instanceof Date) return isNaN(v)?'':v.toLocaleDateString('es-CL');
   if(typeof v==='number'){ const d=XLSX.SSF.parse_date_code(v); return d?`${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${d.y}`:''; }
-  const s=String(v).trim(); const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s); // viene como MM/dd/yyyy en el informe
-  if(m) return `${m[2].padStart(2,'0')}/${m[1].padStart(2,'0')}/${m[3]}`;
+  const s=String(v).trim(); const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
+  if(m) return `${m[2].padStart(2,'0')}/${m[1].padStart(2,'0')}/${m[3]}`; // el informe trae MM/dd/yyyy
   return s.split(' ')[0];
 }
 function num(v){ if(v==null||v==='') return null; const n=Number(String(v).replace(',','.')); return isNaN(n)?null:n; }
 function divDe(dest){ const m=/\(([A-Z]{2,5})\)\s*$/.exec(String(dest||'').trim()); if(!m) return ''; return DIV_MAP[m[1]]||m[1]; }
 function divLabel(code){ return DIV_NOM[code] ? `${DIV_NOM[code]} (${code})` : code; }
-function toast(msg){ let t=$('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.style.cssText='position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c2430;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:70;box-shadow:0 6px 20px rgba(0,0,0,.25)'; document.body.appendChild(t);} t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',3500); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',3500); }
+function fechaKey(s){ const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String(s||'')); return m?`${m[3]}${m[2].padStart(2,'0')}${m[1].padStart(2,'0')}`:''; }
 
 /* ---------- estado ---------- */
-let HAB = null;   // {file, fecha, cond:[], eq:[]}
-let SRV = null;   // {file, fecha, rows:[]}
-let CRUCE = [];   // filas calculadas
-let SORT = {k:'', dir:1};
+let HAB=null, SRV=null, CRUCE=[], DESV=[], PEAJES=[];
+let SORT={cruce:{k:'',dir:1}, desv:{k:'',dir:1}, peaje:{k:'',dir:1}};
+let LAST={cruce:[], desv:[], peaje:[]};
+let IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map()};
 
 /* ---------- lectura de Excel ---------- */
-function idxHeaders(hdr){ const m={}; hdr.forEach((h,i)=>{ const k=norm(h); if(k && m[k]===undefined) m[k]=i; }); return m; }
-function col(m, ...names){ for(const n of names){ const i=m[norm(n)]; if(i!==undefined) return i; } return -1; }
+function headersNorm(hdr){ return hdr.map(h=>norm(h)); }
+function colExact(hn, ...names){ for(const n of names){ const i=hn.indexOf(norm(n)); if(i>=0) return i; } return -1; }
+function colLike(hn, key){ key=norm(key); return hn.findIndex(h=>h.includes(key)); }
 
 function leerHabilitados(wb, name){
-  const wsC = wb.Sheets[Object.keys(wb.Sheets).find(n=>/conductor/i.test(n))];
-  const wsE = wb.Sheets[Object.keys(wb.Sheets).find(n=>/equipo/i.test(n))];
-  if(!wsC||!wsE) throw new Error('El informe debe tener las pestañas CONDUCTORES y EQUIPOS');
-  const aC = XLSX.utils.sheet_to_json(wsC,{header:1,defval:'',raw:true});
-  const aE = XLSX.utils.sheet_to_json(wsE,{header:1,defval:'',raw:true});
-  const mC = idxHeaders(aC[0]||[]), mE = idxHeaders(aE[0]||[]);
-  const cDiv=col(mC,'División','Division'), cRut=col(mC,'Identificador persona','RUT'), cNom=col(mC,'Nombre completo','Nombre'),
-        cEst=col(mC,'Estado habilitacion conductor','Estado habilitación conductor'), cDias=col(mC,'Días de vigencia restantes','Dias de vigencia restantes'),
-        cFec=col(mC,'Fecha vigencia'), cEmp=col(mC,'Identificador empresa','Nombre fantasía empresa');
-  const eDiv=col(mE,'División','Division'), ePat=col(mE,'Patente'), eTipo=col(mE,'Tipo Vehiculo','Tipo Vehículo'),
-        eEst=col(mE,'Estado habilitación equipo','Estado habilitacion equipo'), eDias=col(mE,'Dias de vigencia restantes','Días de vigencia restantes'),
-        eFec=col(mE,'Fecha expiracion','Fecha expiración'), eEmp=col(mE,'Nombre fantasía empresa');
-  if([cDiv,cRut,cNom,cEst,cDias].includes(-1)) throw new Error('CONDUCTORES: no encuentro las columnas División / Identificador persona / Nombre completo / Estado habilitacion conductor / Días de vigencia restantes');
-  if([eDiv,ePat,eTipo,eEst,eDias].includes(-1)) throw new Error('EQUIPOS: no encuentro las columnas División / Patente / Tipo Vehiculo / Estado habilitación equipo / Dias de vigencia restantes');
+  const nC = Object.keys(wb.Sheets).find(n=>/conductor/i.test(n)), nE = Object.keys(wb.Sheets).find(n=>/equipo/i.test(n));
+  if(!nC||!nE) throw new Error('El informe debe tener las pestañas CONDUCTORES y EQUIPOS');
+  const aC = XLSX.utils.sheet_to_json(wb.Sheets[nC],{header:1,defval:'',raw:true});
+  const aE = XLSX.utils.sheet_to_json(wb.Sheets[nE],{header:1,defval:'',raw:true});
+  const hC = headersNorm(aC[0]||[]), hE = headersNorm(aE[0]||[]);
+  const c = { div:colExact(hC,'División','Division'), rut:colExact(hC,'Identificador persona','RUT'), nom:colExact(hC,'Nombre completo','Nombre'),
+    est:colLike(hC,'estado habilitacion conductor'), dias:colLike(hC,'dias de vigencia restantes'), fecha:colExact(hC,'Fecha vigencia'),
+    emp:colExact(hC,'Identificador empresa','Nombre fantasía empresa'), estC:colExact(hC,'Estado Contrato'), estV:colExact(hC,'Estado vigencia'),
+    estCr:colExact(hC,'Estado credencial'), estL:colExact(hC,'Estado licencia interna') };
+  const items = ITEMS_COND.map(it=>({...it, iD:colLike(hC,it.dias), iF:colLike(hC,it.fecha)}));
+  const e = { div:colExact(hE,'División','Division'), pat:colExact(hE,'Patente'), tipo:colLike(hE,'tipo vehiculo'), est:colLike(hE,'estado habilitacion equipo'),
+    dias:colLike(hE,'dias de vigencia restantes'), fecha:colLike(hE,'fecha expiracion'), emp:colLike(hE,'nombre fantasia empresa'), marca:colExact(hE,'Marca'),
+    modelo:colExact(hE,'Modelo'), anio:colExact(hE,'Año','Anio'), estK:colExact(hE,'Estado'), estCr:colLike(hE,'estado credencial'),
+    revF:colLike(hE,'fecha revision tecnica'), revD:colLike(hE,'dias por rev tec'), venD:colExact(hE,'Dias por vencer','Días por vencer') };
+  if([c.div,c.rut,c.nom,c.est,c.dias].includes(-1)) throw new Error('CONDUCTORES: no encuentro las columnas División / Identificador persona / Nombre completo / Estado habilitacion conductor / Días de vigencia restantes');
+  if([e.div,e.pat,e.tipo,e.est,e.dias].includes(-1)) throw new Error('EQUIPOS: no encuentro las columnas División / Patente / Tipo Vehiculo / Estado habilitación equipo / Dias de vigencia restantes');
+  const g=(r,i)=> i>=0 ? r[i] : '';
   const cond=[], eq=[];
-  for(let i=1;i<aC.length;i++){ const r=aC[i]; const rut=normRut(r[cRut]); if(!rut) continue;
-    cond.push({div:String(r[cDiv]).trim().toUpperCase(), rut, nom:String(r[cNom]).trim(), est:String(r[cEst]).trim(), dias:num(r[cDias]), fecha:fmtFecha(r[cFec]), emp:cEmp>=0?String(r[cEmp]).trim():''}); }
-  for(let i=1;i<aE.length;i++){ const r=aE[i]; const pat=normPat(r[ePat]); if(!pat) continue;
-    eq.push({div:String(r[eDiv]).trim().toUpperCase(), pat, tipo:String(r[eTipo]).trim().toUpperCase(), est:String(r[eEst]).trim(), dias:num(r[eDias]), fecha:fmtFecha(r[eFec]), emp:eEmp>=0?String(r[eEmp]).trim():''}); }
+  for(let i=1;i<aC.length;i++){ const r=aC[i]; const rut=normRut(g(r,c.rut)); if(!rut) continue;
+    cond.push({ div:String(g(r,c.div)).trim().toUpperCase(), rut, nom:String(g(r,c.nom)).trim(), est:String(g(r,c.est)).trim(), dias:num(g(r,c.dias)), fecha:fmtFecha(g(r,c.fecha)),
+      emp:String(g(r,c.emp)).trim(), estC:String(g(r,c.estC)).trim(), estV:String(g(r,c.estV)).trim(), estCr:String(g(r,c.estCr)).trim(), estL:String(g(r,c.estL)).trim(),
+      it: items.map(it=>[ it.iD>=0?num(r[it.iD]):null, it.iF>=0?fmtFecha(r[it.iF]):'' ]) }); }
+  for(let i=1;i<aE.length;i++){ const r=aE[i]; const pat=normPat(g(r,e.pat)); if(!pat) continue;
+    eq.push({ div:String(g(r,e.div)).trim().toUpperCase(), pat, tipo:String(g(r,e.tipo)).trim().toUpperCase(), est:String(g(r,e.est)).trim(), dias:num(g(r,e.dias)), fecha:fmtFecha(g(r,e.fecha)),
+      emp:String(g(r,e.emp)).trim(), marca:String(g(r,e.marca)).trim(), modelo:String(g(r,e.modelo)).trim(), anio:String(g(r,e.anio)).trim(), estK:String(g(r,e.estK)).trim(),
+      estCr:String(g(r,e.estCr)).trim(), revF:fmtFecha(g(r,e.revF)), revD:num(g(r,e.revD)), venD:num(g(r,e.venD)) }); }
   return {file:name, fecha:new Date().toISOString(), cond, eq};
 }
 
 function leerServicios(wb, name){
   let ws=null;
-  for(const n of Object.keys(wb.Sheets)){ const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,range:0,defval:''}); if(a[0] && idxHeaders(a[0])[norm('Id Pedido')]!==undefined){ ws=wb.Sheets[n]; break; } }
+  for(const n of Object.keys(wb.Sheets)){ const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,range:0,defval:''}); if(a[0] && headersNorm(a[0]).includes(norm('Id Pedido'))){ ws=wb.Sheets[n]; break; } }
   if(!ws) throw new Error('No encuentro una pestaña con la columna "Id Pedido"');
   const a = XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
-  const m = idxHeaders(a[0]);
+  const H = a[0].map(h=>String(h).trim()), hn = headersNorm(H);
   const c = {
-    id:col(m,'Id Pedido'), cat:col(m,'Categoria','Categoría'), dest:col(m,'Bodega Destino'), estV:col(m,'Estado Viaje'), estP:col(m,'Estado Pedido'),
-    emp:col(m,'Proveedor TTE','Proveedor'), tracto:col(m,'Patente Principal'), semi:col(m,'Patente Secundaria'), chofer:col(m,'Chofer'),
-    rut:col(m,'Rut Conductor','RUT Conductor'), tipo:col(m,'Tipo Vehiculo Principal'), fcar:col(m,'Fecha Plan Carga'), fdes:col(m,'Fecha Plan Descarga'), orig:col(m,'Bodega Origen'), viaje:col(m,'Id Viaje')
+    id:colExact(hn,'Id Pedido'), viaje:colExact(hn,'Id Viaje'), cat:colExact(hn,'Categoria','Categoría'), verif:colExact(hn,'Verificacion','Verificación'),
+    dest:colExact(hn,'Bodega Destino'), dirDesc:colLike(hn,'direccion descarga pedido'), orig:colExact(hn,'Bodega Origen'), dirCarga:colLike(hn,'direccion carga pedido'),
+    estV:colExact(hn,'Estado Viaje'), estP:colExact(hn,'Estado Pedido'), prio:colExact(hn,'Prioridad'), tipoPlan:colExact(hn,'Tipo Vehiculo Plan'),
+    emp:colExact(hn,'Proveedor TTE','Proveedor'), tracto:colExact(hn,'Patente Principal'), semi:colExact(hn,'Patente Secundaria'), chofer:colExact(hn,'Chofer'), cocond:colExact(hn,'Coconductor'),
+    rut:colExact(hn,'Rut Conductor','RUT Conductor'), tipo:colExact(hn,'Tipo Vehiculo Principal'), tipoSec:colExact(hn,'Tipo Vehiculo Secundario'),
+    fcar:colExact(hn,'Fecha Plan Carga'), fdes:colExact(hn,'Fecha Plan Descarga'), fcre:colExact(hn,'Fecha Creacion','Fecha Creación'), incid:colExact(hn,'Incidencias Viaje'), cliente:colExact(hn,'Cliente'), refExt:colExact(hn,'Referencia Externa')
   };
-  const falta = Object.entries(c).filter(([k,v])=>v<0 && ['id','dest','estV','tracto','rut'].includes(k)).map(([k])=>k);
+  const falta = ['id','viaje','dest','estV','tracto','rut'].filter(k=>c[k]<0);
   if(falta.length) throw new Error('Punto a Punto: faltan columnas: '+falta.join(', '));
   const g=(r,i)=> i>=0 ? String(r[i]??'').trim() : '';
   const rows=[];
-  for(let i=1;i<a.length;i++){ const r=a[i]; if(!g(r,c.id)) continue;
-    rows.push({ id:g(r,c.id), cat:g(r,c.cat), dest:g(r,c.dest), estV:g(r,c.estV), estP:g(r,c.estP), emp:g(r,c.emp), tracto:normPat(g(r,c.tracto)), semi:normPat(g(r,c.semi)),
-      chofer:g(r,c.chofer), rut:normRut(g(r,c.rut)), tipo:g(r,c.tipo), fcar:g(r,c.fcar), fdes:g(r,c.fdes), orig:g(r,c.orig), viaje:g(r,c.viaje) }); }
+  for(let i=1;i<a.length;i++){ const r=a[i]; if(!g(r,c.id) && !g(r,c.viaje)) continue;
+    const noDet=[]; r.forEach((v,j)=>{ if(/no determinado/i.test(String(v))) noDet.push(H[j]||('col '+(j+1))); });
+    rows.push({ id:g(r,c.id), viaje:g(r,c.viaje), cat:g(r,c.cat), verif:g(r,c.verif), dest:g(r,c.dest), dirDesc:g(r,c.dirDesc), orig:g(r,c.orig), dirCarga:g(r,c.dirCarga),
+      estV:g(r,c.estV), estP:g(r,c.estP), prio:g(r,c.prio), tipoPlan:g(r,c.tipoPlan), emp:g(r,c.emp), tracto:normPat(g(r,c.tracto)), semi:normPat(g(r,c.semi)), semiRaw:g(r,c.semi),
+      chofer:g(r,c.chofer), cocond:g(r,c.cocond), rut:normRut(g(r,c.rut)), tipo:g(r,c.tipo), tipoSec:g(r,c.tipoSec), fcar:g(r,c.fcar), fdes:g(r,c.fdes), fcre:g(r,c.fcre),
+      incid:g(r,c.incid), cliente:g(r,c.cliente), refExt:g(r,c.refExt), noDet }); }
   return {file:name, fecha:new Date().toISOString(), rows};
 }
 
 async function archivos(files){
   if(!files||!files.length) return;
-  for(const f of files){
-    try{
-      const buf = await f.arrayBuffer();
-      await ingestBuffer(f.name, buf);
-    }catch(e){ console.error(e); toast('Error en '+f.name+': '+e.message); }
-  }
+  for(const f of files){ try{ await ingestBuffer(f.name, await f.arrayBuffer()); }catch(e){ console.error(e); toast('Error en '+f.name+': '+e.message); } }
   $('fi').value='';
 }
 async function ingestBuffer(name, buf){
@@ -272,17 +417,44 @@ async function ingestBuffer(name, buf){
 }
 function guardar(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('No se pudo guardar en el navegador: '+e.message); } }
 function cargarGuardado(){ try{ HAB=JSON.parse(localStorage.getItem(KEY_HAB)||'null'); SRV=JSON.parse(localStorage.getItem(KEY_SRV)||'null'); }catch(e){} }
-function limpiarTodo(){ if(!confirm('¿Borrar los archivos cargados de este navegador?')) return; localStorage.removeItem(KEY_HAB); localStorage.removeItem(KEY_SRV); HAB=null; SRV=null; CRUCE=[]; refrescar(); }
+function limpiarTodo(){ if(!confirm('¿Borrar los archivos cargados de este navegador?')) return; localStorage.removeItem(KEY_HAB); localStorage.removeItem(KEY_SRV); HAB=null; SRV=null; CRUCE=[]; DESV=[]; PEAJES=[]; refrescar(); }
 
-/* ---------- cruce ---------- */
-let IDX = {cond:new Map(), eq:new Map()};
+/* ---------- índices y estados ---------- */
 function indexar(){
-  IDX = {cond:new Map(), eq:new Map()};
-  if(!HAB) return;
-  for(const r of HAB.cond){ const k=r.div+'|'+r.rut; const p=IDX.cond.get(k); if(!p || mejor(r,p)) IDX.cond.set(k,r); }
-  for(const r of HAB.eq){ const k=r.div+'|'+r.pat; const p=IDX.eq.get(k); if(!p || mejor(r,p)) IDX.eq.set(k,r); }
+  IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map()};
+  if(HAB){
+    for(const r of HAB.cond){ const k=r.div+'|'+r.rut; const p=IDX.cond.get(k); if(!p||mejor(r,p)) IDX.cond.set(k,r); (IDX.condByRut.get(r.rut)||IDX.condByRut.set(r.rut,[]).get(r.rut)).push(r); }
+    for(const r of HAB.eq){ const k=r.div+'|'+r.pat; const p=IDX.eq.get(k); if(!p||mejor(r,p)) IDX.eq.set(k,r); (IDX.eqByPat.get(r.pat)||IDX.eqByPat.set(r.pat,[]).get(r.pat)).push(r); }
+  }
+  if(SRV) for(const s of SRV.rows) IDX.srvByViaje.set(s.viaje, s);
 }
 function mejor(a,b){ const ha=isHab(a.est), hb=isHab(b.est); if(ha!==hb) return ha; return (a.dias??-1e9) > (b.dias??-1e9); }
+
+function itemsCond(rec){ return ITEMS_COND.map((it,i)=>({...it, dias:rec.it?.[i]?.[0] ?? null, fecha:rec.it?.[i]?.[1] ?? ''})); }
+function motivoCond(rec, st){
+  if(!rec){ const otras=(IDX.condByRut.get(st.rut)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No registrado en esta división. Habilitado en '+otras.join(', '):'No aparece en el informe de conductores'; }
+  const its=itemsCond(rec); const venc=its.filter(i=>i.dias!=null&&i.dias<=0), porV=its.filter(i=>i.dias!=null&&i.dias>0&&i.dias<11);
+  if(st.cls==='bad'){
+    if(venc.length) return 'Vencido: '+venc.map(i=>i.short).join(', ');
+    const est=[]; if(rec.estV&&!/^acreditado/i.test(rec.estV)) est.push('vigencia '+rec.estV.toLowerCase()); if(rec.estCr&&!/^habilitada/i.test(rec.estCr)) est.push('credencial '+rec.estCr.toLowerCase()); if(rec.estC&&!/^acreditado/i.test(rec.estC)) est.push('contrato '+rec.estC.toLowerCase()); if(rec.estL&&!/^aprobado/i.test(rec.estL)) est.push('licencia interna '+rec.estL.toLowerCase());
+    return est.length ? est.join(' · ') : 'Sin detalle en el informe';
+  }
+  if(st.cls==='warn') return porV.length ? 'Por vencer: '+porV.map(i=>`${i.short} (${i.dias} d)`).join(', ') : 'Vigencia general por vencer';
+  return '';
+}
+function motivoEq(rec, st, pat, quiereSemi){
+  if(!rec){ if(!pat) return ''; const otras=(IDX.eqByPat.get(pat)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No registrado en esta división. Habilitado en '+otras.join(', '):'No aparece en el informe de equipos'; }
+  if(st.cls==='bad'){
+    if(isSemi(rec.tipo)!==quiereSemi) return 'Tipo distinto al esperado';
+    const m=[];
+    if(rec.revD!=null&&rec.revD<=0) m.push('Revisión técnica vencida'+(rec.revF?' el '+rec.revF:''));
+    if(rec.venD!=null&&rec.venD<=0) m.push('Acreditación vencida'+(rec.fecha?' el '+rec.fecha:''));
+    if(rec.estK&&/caducado/i.test(rec.estK)) m.push('estado CADUCADO');
+    return m.length ? m.join(' · ') : 'Sin detalle en el informe';
+  }
+  if(st.cls==='warn'){ if(rec.revD!=null&&rec.revD<11) return `Revisión técnica vence en ${rec.revD} d`+(rec.revF?' ('+rec.revF+')':''); return 'Vigencia por vencer'+(rec.fecha?' el '+rec.fecha:''); }
+  return '';
+}
 function estado(rec){
   if(!rec) return {cls:'bad', txt:'No registrado', orden:0, dias:null};
   if(!isHab(rec.est)) return {cls:'bad', txt:rec.est||'No habilitado', orden:0, dias:rec.dias};
@@ -290,39 +462,70 @@ function estado(rec){
   return {cls:'ok', txt: rec.dias!=null ? `OK · ${rec.dias} días` : 'OK', orden:2, dias:rec.dias};
 }
 function estadoEquipo(div, pat, quiereSemi){
-  if(!pat) return {cls:'na', txt: quiereSemi?'Sin semirremolque':'Sin patente', orden:3, dias:null, rec:null};
+  if(!pat) return {cls:'na', txt: quiereSemi?'Sin semirremolque':'Sin patente', orden:3, dias:null, rec:null, motivo:''};
   const rec = IDX.eq.get(div+'|'+pat);
-  if(rec && isSemi(rec.tipo)!==quiereSemi) return {cls:'bad', txt:'Registrado como '+rec.tipo.toLowerCase(), orden:0, dias:rec.dias, rec};
-  const s = estado(rec); s.rec=rec; return s;
+  let s;
+  if(rec && isSemi(rec.tipo)!==quiereSemi) s={cls:'bad', txt:'Registrado como '+rec.tipo.toLowerCase(), orden:0, dias:rec.dias};
+  else s=estado(rec);
+  s.rec=rec; s.motivo=motivoEq(rec,s,pat,quiereSemi); return s;
 }
+
+/* ---------- cálculo ---------- */
 function calcular(){
-  CRUCE=[]; indexar();
-  if(!HAB||!SRV) return;
+  CRUCE=[]; DESV=[]; PEAJES=[]; indexar();
+  if(!SRV) return;
   for(const s of SRV.rows){
-    const div = divDe(s.dest); if(!div) continue;
-    const rc = IDX.cond.get(div+'|'+s.rut);
-    const condSt = estado(rc);
-    const tractoSt = estadoEquipo(div, s.tracto, false);
-    const semiSt = estadoEquipo(div, s.semi, true);
-    const peor = Math.min(condSt.orden, tractoSt.orden, semiSt.orden===3?9:semiSt.orden);
-    CRUCE.push({ ...s, div, divN:divLabel(div), cond: rc?rc.nom:(s.chofer||''), condRec:rc, condSt, tractoSt, semiSt, peor, activo: /^activo$/i.test(s.estV) });
+    const activo=esActivo(s.estV);
+    // ---- cruce
+    const div=divDe(s.dest);
+    if(div && HAB){
+      const rc=IDX.cond.get(div+'|'+s.rut);
+      const condSt=estado(rc); condSt.rec=rc; condSt.rut=s.rut; condSt.motivo=motivoCond(rc,condSt);
+      const tractoSt=estadoEquipo(div,s.tracto,false), semiSt=estadoEquipo(div,s.semi,true);
+      const peor=Math.min(condSt.orden,tractoSt.orden,semiSt.orden===3?9:semiSt.orden);
+      CRUCE.push({...s, div, divN:divLabel(div), cond: rc?rc.nom:(s.chofer||''), condRec:rc, condSt, tractoSt, semiSt, peor, activo});
+    }
+    // ---- desviaciones
+    const d=[];
+    const v=norm(s.verif), cat=norm(s.cat);
+    if(v||cat){ const perm=PATRON[v]; if(!perm) d.push({t:'patron', txt:`Verificación no reconocida: ${s.verif||'(vacía)'}`}); else if(!perm.includes(cat)) d.push({t:'patron', txt:`${s.verif} no admite categoría ${s.cat||'(vacía)'}`}); }
+    if(/^urgencia$/i.test(s.prio) && !/^urgencia$/i.test(s.cat)) d.push({t:'urgencia', txt:`Prioridad Urgencia con categoría ${s.cat||'(vacía)'}`});
+    if(/6X4|6X2|CAMA\s*BAJA/i.test(s.tipoPlan) && (!s.semi || /no determinado/i.test(s.semiRaw))) d.push({t:'semi', txt:`${s.tipoPlan} sin patente de semirremolque`});
+    if(s.noDet&&s.noDet.length) d.push({t:'nodet', txt:'NO DETERMINADO en: '+s.noDet.join(', ')});
+    if(d.length) DESV.push({...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)});
+    // ---- peajes
+    const origDiv=divDe(s.orig);
+    const hacia=PEAJE_DIVS.includes(div), desde=PEAJE_DIVS.includes(origDiv) && norm(s.dirDesc).includes('antofagasta');
+    if(hacia||desde){
+      const motivo = hacia ? 'Hacia '+divLabel(div) : 'Desde '+divLabel(origDiv)+' a Antofagasta';
+      const peajeReg=/peaje/i.test(s.incid);
+      PEAJES.push({...s, activo, motivo, tipoMot: hacia?'hacia':'desde', peajeReg, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
+    }
   }
 }
 
-/* ---------- render ---------- */
+/* ---------- render general ---------- */
 function refrescar(){
   const fh=$('fHab'), fs=$('fSrv');
   fh.classList.toggle('ok',!!HAB); fs.classList.toggle('ok',!!SRV);
   fh.querySelector('span:last-child').textContent = HAB ? `${HAB.file} · ${HAB.cond.length} conductores, ${HAB.eq.length} equipos · ${new Date(HAB.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
   fs.querySelector('span:last-child').textContent = SRV ? `${SRV.file} · ${SRV.rows.length} servicios · ${new Date(SRV.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
   calcular();
-  const listo = !!(HAB&&SRV);
-  $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none';
-  $('secBus').style.display = HAB?'':'none';
-  $('btnXls').disabled = !listo;
+  const listo=!!(HAB&&SRV);
+  $('tabs').style.display = SRV?'':'none';
+  $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none'; $('secBus').style.display = HAB?'':'none';
+  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.length;
   if(listo){ llenarFiltros(); render(); }
+  if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); }
   if(HAB) buscar();
 }
+function verTab(t){ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); ['cruce','desv','peaje'].forEach(p=>$('p'+p[0].toUpperCase()+p.slice(1)).classList.toggle('on',p===t)); }
+function thArrows(tableId, st){ document.querySelectorAll('#'+tableId+' th').forEach(th=>{ th.innerHTML = th.textContent.replace(/[▲▼]$/,'').trim() + (th.dataset.k===st.k?` <span class="arr">${st.dir>0?'▲':'▼'}</span>`:''); }); }
+function sortRows(rows, st, val){ if(!st.k) return rows; return rows.sort((a,b)=>{ const va=val(a,st.k), vb=val(b,st.k); return (va>vb?1:va<vb?-1:0)*st.dir; }); }
+function stHTML(s){ return `<div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${esc(s.txt)}</span></div>${s.motivo?`<span class="why ${s.cls}">${esc(s.motivo)}</span>`:''}`; }
+function kpiHTML(list){ return list.map(([c,v,l])=>`<div class="kpi ${c}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join(''); }
+
+/* ---------- CRUCE ---------- */
 function llenarFiltros(){
   const sd=$('fDiv'), se=$('fEmp'); const vd=sd.value, ve=se.value;
   const divs=[...new Set(CRUCE.map(r=>r.div))].sort(); const emps=[...new Set(CRUCE.map(r=>r.emp).filter(Boolean))].sort();
@@ -330,101 +533,217 @@ function llenarFiltros(){
   se.innerHTML='<option value="">Todas las empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
   sd.value=vd; se.value=ve;
 }
-function stHTML(s, extra){ return `<div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${esc(s.txt)}</span></div>${extra?`<span class="sub">${esc(extra)}</span>`:''}`; }
-function filas(){
+function filasCruce(){
   const q=norm($('q').value), fd=$('fDiv').value, fe=$('fEmp').value, fe2=$('fEst').value, al=$('fAl').checked;
-  let rows = CRUCE.filter(r => (fe2==='todos'||r.activo) && (!fd||r.div===fd) && (!fe||r.emp===fe) && (!al||r.peor<2));
-  if(q) rows = rows.filter(r => norm([r.id,r.cat,r.divN,r.emp,r.cond,r.chofer,fmtRut(r.rut),r.rut,r.tracto,r.semi,r.dest].join(' ')).includes(q));
-  const k=SORT.k;
-  if(k){ const val = r => k.endsWith('St') ? r[k].orden : (k==='div'? r.divN : (r[k]??'')); rows.sort((a,b)=>{ const va=val(a), vb=val(b); return (va>vb?1:va<vb?-1:0)*SORT.dir; }); }
-  else rows.sort((a,b)=> a.peor-b.peor || a.divN.localeCompare(b.divN) || String(a.id).localeCompare(String(b.id)));
+  let rows=CRUCE.filter(r=>(fe2==='todos'||r.activo)&&(!fd||r.div===fd)&&(!fe||r.emp===fe)&&(!al||r.peor<2));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.cat,r.divN,r.emp,r.cond,r.chofer,fmtRut(r.rut),r.rut,r.tracto,r.semi,r.dest].join(' ')).includes(q));
+  const st=SORT.cruce;
+  if(st.k) sortRows(rows, st, (r,k)=> k.endsWith('St') ? r[k].orden : (r[k]??''));
+  else rows.sort((a,b)=>a.peor-b.peor||a.divN.localeCompare(b.divN)||String(a.viaje).localeCompare(String(b.viaje)));
   return rows;
 }
 function render(){
-  const rows=filas();
+  const rows=filasCruce(); LAST.cruce=rows;
   const tb=$('tb');
-  if(!rows.length){ tb.innerHTML=`<tr><td colspan="10" class="empty">No hay servicios que coincidan con el filtro.</td></tr>`; }
-  else tb.innerHTML = rows.map(r=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">
-    <td><b>${esc(r.id)}</b><span class="sub">${esc(r.estV)}${r.fcar?' · carga '+esc(r.fcar):''}</span></td>
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="10" class="empty">No hay servicios que coincidan con el filtro.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">
+    <td class="dbl" data-d="viaje" data-i="${i}" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)} · ${esc(r.estV)}${r.fcar?' · carga '+esc(r.fcar):''}</span></td>
     <td>${esc(r.cat)}</td>
-    <td>${esc(r.divN)}<span class="sub">${esc(r.dest.replace(/^\d+-/,''))}</span></td>
+    <td>${esc(r.divN)}<span class="sub">${esc(sinPrefijo(r.dest))}</span></td>
     <td>${esc(r.emp)}</td>
-    <td>${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}${r.condRec&&r.chofer&&norm(r.condRec.nom)!==norm(r.chofer)?' · en servicio: '+esc(r.chofer):''}</span></td>
-    <td>${stHTML(r.condSt, r.condRec&&r.condRec.fecha?'vigencia '+r.condRec.fecha:'')}</td>
-    <td><span class="plate">${esc(r.tracto)||'—'}</span><span class="sub">${esc(r.tipo)}</span></td>
-    <td>${stHTML(r.tractoSt, r.tractoSt.rec&&r.tractoSt.rec.fecha?'vence '+r.tractoSt.rec.fecha:'')}</td>
-    <td><span class="plate">${esc(r.semi)||'—'}</span></td>
-    <td>${stHTML(r.semiSt, r.semiSt.rec&&r.semiSt.rec.fecha?'vence '+r.semiSt.rec.fecha:'')}</td>
+    <td class="dbl" data-d="cond" data-i="${i}" title="Doble clic: detalle del conductor">${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}${r.condRec&&r.chofer&&norm(r.condRec.nom)!==norm(r.chofer)?' · en servicio: '+esc(r.chofer):''}</span></td>
+    <td class="dbl" data-d="cond" data-i="${i}" title="Doble clic: detalle del conductor">${stHTML(r.condSt)}</td>
+    <td class="dbl" data-d="tracto" data-i="${i}" title="Doble clic: detalle del equipo"><span class="plate">${esc(r.tracto)||'—'}</span><span class="sub">${esc(r.tipo)}</span></td>
+    <td class="dbl" data-d="tracto" data-i="${i}" title="Doble clic: detalle del equipo">${stHTML(r.tractoSt)}</td>
+    <td class="dbl" data-d="semi" data-i="${i}" title="Doble clic: detalle del equipo"><span class="plate">${esc(r.semi)||'—'}</span></td>
+    <td class="dbl" data-d="semi" data-i="${i}" title="Doble clic: detalle del equipo">${stHTML(r.semiSt)}</td>
   </tr>`).join('');
-  document.querySelectorAll('#tab th').forEach(th=>{ th.innerHTML = th.textContent.replace(/[▲▼]$/,'').trim() + (th.dataset.k===SORT.k?` <span class="arr">${SORT.dir>0?'▲':'▼'}</span>`:''); });
-  const act = CRUCE.filter(r=>r.activo).length;
-  const sinDiv = SRV.rows.filter(r=>/^activo$/i.test(r.estV) && !divDe(r.dest)).length;
-  $('tabHint').textContent = `Mostrando ${rows.length} de ${act} servicios activos con destino a división. ${sinDiv} servicios activos van a destinos sin código de división y no se muestran porque no requieren acreditación. Haga clic en un encabezado para ordenar.`;
+  thArrows('tab', SORT.cruce);
+  const act=CRUCE.filter(r=>r.activo).length, sinDiv=SRV.rows.filter(r=>esActivo(r.estV)&&!divDe(r.dest)).length;
+  $('tabHint').textContent=`Mostrando ${rows.length} de ${act} servicios activos con destino a división. ${sinDiv} servicios activos van a destinos sin código de división y no se muestran porque no requieren acreditación. Clic en un encabezado ordena; doble clic en una celda abre el detalle.`;
   kpis();
 }
-function ordenar(k){ if(SORT.k===k) SORT.dir*=-1; else { SORT.k=k; SORT.dir=1; } render(); }
 function kpis(){
-  const a = CRUCE.filter(r=>r.activo);
-  const cnt = (sel, cls) => a.filter(r=>sel(r).cls===cls).length;
-  const tiene = (r,cls) => [r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls===cls);
-  const ok = a.filter(r=>r.peor>=2).length, warn=a.filter(r=>tiene(r,'warn')).length, bad=a.filter(r=>tiene(r,'bad')).length;
-  $('kpis').innerHTML = [
-    ['', a.length, 'Servicios activos a división'],
-    ['ok', ok, 'Servicios sin alertas'],
-    ['warn', warn, 'Con vencimiento < 11 días'],
-    ['bad', bad, 'Con algo no habilitado'],
-    ['bad', cnt(r=>r.condSt,'bad'), 'Conductores no habilitados'],
-    ['bad', cnt(r=>r.tractoSt,'bad'), 'Tractos / camiones no habilitados'],
-    ['bad', cnt(r=>r.semiSt,'bad'), 'Semirremolques no habilitados'],
-  ].map(([c,v,l])=>`<div class="kpi ${c}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  const a=CRUCE.filter(r=>r.activo);
+  const tiene=(r,cls)=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls===cls);
+  const cnt=(sel,cls)=>a.filter(r=>sel(r).cls===cls).length;
+  $('kpis').innerHTML=kpiHTML([
+    ['',a.length,'Servicios activos a división'],
+    ['ok',a.filter(r=>r.peor>=2).length,'Servicios sin alertas'],
+    ['warn',a.filter(r=>tiene(r,'warn')).length,'Con vencimiento < 11 días'],
+    ['bad',a.filter(r=>tiene(r,'bad')).length,'Con algo no habilitado'],
+    ['bad',cnt(r=>r.condSt,'bad'),'Conductores no habilitados'],
+    ['bad',cnt(r=>r.tractoSt,'bad'),'Tractos / camiones no habilitados'],
+    ['bad',cnt(r=>r.semiSt,'bad'),'Semirremolques no habilitados'],
+  ]);
 }
+function exportarCruce(){
+  const rows=LAST.cruce;
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor habilitado','Motivo conductor','Vigencia conductor','Patente tracto/camión','Tipo','Tracto habilitado','Motivo tracto','Vence tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque','Vence semirremolque']];
+  for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.cat,r.divN,r.dest,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.condRec?r.condRec.fecha:'',r.tracto,r.tipo,r.tractoSt.txt,r.tractoSt.motivo,r.tractoSt.rec?r.tractoSt.rec.fecha:'',r.semi,r.semiSt.txt,r.semiSt.motivo,r.semiSt.rec?r.semiSt.rec.fecha:'']);
+  descargar(aoa,'Cruce',`cruce_habilitaciones`);
+}
+
+/* ---------- DESVIACIONES ---------- */
+const DESV_NOM={patron:'Patrón Verificación / Categoría', urgencia:'Prioridad Urgencia sin categoría URGENCIA', semi:'Tracto sin patente de semirremolque', nodet:'Columna con NO DETERMINADO'};
+function llenarFiltrosDesv(){ const s=$('fTipoD'); const v=s.value; s.innerHTML='<option value="">Todas las desviaciones</option>'+Object.entries(DESV_NOM).map(([k,l])=>`<option value="${k}">${l}</option>`).join(''); s.value=v; }
+function filasDesv(){
+  const q=norm($('qd').value), fe=$('fEstD').value, ft=$('fTipoD').value;
+  let rows=DESV.filter(r=>(fe==='todos'||r.activo)&&(!ft||r.tipos.includes(ft)));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.cat,r.verif,r.prio,r.emp,r.tipoPlan,r.semi,r.dest,r.desv.map(d=>d.txt).join(' ')].join(' ')).includes(q));
+  const st=SORT.desv;
+  if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(r[k]??''));
+  else rows.sort((a,b)=>(b.activo-a.activo)||fechaKey(b.fcar).localeCompare(fechaKey(a.fcar))||String(b.viaje).localeCompare(String(a.viaje)));
+  return rows;
+}
+function renderDesv(){
+  const rows=filasDesv(); LAST.desv=rows;
+  const tb=$('tbD');
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="10" class="empty">No hay viajes con desviaciones para este filtro.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>`<tr class="r-bad">
+    <td class="dbl" data-d="viaje" data-i="${i}" data-src="desv" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)}</span></td>
+    <td>${esc(r.estV)}</td><td>${esc(r.fcar)}</td><td>${esc(r.verif)}</td><td>${esc(r.cat)}</td><td>${esc(r.prio)}</td><td>${esc(r.tipoPlan)}</td>
+    <td><span class="plate">${esc(r.semiRaw||r.semi)||'—'}</span></td><td>${esc(r.emp)}</td>
+    <td>${r.desv.map(d=>`<span class="tag bad">${esc(d.txt)}</span>`).join('')}</td>
+  </tr>`).join('');
+  thArrows('tabD', SORT.desv);
+  const tot=SRV.rows.length, act=SRV.rows.filter(r=>esActivo(r.estV)).length;
+  $('hintD').textContent=`Mostrando ${rows.length} viajes con desviación de ${DESV.length} detectados en ${tot} viajes de la planilla (${DESV.filter(r=>r.activo).length} de los ${act} activos).`;
+  const c=t=>DESV.filter(r=>r.tipos.includes(t)).length;
+  $('kpisDesv').innerHTML=kpiHTML([['bad',DESV.length,'Viajes con desviación'],['bad',DESV.filter(r=>r.activo).length,'De ellos, activos'],['',c('patron'),'Fuera del patrón Verificación / Categoría'],['',c('urgencia'),'Urgencia sin categoría URGENCIA'],['',c('semi'),'Tracto sin semirremolque'],['',c('nodet'),'Con NO DETERMINADO']]);
+}
+function exportarDesv(){
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Verificación','Categoría','Prioridad','Tipo vehículo plan','Patente principal','Patente secundaria','Empresa','Destino','Desviaciones']];
+  for(const r of LAST.desv) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.verif,r.cat,r.prio,r.tipoPlan,r.tracto,r.semiRaw,r.emp,r.dest,r.desv.map(d=>d.txt).join(' | ')]);
+  descargar(aoa,'Desviaciones','desviaciones');
+}
+
+/* ---------- PEAJES ---------- */
+function filasPeaje(){
+  const q=norm($('qp').value), fe=$('fEstP').value, fm=$('fMotP').value, sin=$('fSinP').checked;
+  let rows=PEAJES.filter(r=>(fe==='todos'||r.activo)&&(!fm||r.tipoMot===fm)&&(!sin||!r.peajeReg));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV].join(' ')).includes(q));
+  const st=SORT.peaje;
+  if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(k==='peajeReg'?(r.peajeReg?1:0):(r[k]??'')));
+  else rows.sort((a,b)=>(b.activo-a.activo)||fechaKey(b.fcar).localeCompare(fechaKey(a.fcar))||String(b.viaje).localeCompare(String(a.viaje)));
+  return rows;
+}
+function renderPeaje(){
+  const rows=filasPeaje(); LAST.peaje=rows;
+  const tb=$('tbP');
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="9" class="empty">No hay viajes para este filtro.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>`<tr class="${r.peajeReg?'r-ok':'r-warn'}">
+    <td class="dbl" data-d="viaje" data-i="${i}" data-src="peaje" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)}</span></td>
+    <td>${esc(r.estV)}</td><td>${esc(r.fcar)}</td>
+    <td>${esc(r.origN)}<span class="sub">${esc(r.dirCarga)}</span></td>
+    <td>${esc(r.destN)}<span class="sub">${esc(r.dirDesc)}</span></td>
+    <td>${esc(r.emp)}</td>
+    <td><span class="plate">${esc(r.tracto)}</span>${r.semi?`<span class="sub plate">${esc(r.semi)}</span>`:''}</td>
+    <td>${esc(r.motivo)}</td>
+    <td>${r.peajeReg?'<span class="tag ok">Sí</span>':'<span class="tag warn">No</span>'}</td>
+  </tr>`).join('');
+  thArrows('tabP', SORT.peaje);
+  $('hintP').textContent=`Mostrando ${rows.length} de ${PEAJES.length} viajes con incidencia de peajes (${PEAJES.filter(r=>r.activo).length} activos).`;
+  $('kpisPeaje').innerHTML=kpiHTML([['',PEAJES.length,'Viajes con peaje'],['',PEAJES.filter(r=>r.tipoMot==='hacia').length,'Hacia DCH / DRT / DMH'],['',PEAJES.filter(r=>r.tipoMot==='desde').length,'Desde DCH / DRT / DMH a Antofagasta'],['ok',PEAJES.filter(r=>r.peajeReg).length,'Con peaje registrado'],['warn',PEAJES.filter(r=>!r.peajeReg).length,'Sin peaje registrado']]);
+}
+function exportarPeaje(){
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Bodega destino','Dirección descarga','Empresa','Patente principal','Patente secundaria','Motivo','Peaje registrado','Incidencias viaje']];
+  for(const r of LAST.peaje) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,r.destN,r.dirDesc,r.emp,r.tracto,r.semi,r.motivo,r.peajeReg?'Sí':'No',r.incid]);
+  descargar(aoa,'Peajes','incidencia_peajes');
+}
+
+/* ---------- ordenar / exportar ---------- */
+document.querySelectorAll('#tab th').forEach(th=>th.addEventListener('click',()=>ordenar('cruce',th.dataset.k,render)));
+document.querySelectorAll('#tabD th').forEach(th=>th.addEventListener('click',()=>ordenar('desv',th.dataset.k,renderDesv)));
+document.querySelectorAll('#tabP th').forEach(th=>th.addEventListener('click',()=>ordenar('peaje',th.dataset.k,renderPeaje)));
+function ordenar(t,k,fn){ const st=SORT[t]; if(!k) return; if(st.k===k) st.dir*=-1; else { st.k=k; st.dir=1; } fn(); }
+function descargar(aoa, hoja, base){
+  const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=aoa[0].map((h,i)=>({wch:Math.min(45,Math.max(10,...aoa.slice(0,300).map(r=>String(r[i]??'').length)))}));
+  XLSX.utils.book_append_sheet(wb,ws,hoja); XLSX.writeFile(wb,`${base}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ---------- modal ---------- */
+function abrirModal(t,html){ $('mTitle').innerHTML=t; $('mBody').innerHTML=html; $('modalBg').classList.add('on'); }
+function cerrarModal(){ $('modalBg').classList.remove('on'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrarModal(); });
+function kv(pairs){ return `<div class="kv">${pairs.filter(p=>p[1]!==undefined&&p[1]!==null&&p[1]!=='').map(([k,v])=>`<div><b>${esc(k)}</b>${v}</div>`).join('')}</div>`; }
+function chipsDivs(recs, quiereSemi){ return `<div class="chips">${recs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=(quiereSemi===undefined)?estado(d):(isSemi(d.tipo)!==quiereSemi?{cls:'bad',txt:'Registrado como '+d.tipo.toLowerCase()}:estado(d)); return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')||'<span class="hint">No aparece en ninguna división.</span>'}</div>`; }
+function estItem(d){ if(d==null) return {cls:'na',txt:'Sin dato'}; if(d<=0) return {cls:'bad',txt:'Vencido'}; if(d<11) return {cls:'warn',txt:'Por vencer'}; return {cls:'ok',txt:'Vigente'}; }
+function modalConductor(div, rut, nomSrv){
+  const rec=IDX.cond.get(div+'|'+rut); const todas=IDX.condByRut.get(rut)||[];
+  const nom=rec?rec.nom:(todas[0]?todas[0].nom:(nomSrv||''));
+  let html='';
+  if(rec){
+    const st=estado(rec); st.motivo=motivoCond(rec,st);
+    html+=kv([['División',esc(divLabel(div))],['Estado habilitación',stHTML(st)],['Días de vigencia restantes',rec.dias??''],['Fecha vigencia',esc(rec.fecha)],['Empresa',esc(rec.emp)],['Estado contrato',esc(rec.estC)],['Estado vigencia',esc(rec.estV)],['Estado credencial',esc(rec.estCr)],['Estado licencia interna',esc(rec.estL)]]);
+    html+=`<div class="tw" style="max-height:none"><table><thead><tr><th>Ítem</th><th>Fecha de vencimiento</th><th>Días</th><th>Estado</th></tr></thead><tbody>${itemsCond(rec).map(i=>{ const s=estItem(i.dias); return `<tr><td>${esc(i.label)}</td><td>${esc(i.fecha)||'—'}</td><td>${i.dias??'—'}</td><td><div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${s.txt}</span></div></td></tr>`; }).join('')}</tbody></table></div>`;
+  } else {
+    html+=`<p><span class="tag bad">No registrado en ${esc(divLabel(div))}</span></p><p class="hint">Este RUT no aparece en la pestaña CONDUCTORES para esta división.</p>`;
+  }
+  html+=`<h4 style="margin:14px 0 4px">Todas las divisiones</h4>${chipsDivs(todas.slice())}`;
+  abrirModal(`${esc(nom)} <span class="sub">RUT ${esc(fmtRut(rut))}</span>`, html);
+}
+function modalEquipo(div, pat, quiereSemi){
+  if(!pat){ abrirModal('Sin patente', '<p class="hint">Este servicio no tiene patente registrada en esta posición.</p>'); return; }
+  const rec=IDX.eq.get(div+'|'+pat); const todas=IDX.eqByPat.get(pat)||[];
+  let html='';
+  if(rec){
+    const st=estadoEquipo(div,pat,quiereSemi);
+    const rt=estItem(rec.revD);
+    html+=kv([['División',esc(divLabel(div))],['Estado habilitación',stHTML(st)],['Tipo',esc(rec.tipo)],['Marca / modelo / año',esc([rec.marca,rec.modelo,rec.anio].filter(Boolean).join(' · '))],['Empresa',esc(rec.emp)],['Días de vigencia restantes',rec.dias??''],['Fecha expiración',esc(rec.fecha)],['Estado',esc(rec.estK)],['Estado credencial',esc(rec.estCr)],['Revisión técnica',`${esc(rec.revF)||'—'} · ${rec.revD??'—'} días <span class="tag ${rt.cls}">${rt.txt}</span>`]]);
+  } else {
+    html+=`<p><span class="tag bad">No registrado en ${esc(divLabel(div))}</span></p><p class="hint">Esta patente no aparece en la pestaña EQUIPOS para esta división.</p>`;
+  }
+  html+=`<h4 style="margin:14px 0 4px">Todas las divisiones</h4>${chipsDivs(todas.slice(), quiereSemi)}`;
+  abrirModal(`<span class="plate">${esc(pat)}</span> <span class="sub">${esc(rec?rec.tipo:(todas[0]?todas[0].tipo:''))}</span>`, html);
+}
+function modalViaje(s){
+  const pairs=[['Id viaje',esc(s.viaje)],['Id pedido',esc(s.id)],['Estado viaje',esc(s.estV)],['Estado pedido',esc(s.estP)],['Categoría',esc(s.cat)],['Verificación',esc(s.verif)],['Prioridad',esc(s.prio)],['Cliente',esc(s.cliente)],['Referencia externa',esc(s.refExt)],['Fecha creación',esc(s.fcre)],['Fecha plan carga',esc(s.fcar)],['Fecha plan descarga',esc(s.fdes)],['Bodega origen',esc(sinPrefijo(s.orig))],['Dirección carga',esc(s.dirCarga)],['Bodega destino',esc(sinPrefijo(s.dest))],['Dirección descarga',esc(s.dirDesc)],['Empresa de transporte',esc(s.emp)],['Tipo vehículo plan',esc(s.tipoPlan)],['Tipo vehículo principal',esc(s.tipo)],['Patente principal',`<span class="plate">${esc(s.tracto)}</span>`],['Tipo vehículo secundario',esc(s.tipoSec)],['Patente secundaria',`<span class="plate">${esc(s.semiRaw||s.semi)||'—'}</span>`],['Chofer',esc(s.chofer)],['RUT conductor',esc(fmtRut(s.rut))],['Coconductor',esc(s.cocond)],['Incidencias viaje',esc(s.incid)]];
+  let html=kv(pairs);
+  const d=DESV.find(x=>x.viaje===s.viaje); if(d) html+=`<h4 style="margin:10px 0 4px">Desviaciones</h4>${d.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}`;
+  const p=PEAJES.find(x=>x.viaje===s.viaje); if(p) html+=`<h4 style="margin:10px 0 4px">Peajes</h4><span class="tag ${p.peajeReg?'ok':'warn'}">${esc(p.motivo)} · ${p.peajeReg?'peaje registrado':'sin peaje registrado'}</span>`;
+  const c=CRUCE.find(x=>x.viaje===s.viaje); if(c) html+=`<h4 style="margin:10px 0 4px">Habilitaciones en ${esc(c.divN)}</h4><div class="chips"><span class="chip"><span class="dot ${c.condSt.cls}"></span><b>Conductor</b> ${esc(c.condSt.txt)}</span><span class="chip"><span class="dot ${c.tractoSt.cls}"></span><b>Tracto</b> ${esc(c.tractoSt.txt)}</span><span class="chip"><span class="dot ${c.semiSt.cls}"></span><b>Semirremolque</b> ${esc(c.semiSt.txt)}</span></div>`;
+  abrirModal(`Viaje ${esc(s.viaje)} <span class="sub">pedido ${esc(s.id)}</span>`, html);
+}
+document.addEventListener('dblclick', e=>{
+  const td=e.target.closest('td.dbl'); if(!td) return;
+  const src=td.dataset.src||'cruce'; const r=LAST[src][+td.dataset.i]; if(!r) return;
+  const d=td.dataset.d;
+  if(d==='viaje') modalViaje(r);
+  else if(d==='cond') modalConductor(r.div, r.rut, r.chofer);
+  else if(d==='tracto') modalEquipo(r.div, r.tracto, false);
+  else if(d==='semi') modalEquipo(r.div, r.semi, true);
+});
 
 /* ---------- buscador ---------- */
 function buscar(){
   const out=$('bres'); if(!HAB){ out.innerHTML=''; return; }
   const raw=$('bq').value.trim(); const q=norm(raw); const qr=normRut(raw); const qp=normPat(raw);
   if(q.length<3){ out.innerHTML='<p class="hint">Escriba al menos 3 caracteres.</p>'; return; }
-  // conductores por RUT o nombre
-  const porRut = new Map();
+  const porRut=new Map();
   for(const r of HAB.cond){ if((qr.length>=5 && r.rut.includes(qr)) || norm(r.nom).includes(q)){ if(!porRut.has(r.rut)) porRut.set(r.rut,{nom:r.nom, rut:r.rut, divs:[]}); porRut.get(r.rut).divs.push(r); } }
-  const porPat = new Map();
+  const porPat=new Map();
   for(const r of HAB.eq){ if(qp.length>=3 && r.pat.includes(qp)){ if(!porPat.has(r.pat)) porPat.set(r.pat,{pat:r.pat, tipo:r.tipo, divs:[]}); porPat.get(r.pat).divs.push(r); } }
   const conds=[...porRut.values()].slice(0,15), pats=[...porPat.values()].slice(0,15);
-  // servicios de la planilla donde aparece (activos primero)
-  const srvDe = (fn) => (SRV? SRV.rows.filter(fn) : []).sort((a,b)=> (/^activo$/i.test(b.estV)?1:0)-(/^activo$/i.test(a.estV)?1:0)).slice(0,8);
-  const chips = divs => `<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=estado(d); return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')}</div>`;
-  const tablaSrv = (rows, keyFn) => rows.length ? `<div class="tw" style="margin-top:8px"><table><thead><tr><th>Pedido</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Habilitado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st = div? keyFn(div,s) : {cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.id)}</b></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):s.dest.replace(/^\d+-/,''))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>` : '<p class="hint">No aparece en la planilla Punto a Punto.</p>';
+  const srvDe=fn=>(SRV?SRV.rows.filter(fn):[]).sort((a,b)=>(esActivo(b.estV)?1:0)-(esActivo(a.estV)?1:0)).slice(0,8);
+  const chips=(divs,onclick)=>`<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=estado(d); return `<span class="chip" style="cursor:pointer" ondblclick="${onclick(d)}"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')}</div>`;
+  const tablaSrv=(rows,keyFn)=>rows.length?`<div class="tw" style="margin-top:8px;max-height:none"><table><thead><tr><th>Viaje</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Habilitado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st=div?keyFn(div,s):{cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.viaje)}</b><span class="sub">pedido ${esc(s.id)}</span></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):sinPrefijo(s.dest))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>`:'<p class="hint">No aparece en la planilla Punto a Punto.</p>';
   let html='';
-  for(const c of conds){
-    html += `<div class="res"><h3>${esc(c.nom)} <span class="sub">RUT ${esc(fmtRut(c.rut))}</span></h3>${chips(c.divs)}${tablaSrv(srvDe(s=>s.rut===c.rut), (div,s)=>estado(IDX.cond.get(div+'|'+s.rut)))}</div>`;
-  }
-  for(const p of pats){
-    const semi = isSemi(p.tipo);
-    html += `<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat), (div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
-  }
-  // conductores que están en la planilla pero no en el informe
+  for(const c of conds) html+=`<div class="res"><h3>${esc(c.nom)} <span class="sub">RUT ${esc(fmtRut(c.rut))}</span></h3>${chips(c.divs, d=>`modalConductor('${d.div}','${c.rut}','')`)}${tablaSrv(srvDe(s=>s.rut===c.rut),(div,s)=>{ const rc=IDX.cond.get(div+'|'+s.rut); const st=estado(rc); st.motivo=motivoCond(rc,{...st,rut:s.rut}); return st; })}</div>`;
+  for(const p of pats) html+=`<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs, d=>`modalEquipo('${d.div}','${p.pat}',${isSemi(p.tipo)})`)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat),(div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
   if(!conds.length && !pats.length && SRV){
-    const enSrv = SRV.rows.filter(s=> (qr.length>=5 && s.rut.includes(qr)) || norm(s.chofer).includes(q) || (qp.length>=3 && (s.tracto.includes(qp)||s.semi.includes(qp)))).slice(0,8);
-    if(enSrv.length) html += `<div class="res"><h3>No está en el informe de habilitados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está habilitado en ninguna división.</p>${tablaSrv(enSrv,(div,s)=>({cls:'bad',txt:'No registrado'}))}</div>`;
+    const enSrv=SRV.rows.filter(s=>(qr.length>=5 && s.rut.includes(qr)) || norm(s.chofer).includes(q) || (qp.length>=3 && (s.tracto.includes(qp)||s.semi.includes(qp)))).slice(0,8);
+    if(enSrv.length) html+=`<div class="res"><h3>No está en el informe de habilitados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está habilitado en ninguna división.</p>${tablaSrv(enSrv,()=>({cls:'bad',txt:'No registrado'}))}</div>`;
   }
-  out.innerHTML = html || '<p class="hint">Sin resultados.</p>';
+  out.innerHTML=html||'<p class="hint">Sin resultados.</p>';
 }
 
-/* ---------- exportar ---------- */
-function exportar(){
-  const rows=filas();
-  const aoa=[['Id pedido','Estado viaje','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor habilitado','Vigencia conductor','Patente tracto/camión','Tipo','Tracto habilitado','Vence tracto','Patente semirremolque','Semirremolque habilitado','Vence semirremolque']];
-  for(const r of rows) aoa.push([r.id,r.estV,r.cat,r.divN,r.dest,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condRec?r.condRec.fecha:'',r.tracto,r.tipo,r.tractoSt.txt,r.tractoSt.rec?r.tractoSt.rec.fecha:'',r.semi,r.semiSt.txt,r.semiSt.rec?r.semiSt.rec.fecha:'']);
-  const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=aoa[0].map((h,i)=>({wch:Math.min(40,Math.max(10,...aoa.map(r=>String(r[i]??'').length)))}));
-  XLSX.utils.book_append_sheet(wb,ws,'Cruce'); XLSX.writeFile(wb,`cruce_habilitaciones_${new Date().toISOString().slice(0,10)}.xlsx`);
-}
-
-/* ---------- drag & drop ---------- */
+/* ---------- drag & drop e inicio ---------- */
 const dz=$('drop');
 ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over');}));
 ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over');}));
 dz.addEventListener('drop',e=>archivos(e.dataTransfer.files));
-
 cargarGuardado(); refrescar();
 </script>
 </body>
