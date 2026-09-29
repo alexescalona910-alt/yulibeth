@@ -221,7 +221,7 @@
         <tbody id="tbD"></tbody>
       </table></div>
       <p class="hint" id="hintD"></p>
-      <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO". Doble clic en un viaje abre su detalle.</p>
+      <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO", salvo en camiones rígidos (15, 10, 5, 3/4 t) y camionetas, que no llevan semirremolque. Doble clic en un viaje abre su detalle.</p>
     </section>
   </div>
 
@@ -237,9 +237,12 @@
           <option value="activo">Solo viajes activos</option>
         </select>
         <select id="fMotP" onchange="renderPeaje()">
-          <option value="">Ambos motivos</option>
-          <option value="hacia">Hacia DCH / DRT / DMH</option>
-          <option value="desde">Desde DCH / DRT / DMH a Antofagasta</option>
+          <option value="">Todos los orígenes</option>
+          <option value="Santiago">Desde Santiago hacia DCH / DRT / DMH</option>
+          <option value="Antofagasta">Desde Antofagasta hacia DCH / DRT / DMH</option>
+          <option value="Salvador">Desde Salvador hacia DCH / DRT / DMH</option>
+          <option value="Andina">Desde Andina hacia DCH / DRT / DMH</option>
+          <option value="Hacia Antofagasta">Desde DCH / DRT / DMH a Antofagasta</option>
         </select>
         <label class="chk"><input type="checkbox" id="fSinP" onchange="renderPeaje()"> Solo sin peaje registrado</label>
         <button class="secondary" onclick="exportarPeaje()">Descargar Excel</button>
@@ -259,7 +262,7 @@
         <tbody id="tbP"></tbody>
       </table></div>
       <p class="hint" id="hintP"></p>
-      <p class="hint">Se incluyen todos los viajes con destino a Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes que salen desde esas divisiones hacia cualquier destino de Antofagasta. "Peaje registrado" indica si la columna Incidencias Viaje ya trae Cobro o Pago de Peaje.</p>
+      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, desde Antofagasta, desde Salvador o desde Andina hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. "Peaje registrado" indica si la columna Incidencias Viaje ya trae Cobro o Pago de Peaje.</p>
     </section>
   </div>
 
@@ -279,6 +282,21 @@
 const DIV_MAP = { DTEN:'DET', DAN:'DAND', DSAL:'DSA', DVEN:'DVE' };
 const DIV_NOM = { DCH:'Chuquicamata', DRT:'Radomiro Tomic', DMH:'Ministro Hales', DGM:'Gabriela Mistral', DET:'El Teniente', DAND:'Andina', DSA:'Salvador', DVE:'Ventanas' };
 const PEAJE_DIVS = ['DCH','DRT','DMH'];
+// comunas de la Región Metropolitana (origen "Santiago" para peajes)
+const SANTIAGO = new Set(['santiago','cerrillos','cerro navia','conchali','el bosque','estacion central','huechuraba','independencia','la cisterna','la florida','la granja','la pintana','la reina','las condes','lo barnechea','lo espejo','lo prado','macul','maipu','nunoa','pedro aguirre cerda','penalolen','providencia','pudahuel','quilicura','quinta normal','recoleta','renca','san joaquin','san miguel','san ramon','vitacura','puente alto','pirque','san jose de maipo','colina','lampa','tiltil','til til','san bernardo','buin','calera de tango','paine','melipilla','alhue','curacavi','maria pinto','san pedro','talagante','el monte','isla de maipo','padre hurtado','penaflor']);
+const SALVADOR = new Set(['el salvador','diego de almagro','salvador']);
+const ANDINA = new Set(['los andes','saladillo','andina','san felipe','calle larga','rinconada']);
+function comunaDe(dir){ const t=String(dir||'').trim(); const i=t.lastIndexOf('-'); return norm(i>=0?t.slice(i+1):''); }
+// zona de origen para peajes: Santiago / Antofagasta / Salvador / Andina, o '' si no aplica (Calama y otros quedan fuera)
+function zonaOrigen(s){
+  const c=comunaDe(s.dirCarga), od=divDe(s.orig);
+  if(c==='calama') return '';
+  if(od==='DSA'||SALVADOR.has(c)) return 'Salvador';
+  if(od==='DAND'||ANDINA.has(c)) return 'Andina';
+  if(c==='antofagasta') return 'Antofagasta';
+  if(SANTIAGO.has(c)) return 'Santiago';
+  return '';
+}
 const KEY_HAB = 'yuli_hab2', KEY_SRV = 'yuli_srv2';
 // ítems del conductor: columnas W..AF (días) y su fecha de expiración asociada
 const ITEMS_COND = [
@@ -491,15 +509,17 @@ function calcular(){
     if(v||cat){ const perm=PATRON[v]; if(!perm) d.push({t:'patron', txt:`Verificación no reconocida: ${s.verif||'(vacía)'}`}); else if(!perm.includes(cat)) d.push({t:'patron', txt:`${s.verif} no admite categoría ${s.cat||'(vacía)'}`}); }
     if(/^urgencia$/i.test(s.prio) && !/^urgencia$/i.test(s.cat)) d.push({t:'urgencia', txt:`Prioridad Urgencia con categoría ${s.cat||'(vacía)'}`});
     if(/6X4|6X2|CAMA\s*BAJA/i.test(s.tipoPlan) && (!s.semi || /no determinado/i.test(s.semiRaw))) d.push({t:'semi', txt:`${s.tipoPlan} sin patente de semirremolque`});
-    if(s.noDet&&s.noDet.length) d.push({t:'nodet', txt:'NO DETERMINADO en: '+s.noDet.join(', ')});
+    const rigido=/^(CAMION|CAMIONETA|FURG)/i.test(s.tipoPlan); // camiones 15, 10, 5, 3/4 t y camionetas no llevan semirremolque
+    if(s.noDet&&s.noDet.length&&!rigido) d.push({t:'nodet', txt:'NO DETERMINADO en: '+s.noDet.join(', ')});
     if(d.length) DESV.push({...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)});
     // ---- peajes
-    const origDiv=divDe(s.orig);
-    const hacia=PEAJE_DIVS.includes(div), desde=PEAJE_DIVS.includes(origDiv) && norm(s.dirDesc).includes('antofagasta');
+    const origDiv=divDe(s.orig), zona=zonaOrigen(s), comOrig=comunaDe(s.dirCarga), comDest=comunaDe(s.dirDesc);
+    const hacia=PEAJE_DIVS.includes(div) && !!zona;
+    const desde=PEAJE_DIVS.includes(origDiv) && (comDest==='antofagasta' || (!comDest && norm(s.dirDesc).includes('antofagasta')));
     if(hacia||desde){
-      const motivo = hacia ? 'Hacia '+divLabel(div) : 'Desde '+divLabel(origDiv)+' a Antofagasta';
+      const motivo = hacia ? `Desde ${zona}${comOrig&&norm(zona)!==comOrig?' ('+comOrig.replace(/\b\w/g,c=>c.toUpperCase())+')':''} hacia ${divLabel(div)}` : `Desde ${divLabel(origDiv)} a Antofagasta`;
       const peajeReg=/peaje/i.test(s.incid);
-      PEAJES.push({...s, activo, motivo, tipoMot: hacia?'hacia':'desde', peajeReg, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
+      PEAJES.push({...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
     }
   }
 }
@@ -621,7 +641,7 @@ function exportarDesv(){
 /* ---------- PEAJES ---------- */
 function filasPeaje(){
   const q=norm($('qp').value), fe=$('fEstP').value, fm=$('fMotP').value, sin=$('fSinP').checked;
-  let rows=PEAJES.filter(r=>(fe==='todos'||r.activo)&&(!fm||r.tipoMot===fm)&&(!sin||!r.peajeReg));
+  let rows=PEAJES.filter(r=>(fe==='todos'||r.activo)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
   if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV].join(' ')).includes(q));
   const st=SORT.peaje;
   if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(k==='peajeReg'?(r.peajeReg?1:0):(r[k]??'')));
@@ -644,11 +664,12 @@ function renderPeaje(){
   </tr>`).join('');
   thArrows('tabP', SORT.peaje);
   $('hintP').textContent=`Mostrando ${rows.length} de ${PEAJES.length} viajes con incidencia de peajes (${PEAJES.filter(r=>r.activo).length} activos).`;
-  $('kpisPeaje').innerHTML=kpiHTML([['',PEAJES.length,'Viajes con peaje'],['',PEAJES.filter(r=>r.tipoMot==='hacia').length,'Hacia DCH / DRT / DMH'],['',PEAJES.filter(r=>r.tipoMot==='desde').length,'Desde DCH / DRT / DMH a Antofagasta'],['ok',PEAJES.filter(r=>r.peajeReg).length,'Con peaje registrado'],['warn',PEAJES.filter(r=>!r.peajeReg).length,'Sin peaje registrado']]);
+  const z=n=>PEAJES.filter(r=>r.zona===n).length;
+  $('kpisPeaje').innerHTML=kpiHTML([['',PEAJES.length,'Viajes con peaje'],['',z('Santiago'),'Desde Santiago'],['',z('Antofagasta'),'Desde Antofagasta'],['',z('Salvador')+z('Andina'),'Desde Salvador / Andina'],['',z('Hacia Antofagasta'),'Desde DCH / DRT / DMH a Antofagasta'],['ok',PEAJES.filter(r=>r.peajeReg).length,'Con peaje registrado'],['warn',PEAJES.filter(r=>!r.peajeReg).length,'Sin peaje registrado']]);
 }
 function exportarPeaje(){
-  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Bodega destino','Dirección descarga','Empresa','Patente principal','Patente secundaria','Motivo','Peaje registrado','Incidencias viaje']];
-  for(const r of LAST.peaje) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,r.destN,r.dirDesc,r.emp,r.tracto,r.semi,r.motivo,r.peajeReg?'Sí':'No',r.incid]);
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Comuna origen','Bodega destino','Dirección descarga','Comuna destino','Empresa','Patente principal','Patente secundaria','Origen','Motivo','Peaje registrado','Incidencias viaje']];
+  for(const r of LAST.peaje) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,comunaDe(r.dirCarga).toUpperCase(),r.destN,r.dirDesc,comunaDe(r.dirDesc).toUpperCase(),r.emp,r.tracto,r.semi,r.zona,r.motivo,r.peajeReg?'Sí':'No',r.incid]);
   descargar(aoa,'Peajes','incidencia_peajes');
 }
 
