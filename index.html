@@ -243,6 +243,10 @@
           <option value="Antofagasta">Desde Antofagasta hacia DCH / DRT / DMH</option>
           <option value="Salvador">Desde Salvador hacia DCH / DRT / DMH</option>
           <option value="Andina">Desde Andina hacia DCH / DRT / DMH</option>
+          <option value="Rancagua">Desde Rancagua / Requínoa hacia DCH / DRT / DMH</option>
+          <option value="Concepción">Desde Concepción hacia DCH / DRT / DMH</option>
+          <option value="Copiapó">Desde Copiapó hacia DCH / DRT / DMH</option>
+          <option value="Coquimbo">Desde Coquimbo hacia DCH / DRT / DMH</option>
           <option value="Hacia Antofagasta">Desde DCH / DRT / DMH a Antofagasta</option>
         </select>
         <label class="chk"><input type="checkbox" id="fSinP" onchange="renderPeaje()"> Solo sin peaje registrado</label>
@@ -263,7 +267,7 @@
         <tbody id="tbP"></tbody>
       </table></div>
       <p class="hint" id="hintP"></p>
-      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, desde Antofagasta, desde Salvador o desde Andina hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
+      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
     </section>
   </div>
 
@@ -287,6 +291,8 @@ const PEAJE_DIVS = ['DCH','DRT','DMH'];
 const SANTIAGO = new Set(['santiago','cerrillos','cerro navia','conchali','el bosque','estacion central','huechuraba','independencia','la cisterna','la florida','la granja','la pintana','la reina','las condes','lo barnechea','lo espejo','lo prado','macul','maipu','nunoa','pedro aguirre cerda','penalolen','providencia','pudahuel','quilicura','quinta normal','recoleta','renca','san joaquin','san miguel','san ramon','vitacura','puente alto','pirque','san jose de maipo','colina','lampa','tiltil','til til','san bernardo','buin','calera de tango','paine','melipilla','alhue','curacavi','maria pinto','san pedro','talagante','el monte','isla de maipo','padre hurtado','penaflor']);
 const SALVADOR = new Set(['el salvador','diego de almagro','salvador']);
 const ANDINA = new Set(['los andes','saladillo','andina','san felipe','calle larga','rinconada']);
+// otras comunas de origen que también pagan peaje hacia DCH/DRT/DMH (nombre de zona → comunas)
+const OTRAS_ZONAS = { 'Rancagua':['rancagua','requinoa'], 'Concepción':['concepcion'], 'Copiapó':['copiapo'], 'Coquimbo':['coquimbo'] };
 function comunaDe(dir){ const t=String(dir||'').trim(); const i=t.lastIndexOf('-'); return norm(i>=0?t.slice(i+1):''); }
 // zona de origen para peajes: Santiago / Antofagasta / Salvador / Andina, o '' si no aplica (Calama y otros quedan fuera)
 function zonaOrigen(s){
@@ -296,6 +302,7 @@ function zonaOrigen(s){
   if(od==='DAND'||ANDINA.has(c)) return 'Andina';
   if(c==='antofagasta') return 'Antofagasta';
   if(SANTIAGO.has(c)) return 'Santiago';
+  for(const [z,cs] of Object.entries(OTRAS_ZONAS)) if(cs.includes(c)) return z;
   return '';
 }
 const KEY_HAB = 'yuli_hab2', KEY_SRV = 'yuli_srv2';
@@ -614,7 +621,6 @@ function kpis(){
     K('cAct','','Servicios activos a división',a),
     K('cOk','ok','Servicios sin alertas',a.filter(r=>r.peor>=2)),
     K('cWarn','warn','Con vencimiento < 11 días',a.filter(r=>tiene(r,'warn'))),
-    K('cBad','bad','Con algo no habilitado',a.filter(r=>tiene(r,'bad'))),
     K('cCond','bad','Conductores no habilitados',a.filter(r=>r.condSt.cls==='bad')),
     K('cTracto','bad','Tractos / camiones no habilitados',a.filter(r=>r.tractoSt.cls==='bad')),
     K('cSemi','bad','Semirremolques no habilitados',a.filter(r=>r.semiSt.cls==='bad')),
@@ -690,7 +696,7 @@ function renderPeaje(){
   $('hintP').textContent=`Mostrando ${rows.length} de ${PEAJES.length} viajes con incidencia de peajes (${PEAJES.filter(r=>r.activo).length} activos).`;
   const K=(k,c,l,rows)=>{ defKpi(k,l,'peaje',rows); return [c,rows.length,l,k]; };
   const z=n=>PEAJES.filter(r=>r.zona===n);
-  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',PEAJES),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',PEAJES.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',PEAJES.filter(r=>!r.peajeReg))]);
+  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',PEAJES),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',PEAJES.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',PEAJES.filter(r=>!r.peajeReg))]);
 }
 function exportarPeaje(){
   const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Comuna origen','Bodega destino','Dirección descarga','Comuna destino','Empresa','Patente principal','Patente secundaria','Origen','Motivo','Peaje registrado','Incidencias viaje']];
