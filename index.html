@@ -3,276 +3,453 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Codelco</title>
+<title>Codelco · Centro de Planificación Logística</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
-    --bg:#f3f5f7; --card:#ffffff; --text:#1c2430; --muted:#5b6b7c; --line:#dde3ea;
-    --accent:#1f7a4d; --accent-soft:#e3f3ea;
-    --ok:#1f7a4d; --ok-soft:#e3f3ea; --warn:#c98a00; --warn-soft:#fff3d6; --bad:#c0392b; --bad-soft:#fde3e0; --na:#8a97a5; --na-soft:#eef1f4;
-    --thead:#f7f9fb; --shadow:0 12px 40px rgba(0,0,0,.25);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#0f1418; --card:#171e25; --text:#e8edf2; --muted:#9aa8b6; --line:#2a333d;
-      --accent:#4fbf82; --accent-soft:#16301f;
-      --ok:#4fbf82; --ok-soft:#16301f; --warn:#f0b429; --warn-soft:#3a2d08; --bad:#ff6b5b; --bad-soft:#3d1a16; --na:#8a97a5; --na-soft:#222a33;
-      --thead:#1c242c; --shadow:0 12px 40px rgba(0,0,0,.6);
-    }
+    --bg:#f3f6f4; --card:#ffffff; --text:#172a1f; --muted:#5f6f66; --line:#e1e8e3; --line2:#eef2ef;
+    --green:#0f7a3c; --green-d:#0b5c2e; --green-soft:#e6f4ea; --green-soft2:#f2f9f4;
+    --ok:#15803d; --ok-soft:#e6f4ea; --warn:#c77700; --warn-soft:#fff3dc; --bad:#c62828; --bad-soft:#fde8e6; --na:#8a97a0; --na-soft:#eef1f3;
+    --thead:#f6f9f7; --shadow:0 1px 2px rgba(16,40,24,.06),0 4px 14px rgba(16,40,24,.05); --shadow-lg:0 18px 50px rgba(16,40,24,.22);
+    --side:224px;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;padding:16px}
-  main{max-width:1320px;margin:0 auto}
-  header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;padding:12px 0 8px}
-  h1{margin:0;font-size:1.6rem;letter-spacing:-.02em}
-  header p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
-  .card h2{margin:0 0 10px;font-size:1.05rem}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.45;font-size:15px}
+  a{color:var(--green)}
+  button{font:inherit;cursor:pointer}
+  input[type=text],select{padding:8px 11px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--text);font:inherit;font-size:.92rem}
+  input[type=text]{width:100%}
+  input[type=text]:focus,select:focus{outline:2px solid #bfe3cc;border-color:var(--green)}
+  .btn{padding:8px 14px;border:0;border-radius:9px;background:var(--green);color:#fff;font-weight:600}
+  .btn:hover{background:var(--green-d)}
+  .btn.sec{background:#fff;color:var(--text);border:1px solid var(--line)}
+  .btn.sec:hover{background:var(--green-soft2);border-color:#bfd8c8}
+  .btn:disabled{opacity:.5;cursor:default}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .grow{flex:1;min-width:200px}
-  input[type=text],select{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit}
-  input[type=text]{width:100%}
-  button{padding:9px 14px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
-  button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
-  button:disabled{opacity:.5;cursor:default}
-  .hint{color:var(--muted);font-size:.88rem;margin:8px 0 0}
-  label.chk{display:inline-flex;gap:6px;align-items:center;font-size:.95rem}
-  /* carga */
-  .drop{border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
-  .drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
-  .drop strong{color:var(--text)}
-  .files{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:12px}
-  .file{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center}
-  .file .st{width:10px;height:10px;border-radius:50%;background:var(--na);flex:none}
-  .file.ok .st{background:var(--ok)}
-  .file b{display:block;font-size:.95rem}
-  .file span{color:var(--muted);font-size:.85rem}
-  /* tabs */
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
-  .tab{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:600;cursor:pointer}
-  .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
-  .tab .n{display:inline-block;min-width:22px;padding:0 6px;border-radius:999px;background:rgba(0,0,0,.12);font-size:.8rem;margin-left:6px;text-align:center}
-  .tab.on .n{background:rgba(255,255,255,.25)}
-  .panel{display:none} .panel.on{display:block}
-  /* kpis */
+  .hint{color:var(--muted);font-size:.85rem;margin:8px 0 0}
+  .sub{display:block;color:var(--muted);font-size:.78rem}
+  label.chk{display:inline-flex;gap:6px;align-items:center;font-size:.9rem}
+
+  /* ===== layout ===== */
+  .app{display:flex;min-height:100vh}
+  .side{width:var(--side);background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex:none}
+  .brand{padding:18px 18px 12px;border-bottom:1px solid var(--line2)}
+  .brand .wm{font-weight:800;font-size:1.25rem;letter-spacing:.02em;color:var(--green-d);line-height:1.1}
+  .brand .wm span{color:var(--green);font-weight:700}
+  .brand .tag{color:var(--muted);font-size:.74rem;margin-top:2px}
+  nav{padding:12px 10px;display:flex;flex-direction:column;gap:4px}
+  nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:var(--text);font-weight:600;font-size:.95rem}
+  nav button:hover{background:var(--green-soft2)}
+  nav button.on{background:var(--green);color:#fff}
+  nav button svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  nav button .n{margin-left:auto;font-size:.74rem;font-weight:700;background:var(--green-soft);color:var(--green-d);border-radius:999px;padding:1px 8px}
+  nav button.on .n{background:rgba(255,255,255,.25);color:#fff}
+  .side .foot{margin-top:auto;padding:14px 16px 18px;text-align:center;color:var(--muted);font-size:.78rem}
+  .side .foot svg{width:100%;height:auto;display:block;margin-bottom:8px}
+  .side .foot b{display:block;color:var(--green-d);font-size:.8rem}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{background:#fff;border-bottom:1px solid var(--line);padding:10px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+  .top .ops{display:flex;align-items:center;gap:14px;margin-left:auto;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-weight:600;background:#fff}
+  .pill .dot{width:9px;height:9px;border-radius:50%;background:var(--na)}
+  .pill.on .dot{background:var(--ok)} .pill.on{color:var(--ok);border-color:#bfe3cc;background:var(--green-soft2)}
+  .pill.muted{color:var(--muted);font-weight:500}
+  .user{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem}
+  .user .av{width:32px;height:32px;border-radius:50%;background:var(--green-soft);color:var(--green-d);display:grid;place-items:center}
+  .content{padding:20px 24px 40px;max-width:1500px;width:100%}
+  .sec{display:none} .sec.on{display:block}
+  .ph{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .ph h1{margin:0;font-size:1.45rem;letter-spacing:-.01em}
+  .ph p{margin:3px 0 0;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 10px;font-size:1.02rem}
+  .card + .card{margin-top:14px}
+  .ch{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+  .ch h2{margin:0}
+  .ch .link{background:none;border:0;color:var(--green);font-weight:600;font-size:.88rem;padding:0}
+
+  /* ===== datos ===== */
+  .datos{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .datos .f{display:flex;align-items:center;gap:8px;font-size:.86rem;min-width:220px}
+  .datos .f .st{width:9px;height:9px;border-radius:50%;background:var(--na);flex:none}
+  .datos .f.ok .st{background:var(--ok)}
+  .datos .f b{font-weight:600} .datos .f span{color:var(--muted)}
+  .datos .acts{margin-left:auto;display:flex;gap:8px}
+  .drop{border:2px dashed #bfd8c8;border-radius:14px;padding:34px 20px;text-align:center;color:var(--muted);cursor:pointer;background:#fff;transition:.15s}
+  .drop.over{border-color:var(--green);background:var(--green-soft)}
+  .drop strong{color:var(--text);font-size:1.05rem;display:block;margin-bottom:4px}
+  .drop .ic{width:46px;height:46px;border-radius:12px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto 10px}
+  .drop .ic svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ===== KPI ===== */
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-  .kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
   .kpi .v{font-size:1.6rem;font-weight:700;line-height:1.1}
-  .kpi .l{color:var(--muted);font-size:.85rem}
+  .kpi .l{color:var(--muted);font-size:.84rem}
   .kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--warn)} .kpi.bad .v{color:var(--bad)}
-  /* tablas */
-  .tw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px;max-height:72vh}
-  table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:960px}
-  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-  th{background:var(--thead);position:sticky;top:0;font-weight:600;font-size:.82rem;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;z-index:1}
+  .kpi[data-kpi]{cursor:pointer} .kpi[data-kpi]:hover{border-color:var(--green);box-shadow:var(--shadow)}
+  .bigkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+  .bk{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fff;display:flex;gap:14px;align-items:flex-start;cursor:pointer;box-shadow:var(--shadow)}
+  .bk:hover{border-color:var(--green)}
+  .bk .ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;flex:none;color:#fff;background:var(--green)}
+  .bk .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .bk .t{font-size:.78rem;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+  .bk .v{font-size:1.9rem;font-weight:800;line-height:1.05;margin:2px 0 4px}
+  .bk .s{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .bk .s .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .bk.g{background:var(--green-soft2);border-color:#cfe6d8}
+  .bk.r{background:#fff5f4;border-color:#f3c9c4} .bk.r .ic{background:var(--bad)} .bk.r .s .dot{background:var(--bad)}
+  .bk.a{background:#fffaf0;border-color:#f3dfb4} .bk.a .ic{background:var(--warn)} .bk.a .s .dot{background:var(--warn)}
+
+  /* ===== flujo ===== */
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .step{position:relative;background:var(--green-soft2);border:1px solid var(--line);padding:12px 14px 12px 18px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);cursor:pointer}
+  .step:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);border-radius:10px 0 0 10px}
+  .step:last-child{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,14px 50%);border-radius:0 10px 10px 0}
+  .step:hover{background:var(--green-soft)}
+  .step .l{font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:7px}
+  .step .l svg{width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .step .v{font-size:1.5rem;font-weight:800;line-height:1.1;margin-top:2px}
+  .step .p{font-size:.76rem;color:var(--muted)}
+  .step.w{background:#fff8e8} .step.w .l svg{stroke:var(--warn)}
+  .step.c{background:#f2f4f6} .step.c .l svg{stroke:#475569}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+  .grid2b{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start;margin-top:14px}
+  @media (max-width:1100px){ .grid2,.grid2b{grid-template-columns:1fr} }
+
+  /* ===== paneles verdes ===== */
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .panel .hd{background:var(--green);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;font-weight:700}
+  .panel .hd svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .panel .hd .n{margin-left:auto;background:rgba(255,255,255,.22);border-radius:999px;padding:1px 9px;font-size:.8rem}
+  .panel + .panel{margin-top:14px}
+  .al{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line2);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font:inherit;color:var(--text)}
+  .al:last-child{border-bottom:0} .al:hover{background:var(--green-soft2)}
+  .al .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.9rem;flex:none}
+  .al.bad .ic{background:var(--bad)} .al.warn .ic{background:var(--warn)} .al.na .ic{background:#64748b} .al.ok .ic{background:var(--ok)}
+  .al b{font-size:.95rem} .al b em{font-style:normal;font-size:1.1rem;margin-right:4px}
+  .al.bad b em{color:var(--bad)} .al.warn b em{color:var(--warn)} .al.na b em{color:#475569}
+  .al .s{display:block;color:var(--muted);font-size:.8rem}
+  .al .chev{margin-left:auto;color:var(--muted)}
+  .act{display:flex;align-items:center;gap:12px;margin:10px;padding:12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:#fff;width:calc(100% - 20px);text-align:left;font:inherit;color:var(--text)}
+  .act:hover{border-color:var(--green);background:var(--green-soft2)}
+  .act .ic{width:36px;height:36px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;flex:none}
+  .act .ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .act b{display:block;font-size:.93rem} .act span{color:var(--muted);font-size:.8rem}
+  .act .chev{margin-left:auto;color:var(--muted)}
+
+  /* ===== gráficos ===== */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.82rem}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .chart svg{width:100%;height:auto;display:block}
+  .donut{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .donut svg{width:170px;height:170px;flex:none}
+  .donut table{min-width:0;width:auto;font-size:.9rem} .donut td{padding:5px 8px;border:0}
+  .donut td b{font-weight:700}
+
+  /* ===== tablas ===== */
+  .tw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px;max-height:72vh;background:#fff}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:960px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top}
+  th{background:var(--thead);position:sticky;top:0;font-weight:600;font-size:.78rem;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;z-index:1;text-transform:uppercase;letter-spacing:.03em}
   th .arr{opacity:.6;font-size:.75rem}
   tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:#fafcfb}
   tr.r-bad td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
   tr.r-warn td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
   tr.r-ok td:first-child{box-shadow:inset 4px 0 0 var(--ok)}
-  td.dbl{cursor:pointer} td.dbl:hover{background:var(--accent-soft)}
-  .sub{display:block;color:var(--muted);font-size:.8rem}
-  .why{display:block;font-size:.8rem;margin-top:2px}
+  td.dbl{cursor:pointer} td.dbl:hover{background:var(--green-soft2)}
+  td:nth-child(3){min-width:150px}
+  .why{display:block;font-size:.78rem;margin-top:2px}
   .why.bad{color:var(--bad)} .why.warn{color:var(--warn)} .why.na{color:var(--muted)}
-  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:6px;flex:none}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px;flex:none}
   .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)} .dot.na{background:var(--na)}
-  .st{display:flex;align-items:center;font-size:.85rem;white-space:nowrap}
+  .st{display:flex;align-items:center;font-size:.84rem;white-space:nowrap}
   .st .txt{font-weight:600}
   .st.ok .txt{color:var(--ok)} .st.warn .txt{color:var(--warn)} .st.bad .txt{color:var(--bad)} .st.na .txt{color:var(--na)}
   .plate{font-family:ui-monospace,Consolas,monospace;font-weight:600;letter-spacing:.02em}
   .empty{padding:28px;text-align:center;color:var(--muted)}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.85rem;margin-top:8px}
-  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.78rem;font-weight:600;margin:1px 3px 1px 0;white-space:nowrap}
-  .tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.na{background:var(--na-soft);color:var(--na)}
-  /* buscador */
-  .res{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.76rem;font-weight:600;margin:1px 3px 1px 0;white-space:nowrap}
+  .tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.na{background:var(--na-soft);color:#475569}
+  .mini{min-width:0} .mini th{position:static}
+  .mini td,.mini th{padding:7px 8px}
+  .chev{background:none;border:0;color:var(--muted);font-size:1.1rem;padding:0 4px;cursor:pointer}
+
+  /* ===== buscador ===== */
+  .res{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#fff}
   .res h3{margin:0 0 6px;font-size:1rem}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.85rem}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.84rem;background:#fff}
   .chip b{font-weight:700}
   .res table,.modal table{min-width:0}
-  /* modal */
-  #modalBg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+
+  /* ===== reportes ===== */
+  .reps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .rep{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;box-shadow:var(--shadow)}
+  .rep h3{margin:0 0 4px;font-size:1rem} .rep p{margin:0 0 12px;color:var(--muted);font-size:.86rem}
+
+  /* ===== modal / toast ===== */
+  #modalBg{position:fixed;inset:0;background:rgba(10,30,18,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
   #modalBg.on{display:flex}
-  .modal{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:14px;max-width:1000px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)}
-  .kpi[data-kpi]{cursor:pointer} .kpi[data-kpi]:hover{border-color:var(--accent)}
-  .modal .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
+  .modal{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:14px;max-width:1000px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg)}
+  .modal .mh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
   .modal .mh h3{margin:0;font-size:1.05rem}
   .modal .mb{padding:14px 16px}
-  .modal .x{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:4px 10px}
+  .modal .x{background:#fff;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:5px 10px}
   .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 14px;margin:6px 0 12px}
-  .kv div{font-size:.9rem} .kv b{display:block;color:var(--muted);font-weight:600;font-size:.78rem}
-  footer{color:var(--muted);font-size:.82rem;padding:22px 0;text-align:center}
-  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c2430;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:70;box-shadow:0 6px 20px rgba(0,0,0,.25);display:none}
-  @media (max-width:700px){ body{padding:12px} h1{font-size:1.3rem} }
+  .kv div{font-size:.9rem} .kv b{display:block;color:var(--muted);font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.03em}
+  #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#172a1f;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:70;box-shadow:0 6px 20px rgba(0,0,0,.25);display:none}
+  footer.pf{color:var(--muted);font-size:.8rem;padding:18px 24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:auto}
+
+  @media (max-width:900px){
+    .app{flex-direction:column}
+    .side{width:100%;height:auto;position:static;border-right:0;border-bottom:1px solid var(--line)}
+    .brand{padding:12px 16px}
+    nav{flex-direction:row;overflow:auto;padding:8px}
+    nav button{width:auto;white-space:nowrap;padding:8px 12px}
+    .side .foot{display:none}
+    .top{padding:10px 14px} .content{padding:14px 14px 30px}
+    .flow{grid-template-columns:1fr} .step,.step:first-child,.step:last-child{clip-path:none;border-radius:10px}
+    .bk .v{font-size:1.5rem}
+  }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div>
-      <h1>Codelco</h1>
-      <p>Cruce entre los servicios Punto a Punto y el informe de conductores y equipos habilitados por división.</p>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="side">
+    <div class="brand">
+      <div class="wm">SERLOG <span>| AGUNSA</span></div>
+      <div class="tag">Logística que mueve la minería · Operación CODELCO</div>
     </div>
-    <div class="row">
-      <button class="secondary" onclick="limpiarTodo()">Limpiar datos</button>
+    <nav>
+      <button class="on" data-s="inicio" onclick="ir('inicio')"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Inicio</button>
+      <button data-s="acred" onclick="ir('acred')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Acreditados<span class="n" id="nCruce">0</span></button>
+      <button data-s="viajes" onclick="ir('viajes')"><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>Viajes<span class="n" id="nViajes">0</span></button>
+      <button data-s="desv" onclick="ir('desv')"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>Desviaciones<span class="n" id="nDesv">0</span></button>
+      <button data-s="peaje" onclick="ir('peaje')"><svg viewBox="0 0 24 24"><path d="M4 20 10 4h4l6 16"/><path d="M6.5 14h11"/><path d="M8.5 9h7"/></svg>Peajes<span class="n" id="nPeaje">0</span></button>
+      <button data-s="rep" onclick="ir('rep')"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg>Reportes</button>
+    </nav>
+    <div class="foot">
+      <svg viewBox="0 0 200 70" aria-hidden="true"><path d="M2 60 40 22l18 18 22-30 30 34 26-22 30 30 30-14v22H2z" fill="#e6f4ea"/><path d="M2 60 40 22l18 18 22-30 30 34 26-22 30 30 30-14" fill="none" stroke="#0f7a3c" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 66h196" stroke="#0f7a3c" stroke-width="1.2"/></svg>
+      <b>SERLOG | AGUNSA</b>Operación CODELCO
     </div>
-  </header>
+  </aside>
 
-  <!-- CARGA -->
-  <section class="card">
-    <h2>Cargar archivos</h2>
-    <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
-      <strong>Suelte aquí los archivos Excel</strong> o haga clic para elegirlos.
-      Se aceptan los dos a la vez: <em>Informe Habilitados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
-      <input type="file" id="fi" accept=".xlsx,.xlsm,.xls" multiple style="display:none" onchange="archivos(this.files)">
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <header class="top">
+      <div class="wm" style="font-weight:800;color:var(--green-d);font-size:1.05rem">Centro de Planificación Logística</div>
+      <div class="ops">
+        <span class="pill" id="pillOp"><span class="dot"></span><span>Sin datos cargados</span></span>
+        <span class="pill muted" id="pillFecha">—</span>
+        <span class="user"><span class="av"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>Equipo Planificador</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- barra de datos (siempre visible) -->
+      <div class="datos">
+        <div class="f" id="fHab"><span class="st"></span><div><b>Informe Habilitados</b><span> · Sin cargar</span></div></div>
+        <div class="f" id="fSrv"><span class="st"></span><div><b>Seguimiento Punto a Punto</b><span> · Sin cargar</span></div></div>
+        <div class="acts">
+          <button class="btn" onclick="document.getElementById('fi').click()">Cargar archivos</button>
+          <button class="btn sec" onclick="limpiarTodo()">Limpiar datos</button>
+        </div>
+        <input type="file" id="fi" accept=".xlsx,.xlsm,.xls" multiple style="display:none" onchange="archivos(this.files)">
+      </div>
+
+      <!-- ===== INICIO ===== -->
+      <section class="sec on" id="sInicio">
+        <div class="ph">
+          <div><h1>Centro de Planificación Logística</h1><p>Monitoreo de viajes · Habilitación · Desviaciones · Peajes</p></div>
+          <div class="hint" style="margin:0;text-align:right">Planificación hoy,<br>operación segura mañana.</div>
+        </div>
+        <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div>
+          <strong>Suelte aquí los archivos Excel o haga clic para elegirlos</strong>
+          Se aceptan los dos a la vez: <em>Informe Habilitados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
+          <div class="hint">Los archivos se procesan en su navegador y quedan guardados solo en este equipo. Nada se envía a internet.</div>
+        </div>
+        <div id="dash" style="display:none">
+          <div class="bigkpis" id="bigkpis"></div>
+          <div class="grid2">
+            <div>
+              <div class="card">
+                <div class="ch"><h2>Flujo de la Operación</h2><span class="hint" style="margin:0" id="flowTot"></span></div>
+                <div class="flow" id="flow"></div>
+                <p class="hint" id="flowHint"></p>
+              </div>
+              <div class="grid2b">
+                <div class="card" style="margin:0">
+                  <div class="ch"><h2>Resumen por División</h2><span class="legend"><span><span class="dot" style="background:var(--green)"></span>Viajes activos</span><span><span class="dot" style="background:#9fd3b2"></span>Con alertas</span></span></div>
+                  <div class="chart" id="chDiv"></div>
+                </div>
+                <div class="card" style="margin:0">
+                  <h2>Estado de Habilitación</h2>
+                  <div class="donut" id="donut"></div>
+                </div>
+              </div>
+              <div class="card" style="margin-top:14px">
+                <div class="ch"><h2>Últimos Viajes</h2><button class="link" onclick="ir('viajes')">Ver todos</button></div>
+                <div class="tw" style="margin-top:0;max-height:none"><table class="mini" id="tabUlt"><thead><tr><th>Id viaje</th><th>Origen</th><th>Destino</th><th>Empresa</th><th>Categoría</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody id="tbUlt"></tbody></table></div>
+              </div>
+            </div>
+            <div>
+              <div class="panel">
+                <div class="hd"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg>Alertas del Planificador<span class="n" id="alN">0</span></div>
+                <div id="alertas"></div>
+              </div>
+              <div class="panel">
+                <div class="hd"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>¿Dónde debo mirar ahora?</div>
+                <div id="mirar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ACREDITADOS ===== -->
+      <section class="sec" id="sAcred">
+        <div class="ph"><div><h1>Revisión de Acreditados</h1><p>Conductores, tractos y semirremolques de los servicios activos frente al informe de habilitados por división.</p></div></div>
+        <div class="card" id="secRes" style="display:none">
+          <h2>Resumen de servicios a divisiones</h2>
+          <div class="kpis" id="kpis"></div>
+          <div class="legend" style="margin-top:8px">
+            <span><span class="dot ok"></span>Habilitado</span>
+            <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
+            <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
+            <span><span class="dot na"></span>No aplica</span>
+          </div>
+        </div>
+        <div class="card" id="secTab" style="display:none">
+          <h2>Revisión de Acreditados por servicio</h2>
+          <div class="row">
+            <div class="grow"><input type="text" id="q" placeholder="Filtrar: viaje, pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
+            <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
+            <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
+            <select id="fEst" onchange="render()"><option value="activo">Solo viajes activos</option><option value="todos">Todos los estados</option></select>
+            <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
+            <button class="btn sec" onclick="exportarCruce()">Descargar Excel</button>
+          </div>
+          <div class="tw"><table id="tab">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="cat">Categoría</th><th data-k="divN">Destino / división</th><th data-k="emp">Empresa de transporte</th>
+              <th data-k="cond">Conductor</th><th data-k="condSt">Habilitado</th><th data-k="tracto">Patente tracto / camión</th><th data-k="tractoSt">Habilitado</th>
+              <th data-k="semi">Patente semirremolque</th><th data-k="semiSt">Habilitado</th>
+            </tr></thead>
+            <tbody id="tb"></tbody>
+          </table></div>
+          <p class="hint" id="tabHint"></p>
+        </div>
+        <div class="card" id="secBus" style="display:none">
+          <h2>Buscador de habilitaciones</h2>
+          <div class="row"><div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div></div>
+          <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios donde aparece. Doble clic en una división abre el detalle.</p>
+          <div id="bres"></div>
+        </div>
+        <div class="card" id="acredVacio"><p class="empty">Cargue el Informe Habilitados y el Seguimiento Punto a Punto para ver la revisión.</p></div>
+      </section>
+
+      <!-- ===== VIAJES ===== -->
+      <section class="sec" id="sViajes">
+        <div class="ph"><div><h1>Viajes</h1><p>Todos los viajes de la planilla Punto a Punto con su estado y las alertas detectadas.</p></div></div>
+        <div class="card">
+          <div class="row">
+            <div class="grow"><input type="text" id="qv" placeholder="Filtrar: viaje, pedido, conductor, patente, empresa, origen, destino…" oninput="renderViajes()"></div>
+            <select id="fEstV" onchange="renderViajes()"><option value="">Todos los estados</option></select>
+            <select id="fDivV" onchange="renderViajes()"><option value="">Todos los destinos</option></select>
+            <select id="fEmpV" onchange="renderViajes()"><option value="">Todas las empresas</option></select>
+            <label class="chk"><input type="checkbox" id="fAlV" onchange="renderViajes()"> Solo con alertas</label>
+            <button class="btn sec" onclick="exportarViajes()">Descargar Excel</button>
+          </div>
+          <div class="tw"><table id="tabV">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="fcar">Fecha carga</th><th data-k="origN">Origen</th><th data-k="destN">Destino</th><th data-k="emp">Empresa</th>
+              <th data-k="cat">Categoría</th><th data-k="tipoPlan">Vehículo plan</th><th data-k="estV">Estado viaje</th><th data-k="nivel">Alertas</th>
+            </tr></thead>
+            <tbody id="tbV"></tbody>
+          </table></div>
+          <p class="hint" id="hintV"></p>
+        </div>
+      </section>
+
+      <!-- ===== DESVIACIONES ===== -->
+      <section class="sec" id="sDesv">
+        <div class="ph"><div><h1>Desviaciones</h1><p>Viajes que no cumplen el patrón de verificación, prioridad, vehículo o información.</p></div></div>
+        <div class="card">
+          <div class="kpis" id="kpisDesv"></div>
+          <div class="row" style="margin-top:12px">
+            <div class="grow"><input type="text" id="qd" placeholder="Filtrar: viaje, pedido, empresa, categoría…" oninput="renderDesv()"></div>
+            <select id="fEstD" onchange="renderDesv()"><option value="todos">Todos los estados</option><option value="activo">Solo viajes activos</option></select>
+            <select id="fTipoD" onchange="renderDesv()"><option value="">Todas las desviaciones</option></select>
+            <button class="btn sec" onclick="exportarDesv()">Descargar Excel</button>
+          </div>
+          <div class="tw"><table id="tabD">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="estV">Estado viaje</th><th data-k="fcar">Fecha carga</th><th data-k="verif">Verificación</th><th data-k="cat">Categoría</th>
+              <th data-k="prio">Prioridad</th><th data-k="tipoPlan">Tipo vehículo plan</th><th data-k="semi">Patente semirremolque</th><th data-k="emp">Empresa</th><th data-k="ndesv">Desviaciones</th>
+            </tr></thead>
+            <tbody id="tbD"></tbody>
+          </table></div>
+          <p class="hint" id="hintD"></p>
+          <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO", salvo en camiones rígidos (15, 10, 5, 3/4 t) y camionetas, que no llevan semirremolque. Doble clic en un viaje o en un cuadro abre su detalle.</p>
+        </div>
+      </section>
+
+      <!-- ===== PEAJES ===== -->
+      <section class="sec" id="sPeaje">
+        <div class="ph"><div><h1>Incidencia de peajes</h1><p>Viajes que deben llevar incidencia de peaje y si ya está registrada.</p></div></div>
+        <div class="card">
+          <div class="kpis" id="kpisPeaje"></div>
+          <div class="row" style="margin-top:12px">
+            <div class="grow"><input type="text" id="qp" placeholder="Filtrar: viaje, pedido, empresa, patente, origen, destino…" oninput="renderPeaje()"></div>
+            <select id="fEstP" onchange="renderPeaje()"><option value="todos">Todos los estados</option><option value="activo">Solo viajes activos</option></select>
+            <select id="fMotP" onchange="renderPeaje()">
+              <option value="">Todos los orígenes</option>
+              <option value="Santiago">Desde Santiago hacia DCH / DRT / DMH</option>
+              <option value="Antofagasta">Desde Antofagasta hacia DCH / DRT / DMH</option>
+              <option value="Salvador">Desde Salvador hacia DCH / DRT / DMH</option>
+              <option value="Andina">Desde Andina hacia DCH / DRT / DMH</option>
+              <option value="Rancagua">Desde Rancagua / Requínoa hacia DCH / DRT / DMH</option>
+              <option value="Concepción">Desde Concepción hacia DCH / DRT / DMH</option>
+              <option value="Copiapó">Desde Copiapó hacia DCH / DRT / DMH</option>
+              <option value="Coquimbo">Desde Coquimbo hacia DCH / DRT / DMH</option>
+              <option value="Hacia Antofagasta">Desde DCH / DRT / DMH a Antofagasta</option>
+            </select>
+            <label class="chk"><input type="checkbox" id="fSinP" onchange="renderPeaje()"> Solo sin peaje registrado</label>
+            <button class="btn sec" onclick="exportarPeaje()">Descargar Excel</button>
+          </div>
+          <div class="tw"><table id="tabP">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="estV">Estado viaje</th><th data-k="fcar">Fecha carga</th><th data-k="origN">Origen</th><th data-k="destN">Destino</th>
+              <th data-k="emp">Empresa</th><th data-k="tracto">Patente</th><th data-k="cat">Categoría</th><th data-k="peajeReg">Alerta</th>
+            </tr></thead>
+            <tbody id="tbP"></tbody>
+          </table></div>
+          <p class="hint" id="hintP"></p>
+          <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Los viajes suspendidos y los falsos fletes no se listan en la tabla; solo se cuentan en sus cuadros, donde el doble clic muestra cuáles son. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
+        </div>
+      </section>
+
+      <!-- ===== REPORTES ===== -->
+      <section class="sec" id="sRep">
+        <div class="ph"><div><h1>Reportes</h1><p>Descargas en Excel con los datos cargados. Cada archivo incluye todas las filas, sin aplicar los filtros de pantalla.</p></div></div>
+        <div class="reps">
+          <div class="rep"><h3>Revisión de acreditados</h3><p>Servicios activos a división con el estado de conductor, tracto y semirremolque y el motivo de cada alerta.</p><button class="btn" onclick="exportarCruce(CRUCE.filter(r=>r.activo))">Descargar Excel</button></div>
+          <div class="rep"><h3>Desviaciones</h3><p>Viajes con desviación y el detalle de cada regla incumplida.</p><button class="btn" onclick="exportarDesv(DESV)">Descargar Excel</button></div>
+          <div class="rep"><h3>Incidencia de peajes</h3><p>Viajes que deben llevar peaje, su origen y si la incidencia está registrada.</p><button class="btn" onclick="exportarPeaje(PEAJES.filter(r=>!r.excl))">Descargar Excel</button></div>
+          <div class="rep"><h3>Viajes</h3><p>Todos los viajes de la planilla con su estado y las alertas detectadas.</p><button class="btn" onclick="exportarViajes(SRV?SRV.rows:[])">Descargar Excel</button></div>
+          <div class="rep"><h3>Suspendidos y falsos fletes</h3><p>Viajes a división en estado Suspendido o Falso flete.</p><button class="btn" onclick="exportarCruce(CRUCE.filter(r=>/suspendido|falso\s*flete/i.test(r.estV)))">Descargar Excel</button></div>
+        </div>
+        <p class="hint" id="repHint"></p>
+      </section>
     </div>
-    <div class="files">
-      <div class="file" id="fHab"><span class="st"></span><div><b>Informe Habilitados</b><span>Sin cargar</span></div></div>
-      <div class="file" id="fSrv"><span class="st"></span><div><b>Seguimiento Punto a Punto</b><span>Sin cargar</span></div></div>
-    </div>
-    <p class="hint">Los archivos se procesan en su navegador y quedan guardados solo en este equipo. Nada se envía a internet.</p>
-  </section>
 
-  <div class="tabs" id="tabs" style="display:none">
-    <button class="tab on" data-t="cruce" onclick="verTab('cruce')">Revisión de Acreditados<span class="n" id="nCruce">0</span></button>
-    <button class="tab" data-t="desv" onclick="verTab('desv')">Desviaciones<span class="n" id="nDesv">0</span></button>
-    <button class="tab" data-t="peaje" onclick="verTab('peaje')">Incidencia de peajes<span class="n" id="nPeaje">0</span></button>
+    <footer class="pf"><span>SERLOG | AGUNSA · Operación CODELCO</span><span>Los datos se guardan solo en este navegador.</span></footer>
   </div>
-
-  <!-- ===== CRUCE ===== -->
-  <div class="panel on" id="pCruce">
-    <section class="card" id="secRes" style="display:none">
-      <h2>Resumen de servicios a divisiones</h2>
-      <div class="kpis" id="kpis"></div>
-      <div class="legend">
-        <span><span class="dot ok"></span>Habilitado</span>
-        <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
-        <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
-        <span><span class="dot na"></span>No aplica</span>
-      </div>
-    </section>
-
-    <section class="card" id="secTab" style="display:none">
-      <h2>Revisión de Acreditados por servicio</h2>
-      <div class="row">
-        <div class="grow"><input type="text" id="q" placeholder="Filtrar: viaje, pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
-        <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
-        <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
-        <select id="fEst" onchange="render()">
-          <option value="activo">Solo viajes activos</option>
-          <option value="todos">Todos los estados</option>
-        </select>
-        <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
-        <button class="secondary" onclick="exportarCruce()">Descargar Excel</button>
-      </div>
-      <div class="tw"><table id="tab">
-        <thead><tr>
-          <th data-k="viaje">Id viaje</th>
-          <th data-k="cat">Categoría</th>
-          <th data-k="divN">Destino / división</th>
-          <th data-k="emp">Empresa de transporte</th>
-          <th data-k="cond">Conductor</th>
-          <th data-k="condSt">Habilitado</th>
-          <th data-k="tracto">Patente tracto / camión</th>
-          <th data-k="tractoSt">Habilitado</th>
-          <th data-k="semi">Patente semirremolque</th>
-          <th data-k="semiSt">Habilitado</th>
-        </tr></thead>
-        <tbody id="tb"></tbody>
-      </table></div>
-      <p class="hint" id="tabHint"></p>
-    </section>
-
-    <section class="card" id="secBus" style="display:none">
-      <h2>Buscador de habilitaciones</h2>
-      <div class="row"><div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div></div>
-      <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios donde aparece. Doble clic en una división abre el detalle.</p>
-      <div id="bres"></div>
-    </section>
-  </div>
-
-  <!-- ===== DESVIACIONES ===== -->
-  <div class="panel" id="pDesv">
-    <section class="card">
-      <h2>Viajes con desviaciones</h2>
-      <div class="kpis" id="kpisDesv"></div>
-      <div class="row" style="margin-top:12px">
-        <div class="grow"><input type="text" id="qd" placeholder="Filtrar: viaje, pedido, empresa, categoría…" oninput="renderDesv()"></div>
-        <select id="fEstD" onchange="renderDesv()">
-          <option value="todos">Todos los estados</option>
-          <option value="activo">Solo viajes activos</option>
-        </select>
-        <select id="fTipoD" onchange="renderDesv()"><option value="">Todas las desviaciones</option></select>
-        <button class="secondary" onclick="exportarDesv()">Descargar Excel</button>
-      </div>
-      <div class="tw"><table id="tabD">
-        <thead><tr>
-          <th data-k="viaje">Id viaje</th>
-          <th data-k="estV">Estado viaje</th>
-          <th data-k="fcar">Fecha carga</th>
-          <th data-k="verif">Verificación</th>
-          <th data-k="cat">Categoría</th>
-          <th data-k="prio">Prioridad</th>
-          <th data-k="tipoPlan">Tipo vehículo plan</th>
-          <th data-k="semi">Patente semirremolque</th>
-          <th data-k="emp">Empresa</th>
-          <th data-k="ndesv">Desviaciones</th>
-        </tr></thead>
-        <tbody id="tbD"></tbody>
-      </table></div>
-      <p class="hint" id="hintD"></p>
-      <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO", salvo en camiones rígidos (15, 10, 5, 3/4 t) y camionetas, que no llevan semirremolque. Doble clic en un viaje abre su detalle.</p>
-    </section>
-  </div>
-
-  <!-- ===== PEAJES ===== -->
-  <div class="panel" id="pPeaje">
-    <section class="card">
-      <h2>Viajes con incidencia de peajes</h2>
-      <div class="kpis" id="kpisPeaje"></div>
-      <div class="row" style="margin-top:12px">
-        <div class="grow"><input type="text" id="qp" placeholder="Filtrar: viaje, pedido, empresa, patente, origen, destino…" oninput="renderPeaje()"></div>
-        <select id="fEstP" onchange="renderPeaje()">
-          <option value="todos">Todos los estados</option>
-          <option value="activo">Solo viajes activos</option>
-        </select>
-        <select id="fMotP" onchange="renderPeaje()">
-          <option value="">Todos los orígenes</option>
-          <option value="Santiago">Desde Santiago hacia DCH / DRT / DMH</option>
-          <option value="Antofagasta">Desde Antofagasta hacia DCH / DRT / DMH</option>
-          <option value="Salvador">Desde Salvador hacia DCH / DRT / DMH</option>
-          <option value="Andina">Desde Andina hacia DCH / DRT / DMH</option>
-          <option value="Rancagua">Desde Rancagua / Requínoa hacia DCH / DRT / DMH</option>
-          <option value="Concepción">Desde Concepción hacia DCH / DRT / DMH</option>
-          <option value="Copiapó">Desde Copiapó hacia DCH / DRT / DMH</option>
-          <option value="Coquimbo">Desde Coquimbo hacia DCH / DRT / DMH</option>
-          <option value="Hacia Antofagasta">Desde DCH / DRT / DMH a Antofagasta</option>
-        </select>
-        <label class="chk"><input type="checkbox" id="fSinP" onchange="renderPeaje()"> Solo sin peaje registrado</label>
-        <button class="secondary" onclick="exportarPeaje()">Descargar Excel</button>
-      </div>
-      <div class="tw"><table id="tabP">
-        <thead><tr>
-          <th data-k="viaje">Id viaje</th>
-          <th data-k="estV">Estado viaje</th>
-          <th data-k="fcar">Fecha carga</th>
-          <th data-k="origN">Origen</th>
-          <th data-k="destN">Destino</th>
-          <th data-k="emp">Empresa</th>
-          <th data-k="tracto">Patente</th>
-          <th data-k="cat">Categoría</th>
-          <th data-k="peajeReg">Alerta</th>
-        </tr></thead>
-        <tbody id="tbP"></tbody>
-      </table></div>
-      <p class="hint" id="hintP"></p>
-      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Los viajes suspendidos y los falsos fletes no se listan en la tabla; solo se cuentan en sus cuadros, donde el doble clic muestra cuáles son. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
-    </section>
-  </div>
-
-  <footer>Codelco · Los datos se guardan solo en este navegador.</footer>
-</main>
+</div>
 
 <div id="modalBg" onclick="if(event.target===this) cerrarModal()">
   <div class="modal" role="dialog" aria-modal="true">
@@ -287,42 +464,25 @@
 const DIV_MAP = { DTEN:'DET', DAN:'DAND', DSAL:'DSA', DVEN:'DVE' };
 const DIV_NOM = { DCH:'Chuquicamata', DRT:'Radomiro Tomic', DMH:'Ministro Hales', DGM:'Gabriela Mistral', DET:'El Teniente', DAND:'Andina', DSA:'Salvador', DVE:'Ventanas' };
 const PEAJE_DIVS = ['DCH','DRT','DMH'];
-// comunas de la Región Metropolitana (origen "Santiago" para peajes)
 const SANTIAGO = new Set(['santiago','cerrillos','cerro navia','conchali','el bosque','estacion central','huechuraba','independencia','la cisterna','la florida','la granja','la pintana','la reina','las condes','lo barnechea','lo espejo','lo prado','macul','maipu','nunoa','pedro aguirre cerda','penalolen','providencia','pudahuel','quilicura','quinta normal','recoleta','renca','san joaquin','san miguel','san ramon','vitacura','puente alto','pirque','san jose de maipo','colina','lampa','tiltil','til til','san bernardo','buin','calera de tango','paine','melipilla','alhue','curacavi','maria pinto','san pedro','talagante','el monte','isla de maipo','padre hurtado','penaflor']);
 const SALVADOR = new Set(['el salvador','diego de almagro','salvador']);
 const ANDINA = new Set(['los andes','saladillo','andina','san felipe','calle larga','rinconada']);
-// otras comunas de origen que también pagan peaje hacia DCH/DRT/DMH (nombre de zona → comunas)
 const OTRAS_ZONAS = { 'Rancagua':['rancagua','requinoa'], 'Concepción':['concepcion'], 'Copiapó':['copiapo'], 'Coquimbo':['coquimbo'] };
-function comunaDe(dir){ const t=String(dir||'').trim(); const i=t.lastIndexOf('-'); return norm(i>=0?t.slice(i+1):''); }
-// zona de origen para peajes: Santiago / Antofagasta / Salvador / Andina, o '' si no aplica (Calama y otros quedan fuera)
-function zonaOrigen(s){
-  const c=comunaDe(s.dirCarga), od=divDe(s.orig);
-  if(c==='calama') return '';
-  if(od==='DSA'||SALVADOR.has(c)) return 'Salvador';
-  if(od==='DAND'||ANDINA.has(c)) return 'Andina';
-  if(c==='antofagasta') return 'Antofagasta';
-  if(SANTIAGO.has(c)) return 'Santiago';
-  for(const [z,cs] of Object.entries(OTRAS_ZONAS)) if(cs.includes(c)) return z;
-  return '';
-}
 const KEY_HAB = 'yuli_hab2', KEY_SRV = 'yuli_srv2';
-// ítems del conductor: columnas W..AF (días) y su fecha de expiración asociada
 const ITEMS_COND = [
-  {id:'credencial', label:'Credencial',                         short:'Credencial',    dias:'dias por vencer credencial',           fecha:'fecha vigencia'},
-  {id:'licInt',     label:'Licencia interna',                   short:'Lic. interna',  dias:'dias por vencer lic interna',          fecha:'fecha expiracion licencia interna'},
-  {id:'defensiva',  label:'Curso de manejo a la defensiva',     short:'Manejo def.',   dias:'dias por vencer curso de manejo',      fecha:'fecha expiracion curso de manejo'},
-  {id:'indEsp',     label:'Inducción específica de áreas',      short:'Ind. específ.', dias:'dias por vencer induccion especifica', fecha:'fecha expiracion induccion especifica'},
-  {id:'licMun',     label:'Licencia municipal',                 short:'Lic. municipal',dias:'dias por vencer lic municipal',        fecha:'fecha expiracion licencia municipal'},
-  {id:'ci',         label:'Cédula de identidad',                short:'Cédula',        dias:'dias por vencer ci',                   fecha:'fecha expiracion ci'},
-  {id:'examen',     label:'Examen batería básica',              short:'Examen',        dias:'dias por vencer examen',               fecha:'fecha expiracion examen'},
-  {id:'psico',      label:'Psicosensométrico',                  short:'Psico',         dias:'dias por vencer psico',                fecha:'fecha expiracion psico'},
-  {id:'indGen',     label:'Inducción general',                  short:'Ind. general',  dias:'dias por vencer induccion general',    fecha:'fecha expiracion induccion general'},
-  {id:'contrato',   label:'Contrato laboral',                   short:'Contrato',      dias:'dias para termino contrato',           fecha:'fecha termino contrato'},
+  {id:'credencial', label:'Credencial',                     short:'Credencial',    dias:'dias por vencer credencial',           fecha:'fecha vigencia'},
+  {id:'licInt',     label:'Licencia interna',               short:'Lic. interna',  dias:'dias por vencer lic interna',          fecha:'fecha expiracion licencia interna'},
+  {id:'defensiva',  label:'Curso de manejo a la defensiva', short:'Manejo def.',   dias:'dias por vencer curso de manejo',      fecha:'fecha expiracion curso de manejo'},
+  {id:'indEsp',     label:'Inducción específica de áreas',  short:'Ind. específ.', dias:'dias por vencer induccion especifica', fecha:'fecha expiracion induccion especifica'},
+  {id:'licMun',     label:'Licencia municipal',             short:'Lic. municipal',dias:'dias por vencer lic municipal',        fecha:'fecha expiracion licencia municipal'},
+  {id:'ci',         label:'Cédula de identidad',            short:'Cédula',        dias:'dias por vencer ci',                   fecha:'fecha expiracion ci'},
+  {id:'examen',     label:'Examen batería básica',          short:'Examen',        dias:'dias por vencer examen',               fecha:'fecha expiracion examen'},
+  {id:'psico',      label:'Psicosensométrico',              short:'Psico',         dias:'dias por vencer psico',                fecha:'fecha expiracion psico'},
+  {id:'indGen',     label:'Inducción general',              short:'Ind. general',  dias:'dias por vencer induccion general',    fecha:'fecha expiracion induccion general'},
+  {id:'contrato',   label:'Contrato laboral',               short:'Contrato',      dias:'dias para termino contrato',           fecha:'fecha termino contrato'},
 ];
-// patrón Verificación -> categorías permitidas
 const PATRON = {
-  'molibdeno': ['arriendo'],
-  'regular': ['retorno'],
+  'molibdeno': ['arriendo'], 'regular': ['retorno'],
   'tte cod bc a division': ['directo','barra','catodo','urgencia'],
   'tte cod de proveedor a division': ['catodo','barra','directo','urgencia'],
   'tte cod de retiros': ['retiro'],
@@ -332,6 +492,7 @@ const PATRON = {
   'tte cod movimiento entre divisiones': ['directo','retiro','urgencia','retorno dedicado'],
   'tte cod puerto-bc': ['directo','retiro'],
 };
+const DESV_NOM={patron:'Patrón Verificación / Categoría', urgencia:'Prioridad Urgencia sin categoría URGENCIA', semi:'Tracto sin patente de semirremolque', nodet:'Columna con NO DETERMINADO'};
 
 /* ---------- utilidades ---------- */
 const $ = id => document.getElementById(id);
@@ -343,13 +504,14 @@ const isHab = e => /^HABILITADO/i.test(String(e||'').trim());
 const esActivo = s => /^activo$/i.test(String(s||'').trim());
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sinPrefijo = s => String(s||'').replace(/^\d+-\s*/,'');
+const cap = s => String(s||'').replace(/\b\w/g,c=>c.toUpperCase());
 function fmtRut(r){ r = normRut(r); if(r.length<2) return r; const cuerpo=r.slice(0,-1), dv=r.slice(-1); return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+'-'+dv; }
 function fmtFecha(v){
   if(v==null||v==='') return '';
   if(v instanceof Date) return isNaN(v)?'':v.toLocaleDateString('es-CL');
   if(typeof v==='number'){ const d=XLSX.SSF.parse_date_code(v); return d?`${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${d.y}`:''; }
   const s=String(v).trim(); const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
-  if(m) return `${m[2].padStart(2,'0')}/${m[1].padStart(2,'0')}/${m[3]}`; // el informe trae MM/dd/yyyy
+  if(m) return `${m[2].padStart(2,'0')}/${m[1].padStart(2,'0')}/${m[3]}`;
   return s.split(' ')[0];
 }
 function num(v){ if(v==null||v==='') return null; const n=Number(String(v).replace(',','.')); return isNaN(n)?null:n; }
@@ -357,12 +519,24 @@ function divDe(dest){ const m=/\(([A-Z]{2,5})\)\s*$/.exec(String(dest||'').trim(
 function divLabel(code){ return DIV_NOM[code] ? `${DIV_NOM[code]} (${code})` : code; }
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',3500); }
 function fechaKey(s){ const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String(s||'')); return m?`${m[3]}${m[2].padStart(2,'0')}${m[1].padStart(2,'0')}`:''; }
+function comunaDe(dir){ const t=String(dir||'').trim(); const i=t.lastIndexOf('-'); return norm(i>=0?t.slice(i+1):''); }
+function zonaOrigen(s){
+  const c=comunaDe(s.dirCarga), od=divDe(s.orig);
+  if(c==='calama') return '';
+  if(od==='DSA'||SALVADOR.has(c)) return 'Salvador';
+  if(od==='DAND'||ANDINA.has(c)) return 'Andina';
+  if(c==='antofagasta') return 'Antofagasta';
+  if(SANTIAGO.has(c)) return 'Santiago';
+  for(const [z,cs] of Object.entries(OTRAS_ZONAS)) if(cs.includes(c)) return z;
+  return '';
+}
 
 /* ---------- estado ---------- */
 let HAB=null, SRV=null, CRUCE=[], DESV=[], PEAJES=[];
-let SORT={cruce:{k:'',dir:1}, desv:{k:'',dir:1}, peaje:{k:'',dir:1}};
-let LAST={cruce:[], desv:[], peaje:[]};
-let IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map()};
+let SORT={cruce:{k:'',dir:1}, desv:{k:'',dir:1}, peaje:{k:'',dir:1}, viajes:{k:'',dir:1}};
+let LAST={cruce:[], desv:[], peaje:[], viajes:[], modal:[], ult:[]};
+let IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map(), cruceByViaje:new Map(), desvByViaje:new Map(), peajeByViaje:new Map()};
+let KPI={}, MODAL_XLS=null;
 
 /* ---------- lectura de Excel ---------- */
 function headersNorm(hdr){ return hdr.map(h=>norm(h)); }
@@ -411,7 +585,8 @@ function leerServicios(wb, name){
     estV:colExact(hn,'Estado Viaje'), estP:colExact(hn,'Estado Pedido'), prio:colExact(hn,'Prioridad'), tipoPlan:colExact(hn,'Tipo Vehiculo Plan'),
     emp:colExact(hn,'Proveedor TTE','Proveedor'), tracto:colExact(hn,'Patente Principal'), semi:colExact(hn,'Patente Secundaria'), chofer:colExact(hn,'Chofer'), cocond:colExact(hn,'Coconductor'),
     rut:colExact(hn,'Rut Conductor','RUT Conductor'), tipo:colExact(hn,'Tipo Vehiculo Principal'), tipoSec:colExact(hn,'Tipo Vehiculo Secundario'),
-    fcar:colExact(hn,'Fecha Plan Carga'), fdes:colExact(hn,'Fecha Plan Descarga'), fcre:colExact(hn,'Fecha Creacion','Fecha Creación'), incid:colExact(hn,'Incidencias Viaje'), cliente:colExact(hn,'Cliente'), refExt:colExact(hn,'Referencia Externa')
+    fcar:colExact(hn,'Fecha Plan Carga'), fdes:colExact(hn,'Fecha Plan Descarga'), fcre:colExact(hn,'Fecha Creacion','Fecha Creación'), incid:colExact(hn,'Incidencias Viaje'),
+    cliente:colExact(hn,'Cliente'), refExt:colExact(hn,'Referencia Externa'), estCarga:colExact(hn,'Estado Carga'), estDesc:colExact(hn,'Estado Descarga')
   };
   const falta = ['id','viaje','dest','estV','tracto','rut'].filter(k=>c[k]<0);
   if(falta.length) throw new Error('Punto a Punto: faltan columnas: '+falta.join(', '));
@@ -422,7 +597,7 @@ function leerServicios(wb, name){
     rows.push({ id:g(r,c.id), viaje:g(r,c.viaje), cat:g(r,c.cat), verif:g(r,c.verif), dest:g(r,c.dest), dirDesc:g(r,c.dirDesc), orig:g(r,c.orig), dirCarga:g(r,c.dirCarga),
       estV:g(r,c.estV), estP:g(r,c.estP), prio:g(r,c.prio), tipoPlan:g(r,c.tipoPlan), emp:g(r,c.emp), tracto:normPat(g(r,c.tracto)), semi:normPat(g(r,c.semi)), semiRaw:g(r,c.semi),
       chofer:g(r,c.chofer), cocond:g(r,c.cocond), rut:normRut(g(r,c.rut)), tipo:g(r,c.tipo), tipoSec:g(r,c.tipoSec), fcar:g(r,c.fcar), fdes:g(r,c.fdes), fcre:g(r,c.fcre),
-      incid:g(r,c.incid), cliente:g(r,c.cliente), refExt:g(r,c.refExt), noDet }); }
+      incid:g(r,c.incid), cliente:g(r,c.cliente), refExt:g(r,c.refExt), estCarga:g(r,c.estCarga), estDesc:g(r,c.estDesc), noDet }); }
   return {file:name, fecha:new Date().toISOString(), rows};
 }
 
@@ -443,11 +618,11 @@ async function ingestBuffer(name, buf){
 }
 function guardar(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('No se pudo guardar en el navegador: '+e.message); } }
 function cargarGuardado(){ try{ HAB=JSON.parse(localStorage.getItem(KEY_HAB)||'null'); SRV=JSON.parse(localStorage.getItem(KEY_SRV)||'null'); }catch(e){} }
-function limpiarTodo(){ if(!confirm('¿Borrar los archivos cargados de este navegador?')) return; localStorage.removeItem(KEY_HAB); localStorage.removeItem(KEY_SRV); HAB=null; SRV=null; CRUCE=[]; DESV=[]; PEAJES=[]; refrescar(); }
+function limpiarTodo(){ if(!confirm('¿Borrar los archivos cargados de este navegador?')) return; localStorage.removeItem(KEY_HAB); localStorage.removeItem(KEY_SRV); HAB=null; SRV=null; CRUCE=[]; DESV=[]; PEAJES=[]; refrescar(); ir('inicio'); }
 
 /* ---------- índices y estados ---------- */
 function indexar(){
-  IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map()};
+  IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map(), cruceByViaje:new Map(), desvByViaje:new Map(), peajeByViaje:new Map()};
   if(HAB){
     for(const r of HAB.cond){ const k=r.div+'|'+r.rut; const p=IDX.cond.get(k); if(!p||mejor(r,p)) IDX.cond.set(k,r); (IDX.condByRut.get(r.rut)||IDX.condByRut.set(r.rut,[]).get(r.rut)).push(r); }
     for(const r of HAB.eq){ const k=r.div+'|'+r.pat; const p=IDX.eq.get(k); if(!p||mejor(r,p)) IDX.eq.set(k,r); (IDX.eqByPat.get(r.pat)||IDX.eqByPat.set(r.pat,[]).get(r.pat)).push(r); }
@@ -455,7 +630,6 @@ function indexar(){
   if(SRV) for(const s of SRV.rows) IDX.srvByViaje.set(s.viaje, s);
 }
 function mejor(a,b){ const ha=isHab(a.est), hb=isHab(b.est); if(ha!==hb) return ha; return (a.dias??-1e9) > (b.dias??-1e9); }
-
 function itemsCond(rec){ return ITEMS_COND.map((it,i)=>({...it, dias:rec.it?.[i]?.[0] ?? null, fecha:rec.it?.[i]?.[1] ?? ''})); }
 function motivoCond(rec, st){
   if(!rec){ const otras=(IDX.condByRut.get(st.rut)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No registrado en esta división. Habilitado en '+otras.join(', '):'No aparece en el informe de conductores'; }
@@ -502,80 +676,167 @@ function calcular(){
   if(!SRV) return;
   for(const s of SRV.rows){
     const activo=esActivo(s.estV);
-    // ---- cruce
     const div=divDe(s.dest);
     if(div && HAB){
       const rc=IDX.cond.get(div+'|'+s.rut);
       const condSt=estado(rc); condSt.rec=rc; condSt.rut=s.rut; condSt.motivo=motivoCond(rc,condSt);
       const tractoSt=estadoEquipo(div,s.tracto,false), semiSt=estadoEquipo(div,s.semi,true);
       const peor=Math.min(condSt.orden,tractoSt.orden,semiSt.orden===3?9:semiSt.orden);
-      CRUCE.push({...s, div, divN:divLabel(div), cond: rc?rc.nom:(s.chofer||''), condRec:rc, condSt, tractoSt, semiSt, peor, activo});
+      const row={...s, div, divN:divLabel(div), cond: rc?rc.nom:(s.chofer||''), condRec:rc, condSt, tractoSt, semiSt, peor, activo};
+      CRUCE.push(row); IDX.cruceByViaje.set(s.viaje,row);
     }
-    // ---- desviaciones
     const d=[];
     const v=norm(s.verif), cat=norm(s.cat);
     if(v||cat){ const perm=PATRON[v]; if(!perm) d.push({t:'patron', txt:`Verificación no reconocida: ${s.verif||'(vacía)'}`}); else if(!perm.includes(cat)) d.push({t:'patron', txt:`${s.verif} no admite categoría ${s.cat||'(vacía)'}`}); }
     if(/^urgencia$/i.test(s.prio) && !/^urgencia$/i.test(s.cat)) d.push({t:'urgencia', txt:`Prioridad Urgencia con categoría ${s.cat||'(vacía)'}`});
     if(/6X4|6X2|CAMA\s*BAJA/i.test(s.tipoPlan) && (!s.semi || /no determinado/i.test(s.semiRaw))) d.push({t:'semi', txt:`${s.tipoPlan} sin patente de semirremolque`});
-    const rigido=/^(CAMION|CAMIONETA|FURG)/i.test(s.tipoPlan); // camiones 15, 10, 5, 3/4 t y camionetas no llevan semirremolque
+    const rigido=/^(CAMION|CAMIONETA|FURG)/i.test(s.tipoPlan);
     if(s.noDet&&s.noDet.length&&!rigido) d.push({t:'nodet', txt:'NO DETERMINADO en: '+s.noDet.join(', ')});
-    if(d.length) DESV.push({...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)});
-    // ---- peajes
+    if(d.length){ const row={...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)}; DESV.push(row); IDX.desvByViaje.set(s.viaje,row); }
     const origDiv=divDe(s.orig), zona=zonaOrigen(s), comOrig=comunaDe(s.dirCarga), comDest=comunaDe(s.dirDesc);
     const hacia=PEAJE_DIVS.includes(div) && !!zona;
     const desde=PEAJE_DIVS.includes(origDiv) && (comDest==='antofagasta' || (!comDest && norm(s.dirDesc).includes('antofagasta'))) && /dedicado/i.test(s.cat);
     if(hacia||desde){
-      const motivo = hacia ? `Desde ${zona}${comOrig&&norm(zona)!==comOrig?' ('+comOrig.replace(/\b\w/g,c=>c.toUpperCase())+')':''} hacia ${divLabel(div)}` : `Desde ${divLabel(origDiv)} a Antofagasta`;
+      const motivo = hacia ? `Desde ${zona}${comOrig&&norm(zona)!==comOrig?' ('+cap(comOrig)+')':''} hacia ${divLabel(div)}` : `Desde ${divLabel(origDiv)} a Antofagasta`;
       const peajeReg=/peaje/i.test(s.incid);
       const excl = /suspendido/i.test(s.estV) ? 'Suspendido' : (/falso\s*flete/i.test(s.estV) ? 'Falso flete' : '');
-      PEAJES.push({...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, excl, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
+      const row={...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, excl, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)};
+      PEAJES.push(row); IDX.peajeByViaje.set(s.viaje,row);
     }
   }
 }
+// alertas consolidadas de un viaje (para Viajes e Inicio)
+function alertasViaje(s){
+  const c=IDX.cruceByViaje.get(s.viaje), d=IDX.desvByViaje.get(s.viaje), p=IDX.peajeByViaje.get(s.viaje);
+  const tags=[]; let nivel=3; // 0 desviación/no habilitado, 1 atención, 2 ok, 3 sin revisión
+  if(c){ nivel=2;
+    if(c.condSt.cls==='bad'){ tags.push({cls:'bad',txt:'Conductor no habilitado'}); nivel=0; } else if(c.condSt.cls==='warn'){ tags.push({cls:'warn',txt:'Conductor por vencer'}); nivel=Math.min(nivel,1); }
+    if(c.tractoSt.cls==='bad'){ tags.push({cls:'bad',txt:'Tracto no habilitado'}); nivel=0; } else if(c.tractoSt.cls==='warn'){ tags.push({cls:'warn',txt:'Tracto por vencer'}); nivel=Math.min(nivel,1); }
+    if(c.semiSt.cls==='bad'){ tags.push({cls:'bad',txt:'Semirremolque no habilitado'}); nivel=0; } else if(c.semiSt.cls==='warn'){ tags.push({cls:'warn',txt:'Semirremolque por vencer'}); nivel=Math.min(nivel,1); }
+  }
+  if(d){ d.desv.forEach(x=>tags.push({cls:'bad',txt:x.txt})); nivel=0; }
+  if(p && !p.excl && !p.peajeReg){ tags.push({cls:'warn',txt:'Peaje sin registrar'}); nivel=Math.min(nivel,1); }
+  return {tags, nivel, c, d, p};
+}
+const NIVEL=[{cls:'bad',txt:'Desviación'},{cls:'warn',txt:'Atención'},{cls:'ok',txt:'OK'},{cls:'na',txt:'Sin revisión'}];
 
-/* ---------- render general ---------- */
+/* ---------- navegación y render general ---------- */
+const SECS={inicio:'sInicio', acred:'sAcred', viajes:'sViajes', desv:'sDesv', peaje:'sPeaje', rep:'sRep'};
+function ir(s){ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s)); Object.entries(SECS).forEach(([k,id])=>$(id).classList.toggle('on',k===s)); window.scrollTo({top:0,behavior:'smooth'}); }
+function verTab(t){ ir(t==='cruce'?'acred':t); }
 function refrescar(){
   const fh=$('fHab'), fs=$('fSrv');
   fh.classList.toggle('ok',!!HAB); fs.classList.toggle('ok',!!SRV);
-  fh.querySelector('span:last-child').textContent = HAB ? `${HAB.file} · ${HAB.cond.length} conductores, ${HAB.eq.length} equipos · ${new Date(HAB.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
-  fs.querySelector('span:last-child').textContent = SRV ? `${SRV.file} · ${SRV.rows.length} servicios · ${new Date(SRV.fecha).toLocaleString('es-CL')}` : 'Sin cargar';
+  fh.querySelector('span:last-child').textContent = HAB ? ` · ${HAB.cond.length} conductores, ${HAB.eq.length} equipos · ${new Date(HAB.fecha).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})}` : ' · Sin cargar';
+  fs.querySelector('span:last-child').textContent = SRV ? ` · ${SRV.rows.length} viajes · ${new Date(SRV.fecha).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})}` : ' · Sin cargar';
+  fh.title=HAB?HAB.file:''; fs.title=SRV?SRV.file:'';
   calcular();
   const listo=!!(HAB&&SRV);
-  $('tabs').style.display = SRV?'':'none';
-  $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none'; $('secBus').style.display = HAB?'':'none';
-  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.filter(r=>!r.excl).length;
+  $('pillOp').className='pill'+(listo?' on':''); $('pillOp').querySelector('span:last-child').textContent = listo?'Operación activa · datos cargados':(SRV||HAB?'Falta un archivo':'Sin datos cargados');
+  $('drop').style.display = listo?'none':''; $('dash').style.display = listo?'':'none';
+  $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none'; $('secBus').style.display = HAB?'':'none'; $('acredVacio').style.display = listo?'none':'';
+  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nViajes').textContent = SRV?SRV.rows.filter(r=>esActivo(r.estV)).length:0; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.filter(r=>!r.excl).length;
   if(listo){ llenarFiltros(); render(); }
-  if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); }
+  if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); llenarFiltrosViajes(); renderViajes(); }
   if(HAB) buscar();
+  if(listo) renderInicio();
+  $('repHint').textContent = listo ? `Datos cargados: ${SRV.rows.length} viajes, ${HAB.cond.length} conductores y ${HAB.eq.length} equipos.` : 'Cargue los dos archivos para habilitar las descargas.';
 }
-function verTab(t){ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); ['cruce','desv','peaje'].forEach(p=>$('p'+p[0].toUpperCase()+p.slice(1)).classList.toggle('on',p===t)); }
 function thArrows(tableId, st){ document.querySelectorAll('#'+tableId+' th').forEach(th=>{ th.innerHTML = th.textContent.replace(/[▲▼]$/,'').trim() + (th.dataset.k===st.k?` <span class="arr">${st.dir>0?'▲':'▼'}</span>`:''); }); }
 function sortRows(rows, st, val){ if(!st.k) return rows; return rows.sort((a,b)=>{ const va=val(a,st.k), vb=val(b,st.k); return (va>vb?1:va<vb?-1:0)*st.dir; }); }
 function stHTML(s){ return `<div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${esc(s.txt)}</span></div>${s.motivo?`<span class="why ${s.cls}">${esc(s.motivo)}</span>`:''}`; }
-let KPI={};
 function kpiHTML(list){ return list.map(([c,v,l,k])=>`<div class="kpi ${c}"${k?` data-kpi="${k}" title="Doble clic: ver el detalle"`:''}><div class="v">${v}</div><div class="l">${l}</div></div>`).join(''); }
 function defKpi(k,titulo,tipo,rows){ KPI[k]={titulo,tipo,rows}; return k; }
-function modalKpi(k){
-  const d=KPI[k]; if(!d) return; const rows=d.rows; LAST.modal=rows;
-  let head='', body='', aoa=[];
-  const viajeTd=(r,i)=>`<td class="dbl" data-d="viaje" data-i="${i}" data-src="modal" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)} · ${esc(r.estV)}</span></td>`;
-  if(d.tipo==='cruce'){
-    head='<th>Viaje</th><th>División</th><th>Empresa</th><th>Conductor</th><th>Tracto / camión</th><th>Semirremolque</th>';
-    body=rows.map((r,i)=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">${viajeTd(r,i)}<td>${esc(r.divN)}</td><td>${esc(r.emp)}</td><td>${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}</span>${stHTML(r.condSt)}</td><td><span class="plate">${esc(r.tracto)||'—'}</span>${stHTML(r.tractoSt)}</td><td><span class="plate">${esc(r.semi)||'—'}</span>${stHTML(r.semiSt)}</td></tr>`).join('');
-    aoa=[['Id viaje','Id pedido','Estado viaje','División','Empresa','Conductor','RUT','Conductor habilitado','Motivo conductor','Patente tracto','Tracto habilitado','Motivo tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque'],...rows.map(r=>[r.viaje,r.id,r.estV,r.divN,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.tracto,r.tractoSt.txt,r.tractoSt.motivo,r.semi,r.semiSt.txt,r.semiSt.motivo])];
-  } else if(d.tipo==='desv'){
-    head='<th>Viaje</th><th>Fecha carga</th><th>Verificación</th><th>Categoría</th><th>Prioridad</th><th>Tipo vehículo plan</th><th>Empresa</th><th>Desviaciones</th>';
-    body=rows.map((r,i)=>`<tr class="r-bad">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(r.verif)}</td><td>${esc(r.cat)}</td><td>${esc(r.prio)}</td><td>${esc(r.tipoPlan)}</td><td>${esc(r.emp)}</td><td>${r.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}</td></tr>`).join('');
-    aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Verificación','Categoría','Prioridad','Tipo vehículo plan','Patente secundaria','Empresa','Desviaciones'],...rows.map(r=>[r.viaje,r.id,r.estV,r.fcar,r.verif,r.cat,r.prio,r.tipoPlan,r.semiRaw,r.emp,r.desv.map(x=>x.txt).join(' | ')])];
-  } else {
-    head='<th>Viaje</th><th>Fecha carga</th><th>Origen</th><th>Destino</th><th>Empresa</th><th>Categoría</th><th>Alerta</th>';
-    body=rows.map((r,i)=>`<tr class="${r.peajeReg?'':'r-warn'}">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(r.origN)}<span class="sub">${esc(r.dirCarga)}</span></td><td>${esc(r.destN)}<span class="sub">${esc(r.dirDesc)}</span></td><td>${esc(r.emp)}</td><td>${esc(r.cat)}</td><td>${r.peajeReg?'<span class="sub">—</span>':'<span class="tag warn">Sin peaje registrado</span>'}</td></tr>`).join('');
-    aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Bodega destino','Dirección descarga','Empresa','Categoría','Origen','Motivo','Peaje registrado'],...rows.map(r=>[r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,r.destN,r.dirDesc,r.emp,r.cat,r.zona,r.motivo,r.peajeReg?'Sí':'No'])];
-  }
-  abrirModal(`${esc(d.titulo)} <span class="sub">${rows.length} viaje${rows.length===1?'':'s'}</span>`, `<div class="tw" style="max-height:65vh;margin-top:0"><table><thead><tr>${head}</tr></thead><tbody>${body||'<tr><td class="empty" colspan="9">Sin viajes.</td></tr>'}</tbody></table></div><p class="hint">Doble clic en un viaje abre su detalle.</p>`, {name:d.titulo, aoa});
-}
 
-/* ---------- CRUCE ---------- */
+/* ---------- INICIO (dashboard) ---------- */
+const ICO={ truck:'<svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>',
+  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  warn:'<svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>',
+  toll:'<svg viewBox="0 0 24 24"><path d="M4 20 10 4h4l6 16"/><path d="M6.5 14h11"/><path d="M8.5 9h7"/></svg>',
+  cal:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  doc:'<svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>',
+  flag:'<svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg>',
+  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>' };
+function renderInicio(){
+  const S=SRV.rows, act=S.filter(r=>esActivo(r.estV)), a=CRUCE.filter(r=>r.activo);
+  const items=[]; for(const r of a){ items.push(r.condSt,r.tractoSt); if(r.semiSt.cls!=='na') items.push(r.semiSt); }
+  const cnt=c=>items.filter(s=>s.cls===c).length;
+  const okN=cnt('ok'), warnN=cnt('warn'), badN=cnt('bad'), aplic=items.length;
+  const pct = aplic? Math.round((okN+warnN)/aplic*100) : 0;
+  const PV=PEAJES.filter(r=>!r.excl), sinPeaje=PV.filter(r=>!r.peajeReg), desvAct=DESV.filter(r=>r.activo);
+  // KPI grandes
+  $('bigkpis').innerHTML=[
+    {c:'g',ic:ICO.truck,t:'VIAJES',v:act.length,s:`${a.length} activos a división`,go:"ir('viajes')"},
+    {c:'g',ic:ICO.user,t:'HABILITADOS',v:pct+'%',s:`${okN+warnN} de ${aplic} revisiones habilitadas`,go:"ir('acred')"},
+    {c:desvAct.length?'r':'g',ic:ICO.warn,t:'DESVIACIONES',v:DESV.length,s:desvAct.length?`${desvAct.length} en viajes activos`:'Ninguna en viajes activos',go:"ir('desv')"},
+    {c:sinPeaje.length?'a':'g',ic:ICO.toll,t:'PEAJES',v:sinPeaje.length,s:`sin registrar de ${PV.length} viajes con peaje`,go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
+  ].map(k=>`<div class="bk ${k.c}" onclick="${k.go}"><div class="ic">${k.ic}</div><div><div class="t">${k.t}</div><div class="v">${k.v}</div><div class="s"><span class="dot"></span>${esc(k.s)}</div></div></div>`).join('');
+  // Flujo de la operación (estados reales de la planilla)
+  const tot=S.length||1;
+  const planif=S.filter(r=>/^inactivo$/i.test(r.estV)), regist=act, valid=a.filter(r=>r.peor>=2), obs=a.filter(r=>r.peor<2), cerr=S.filter(r=>/^finalizado/i.test(r.estV));
+  defKpi('fPlan','Planificados · viajes inactivos pendientes de activar','viajes',planif); defKpi('fReg','Registrados · viajes activos con vehículo y conductor','viajes',regist);
+  defKpi('fVal','Validados · activos a división sin alertas','cruce',valid); defKpi('fObs','Con observación · activos a división con alertas','cruce',obs); defKpi('fCer','Cerrados · viajes finalizados','viajes',cerr);
+  $('flowTot').textContent=`Total de viajes: ${S.length}`;
+  $('flow').innerHTML=[['fPlan','Planificados',planif.length,ICO.cal,''],['fReg','Registrados',regist.length,ICO.doc,''],['fVal','Validados',valid.length,ICO.check,''],['fObs','Con observación',obs.length,ICO.warn,'w'],['fCer','Cerrados',cerr.length,ICO.flag,'c']]
+    .map(([k,l,v,ic,c])=>`<div class="step ${c}" ondblclick="modalKpi('${k}')" title="Doble clic: ver los viajes"><div class="l">${ic}${l}</div><div class="v">${v}</div><div class="p">${Math.round(v/tot*100)}%</div></div>`).join('');
+  $('flowHint').textContent='Planificados = viajes inactivos pendientes de activar · Registrados = viajes activos · Validados = activos a división sin alertas · Con observación = activos a división con alertas · Cerrados = viajes finalizados. Doble clic en una etapa muestra sus viajes.';
+  // Alertas del planificador
+  const porVencer=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls==='warn'));
+  const incompl=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>/no registrado|no aparece/i.test(s.txt+' '+(s.motivo||''))));
+  const noHab=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls==='bad'));
+  const al=[
+    {n:noHab.length,cls:'bad',t:'servicios con conductor o equipo no habilitado',s:'Revisar acreditación antes del ingreso a división.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:desvAct.length,cls:'bad',t:'viajes activos con desviación',s:'Revisar verificación, categoría, prioridad y vehículo.',go:"ir('desv');$('fEstD').value='activo';renderDesv()"},
+    {n:porVencer.length,cls:'warn',t:'servicios con habilitación próxima a vencer',s:'Menos de 11 días de vigencia. Gestionar renovación.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:incompl.length,cls:'warn',t:'servicios con conductor o patente no registrados',s:'No aparecen en el informe para esa división.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:sinPeaje.length,cls:'na',t:'viajes con peaje sin registrar',s:'Revisar y regularizar la incidencia de peaje.',go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
+  ];
+  $('alN').textContent=al.reduce((x,y)=>x+y.n,0);
+  $('alertas').innerHTML=al.map(x=>`<button class="al ${x.n?x.cls:'ok'}" onclick="${x.go}"><span class="ic">${x.n?'!':'✓'}</span><span><b><em>${x.n}</em>${esc(x.t)}</b><span class="s">${esc(x.n?x.s:'Sin pendientes.')}</span></span><span class="chev">›</span></button>`).join('');
+  // Dónde debo mirar ahora
+  const acts=[
+    {n:noHab.length,ic:ICO.user,t:'Gestionar acreditaciones',s:`${noHab.length} servicios con equipo o conductor no habilitado`,go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:desvAct.length,ic:ICO.warn,t:'Revisar viajes con desviación',s:`${desvAct.length} viajes activos · ${DESV.length} en total`,go:"ir('desv')"},
+    {n:porVencer.length,ic:ICO.cal,t:'Renovar habilitaciones por vencer',s:`${porVencer.length} servicios con vencimiento en menos de 11 días`,go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:sinPeaje.length,ic:ICO.toll,t:'Consultar incidencias de peajes',s:`${sinPeaje.length} viajes sin peaje registrado`,go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
+    {n:1,ic:ICO.search,t:'Buscar un conductor o patente',s:'Ver en qué divisiones está habilitado',go:"ir('acred');setTimeout(()=>$('bq').focus(),300)"},
+  ].sort((x,y)=>(y.n>0)-(x.n>0));
+  $('mirar').innerHTML=acts.map(x=>`<button class="act" onclick="${x.go}"><span class="ic">${x.ic}</span><span><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev">›</span></button>`).join('');
+  // Resumen por división (barras)
+  const divs=[...new Set(a.map(r=>r.div))].sort((x,y)=>a.filter(r=>r.div===y).length-a.filter(r=>r.div===x).length);
+  const data=divs.map(d=>({d, n:a.filter(r=>r.div===d).length, al:a.filter(r=>r.div===d&&r.peor<2).length}));
+  const W=560,Hh=230,pl=34,pb=42,pt=14; const maxV=Math.max(1,...data.map(x=>x.n)); const gw=(W-pl-10)/Math.max(1,data.length); const bw=Math.min(34,gw*0.32);
+  const ticks=[0,0.25,0.5,0.75,1].map(f=>Math.round(maxV*f));
+  let svg=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Viajes activos y con alertas por división">`;
+  svg+=[...new Set(ticks)].map(t=>{ const y=pt+(Hh-pt-pb)*(1-t/maxV); return `<line x1="${pl}" x2="${W-6}" y1="${y}" y2="${y}" stroke="#e8eeea"/><text x="${pl-6}" y="${y+4}" font-size="10" fill="#7a8781" text-anchor="end">${t}</text>`; }).join('');
+  data.forEach((x,i)=>{ const cx=pl+gw*i+gw/2; const h1=(Hh-pt-pb)*x.n/maxV, h2=(Hh-pt-pb)*x.al/maxV; const y1=Hh-pb-h1, y2=Hh-pb-h2;
+    svg+=`<g style="cursor:pointer" ondblclick="modalDiv('${x.d}')"><title>${esc(DIV_NOM[x.d]||x.d)}: ${x.n} viajes activos, ${x.al} con alertas (doble clic: detalle)</title>
+      <rect x="${cx-bw-2}" y="${y1}" width="${bw}" height="${h1}" rx="3" fill="#0f7a3c"/><text x="${cx-bw/2-2}" y="${y1-4}" font-size="11" font-weight="700" fill="#172a1f" text-anchor="middle">${x.n}</text>
+      <rect x="${cx+2}" y="${y2}" width="${bw}" height="${h2}" rx="3" fill="#9fd3b2"/><text x="${cx+bw/2+2}" y="${y2-4}" font-size="11" fill="#45584d" text-anchor="middle">${x.al}</text>
+      <text x="${cx}" y="${Hh-pb+16}" font-size="11" fill="#45584d" text-anchor="middle">${esc(DIV_NOM[x.d]||x.d)}</text></g>`; });
+  svg+='</svg>';
+  $('chDiv').innerHTML = data.length? svg : '<p class="empty">Sin servicios activos a división.</p>';
+  // Donut estado de habilitación
+  const naN=a.filter(r=>r.semiSt.cls==='na').length;
+  const segs=[['Habilitados',okN,'#0f7a3c','ok'],['Por vencer',warnN,'#e0a100','warn'],['No habilitados',badN,'#c62828','bad'],['No aplica',naN,'#b4bec6','na']];
+  const totS=segs.reduce((x,s)=>x+s[1],0)||1; let ang=-Math.PI/2; const R=70,r0=46,cx=85,cy=85;
+  let d='';
+  segs.forEach(s=>{ if(!s[1]) return; const a2=ang+2*Math.PI*s[1]/totS; const large=(a2-ang)>Math.PI?1:0; const p=(R,an)=>[cx+R*Math.cos(an),cy+R*Math.sin(an)];
+    const [x1,y1]=p(R,ang),[x2,y2]=p(R,a2),[x3,y3]=p(r0,a2),[x4,y4]=p(r0,ang);
+    d+=`<path d="M${x1} ${y1} A${R} ${R} 0 ${large} 1 ${x2} ${y2} L${x3} ${y3} A${r0} ${r0} 0 ${large} 0 ${x4} ${y4} Z" fill="${s[2]}"><title>${s[0]}: ${s[1]}</title></path>`; ang=a2; });
+  $('donut').innerHTML=`<svg viewBox="0 0 170 170">${d}<text x="85" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#172a1f">${pct}%</text><text x="85" y="100" text-anchor="middle" font-size="11" fill="#5f6f66">Habilitados</text></svg>
+    <table>${segs.map(s=>`<tr><td><span class="dot" style="background:${s[2]}"></span>${s[0]}</td><td><b>${s[1]}</b></td></tr>`).join('')}</table>
+    <p class="hint" style="flex-basis:100%">Revisiones de conductor, tracto y semirremolque en los ${a.length} servicios activos a división.</p>`;
+  // Últimos viajes
+  const ult=[...S].sort((x,y)=>(esActivo(y.estV)-esActivo(x.estV))||fechaKey(y.fcar).localeCompare(fechaKey(x.fcar))||String(y.viaje).localeCompare(String(x.viaje))).slice(0,8);
+  LAST.ult=ult;
+  $('tbUlt').innerHTML=ult.map((s,i)=>{ const al=alertasViaje(s); const nv=NIVEL[al.nivel]; const dv=divDe(s.dest);
+    return `<tr class="r-${nv.cls}"><td class="dbl" data-d="viaje" data-i="${i}" data-src="ult"><b>${esc(s.viaje)}</b><span class="sub">${esc(s.estV)}${s.fcar?' · '+esc(s.fcar):''}</span></td><td>${esc(cap(comunaDe(s.dirCarga))||sinPrefijo(s.orig))}</td><td>${esc(dv?divLabel(dv):sinPrefijo(s.dest))}</td><td>${esc(s.emp)}</td><td>${esc(s.cat)}</td><td><div class="st ${nv.cls}"><span class="dot ${nv.cls}"></span><span class="txt">${nv.txt}</span></div></td><td>${al.tags.length?al.tags.slice(0,3).map(t=>`<span class="tag ${t.cls}">${esc(t.txt)}</span>`).join('')+(al.tags.length>3?`<span class="tag na">+${al.tags.length-3}</span>`:''):'<span class="sub">—</span>'}</td><td><button class="chev" onclick="modalViaje(LAST.ult[${i}])" title="Ver detalle">›</button></td></tr>`; }).join('');
+}
+function modalDiv(d){ const rows=CRUCE.filter(r=>r.activo&&r.div===d); defKpi('divTmp',`Servicios activos a ${divLabel(d)}`,'cruce',rows); modalKpi('divTmp'); }
+
+/* ---------- ACREDITADOS ---------- */
 function llenarFiltros(){
   const sd=$('fDiv'), se=$('fEmp'); const vd=sd.value, ve=se.value;
   const divs=[...new Set(CRUCE.map(r=>r.div))].sort(); const emps=[...new Set(CRUCE.map(r=>r.emp).filter(Boolean))].sort();
@@ -616,7 +877,6 @@ function render(){
 function kpis(){
   const a=CRUCE.filter(r=>r.activo);
   const tiene=(r,cls)=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls===cls);
-  const cnt=(sel,cls)=>a.filter(r=>sel(r).cls===cls).length;
   const K=(k,c,l,rows)=>{ defKpi(k,l,'cruce',rows); return [c,rows.length,l,k]; };
   $('kpis').innerHTML=kpiHTML([
     K('cAct','','Servicios activos a división',a),
@@ -629,15 +889,52 @@ function kpis(){
     K('cFalso','','Falsos fletes',CRUCE.filter(r=>/falso\s*flete/i.test(r.estV))),
   ]);
 }
-function exportarCruce(){
-  const rows=LAST.cruce;
+function exportarCruce(rows){
+  rows=rows||LAST.cruce;
   const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor habilitado','Motivo conductor','Vigencia conductor','Patente tracto/camión','Tipo','Tracto habilitado','Motivo tracto','Vence tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque','Vence semirremolque']];
   for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.cat,r.divN,r.dest,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.condRec?r.condRec.fecha:'',r.tracto,r.tipo,r.tractoSt.txt,r.tractoSt.motivo,r.tractoSt.rec?r.tractoSt.rec.fecha:'',r.semi,r.semiSt.txt,r.semiSt.motivo,r.semiSt.rec?r.semiSt.rec.fecha:'']);
-  descargar(aoa,'Cruce',`cruce_habilitaciones`);
+  descargar(aoa,'Acreditados','revision_acreditados');
+}
+
+/* ---------- VIAJES ---------- */
+function llenarFiltrosViajes(){
+  const se=$('fEstV'), sd=$('fDivV'), sm=$('fEmpV'); const ve=se.value, vd=sd.value, vm=sm.value;
+  const ests=[...new Set(SRV.rows.map(r=>r.estV).filter(Boolean))].sort(); const divs=[...new Set(SRV.rows.map(r=>divDe(r.dest)).filter(Boolean))].sort(); const emps=[...new Set(SRV.rows.map(r=>r.emp).filter(Boolean))].sort();
+  se.innerHTML='<option value="">Todos los estados</option>'+ests.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+  sd.innerHTML='<option value="">Todos los destinos</option>'+divs.map(d=>`<option value="${d}">${esc(divLabel(d))}</option>`).join('')+'<option value="__otros">Destinos sin división</option>';
+  sm.innerHTML='<option value="">Todas las empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+  se.value=ve; sd.value=vd; sm.value=vm;
+}
+function filasViajes(){
+  const q=norm($('qv').value), fe=$('fEstV').value, fd=$('fDivV').value, fm=$('fEmpV').value, al=$('fAlV').checked;
+  let rows=SRV.rows.map(s=>{ const a=alertasViaje(s); const dv=divDe(s.dest); return {...s, dv, nivel:a.nivel, tags:a.tags, origN:cap(comunaDe(s.dirCarga))||sinPrefijo(s.orig), destN:dv?divLabel(dv):sinPrefijo(s.dest)}; });
+  rows=rows.filter(r=>(!fe||r.estV===fe)&&(!fd||(fd==='__otros'?!r.dv:r.dv===fd))&&(!fm||r.emp===fm)&&(!al||r.nivel<2));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.cat,r.emp,r.chofer,r.rut,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.estV,r.tipoPlan].join(' ')).includes(q));
+  const st=SORT.viajes;
+  if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(r[k]??''));
+  else rows.sort((a,b)=>(esActivo(b.estV)-esActivo(a.estV))||a.nivel-b.nivel||fechaKey(b.fcar).localeCompare(fechaKey(a.fcar))||String(b.viaje).localeCompare(String(a.viaje)));
+  return rows;
+}
+function renderViajes(){
+  const rows=filasViajes(); LAST.viajes=rows;
+  const tb=$('tbV');
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="9" class="empty">No hay viajes para este filtro.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>{ const nv=NIVEL[r.nivel]; return `<tr class="${r.nivel<3?'r-'+nv.cls:''}">
+    <td class="dbl" data-d="viaje" data-i="${i}" data-src="viajes" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)}</span></td>
+    <td>${esc(r.fcar)}</td><td>${esc(r.origN)}<span class="sub">${esc(sinPrefijo(r.orig))}</span></td><td>${esc(r.destN)}${r.dv?`<span class="sub">${esc(sinPrefijo(r.dest))}</span>`:''}</td>
+    <td>${esc(r.emp)}</td><td>${esc(r.cat)}</td><td>${esc(r.tipoPlan)}</td><td>${esc(r.estV)}<span class="sub">${esc(r.estCarga||'')}</span></td>
+    <td><div class="st ${nv.cls}"><span class="dot ${nv.cls}"></span><span class="txt">${nv.txt}</span></div>${r.tags.map(t=>`<span class="tag ${t.cls}">${esc(t.txt)}</span>`).join('')}</td></tr>`; }).join('');
+  thArrows('tabV', SORT.viajes);
+  $('hintV').textContent=`Mostrando ${rows.length} de ${SRV.rows.length} viajes. "Sin revisión" indica destinos sin código de división, que no requieren acreditación. Doble clic en un viaje abre su detalle.`;
+}
+function exportarViajes(src){
+  const rows=src ? src.map(s=>{ const a=alertasViaje(s); const dv=divDe(s.dest); return {...s, dv, nivel:a.nivel, tags:a.tags, origN:cap(comunaDe(s.dirCarga))||sinPrefijo(s.orig), destN:dv?divLabel(dv):sinPrefijo(s.dest)}; }) : LAST.viajes;
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Estado pedido','Fecha plan carga','Fecha plan descarga','Origen','Bodega origen','Destino','Bodega destino','Empresa','Categoría','Verificación','Prioridad','Tipo vehículo plan','Patente principal','Patente secundaria','Chofer','RUT','Estado revisión','Alertas']];
+  for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.estP,r.fcar,r.fdes,r.origN,r.orig,r.destN,r.dest,r.emp,r.cat,r.verif,r.prio,r.tipoPlan,r.tracto,r.semiRaw||r.semi,r.chofer,fmtRut(r.rut),NIVEL[r.nivel].txt,r.tags.map(t=>t.txt).join(' | ')]);
+  descargar(aoa,'Viajes','viajes');
 }
 
 /* ---------- DESVIACIONES ---------- */
-const DESV_NOM={patron:'Patrón Verificación / Categoría', urgencia:'Prioridad Urgencia sin categoría URGENCIA', semi:'Tracto sin patente de semirremolque', nodet:'Columna con NO DETERMINADO'};
 function llenarFiltrosDesv(){ const s=$('fTipoD'); const v=s.value; s.innerHTML='<option value="">Todas las desviaciones</option>'+Object.entries(DESV_NOM).map(([k,l])=>`<option value="${k}">${l}</option>`).join(''); s.value=v; }
 function filasDesv(){
   const q=norm($('qd').value), fe=$('fEstD').value, ft=$('fTipoD').value;
@@ -665,9 +962,10 @@ function renderDesv(){
   const t=x=>DESV.filter(r=>r.tipos.includes(x));
   $('kpisDesv').innerHTML=kpiHTML([K('dAll','bad','Viajes con desviación',DESV),K('dAct','bad','De ellos, activos',DESV.filter(r=>r.activo)),K('dPatron','','Fuera del patrón Verificación / Categoría',t('patron')),K('dUrg','','Urgencia sin categoría URGENCIA',t('urgencia')),K('dSemi','','Tracto sin semirremolque',t('semi')),K('dNodet','','Con NO DETERMINADO',t('nodet'))]);
 }
-function exportarDesv(){
+function exportarDesv(rows){
+  rows=rows||LAST.desv;
   const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Verificación','Categoría','Prioridad','Tipo vehículo plan','Patente principal','Patente secundaria','Empresa','Destino','Desviaciones']];
-  for(const r of LAST.desv) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.verif,r.cat,r.prio,r.tipoPlan,r.tracto,r.semiRaw,r.emp,r.dest,r.desv.map(d=>d.txt).join(' | ')]);
+  for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.verif,r.cat,r.prio,r.tipoPlan,r.tracto,r.semiRaw,r.emp,r.dest,r.desv.map(d=>d.txt).join(' | ')]);
   descargar(aoa,'Desviaciones','desviaciones');
 }
 
@@ -675,7 +973,7 @@ function exportarDesv(){
 function filasPeaje(){
   const q=norm($('qp').value), fe=$('fEstP').value, fm=$('fMotP').value, sin=$('fSinP').checked;
   let rows=PEAJES.filter(r=>!r.excl&&(fe==='todos'||r.activo)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
-  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV].join(' ')).includes(q));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV,r.cat].join(' ')).includes(q));
   const st=SORT.peaje;
   if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(k==='peajeReg'?(r.peajeReg?1:0):(r[k]??'')));
   else rows.sort((a,b)=>(b.activo-a.activo)||fechaKey(b.fcar).localeCompare(fechaKey(a.fcar))||String(b.viaje).localeCompare(String(a.viaje)));
@@ -702,9 +1000,10 @@ function renderPeaje(){
   const z=n=>V.filter(r=>r.zona===n);
   $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',V),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',V.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',V.filter(r=>!r.peajeReg)),K('pSusp','','Viajes suspendidos',susp),K('pFalso','','Falsos fletes',falso)]);
 }
-function exportarPeaje(){
-  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Comuna origen','Bodega destino','Dirección descarga','Comuna destino','Empresa','Patente principal','Patente secundaria','Origen','Motivo','Peaje registrado','Incidencias viaje']];
-  for(const r of LAST.peaje) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,comunaDe(r.dirCarga).toUpperCase(),r.destN,r.dirDesc,comunaDe(r.dirDesc).toUpperCase(),r.emp,r.tracto,r.semi,r.zona,r.motivo,r.peajeReg?'Sí':'No',r.incid]);
+function exportarPeaje(rows){
+  rows=rows||LAST.peaje;
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Comuna origen','Bodega destino','Dirección descarga','Comuna destino','Empresa','Patente principal','Patente secundaria','Categoría','Origen','Motivo','Peaje registrado','Incidencias viaje']];
+  for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,comunaDe(r.dirCarga).toUpperCase(),r.destN,r.dirDesc,comunaDe(r.dirDesc).toUpperCase(),r.emp,r.tracto,r.semi,r.cat,r.zona,r.motivo,r.peajeReg?'Sí':'No',r.incid]);
   descargar(aoa,'Peajes','incidencia_peajes');
 }
 
@@ -712,6 +1011,7 @@ function exportarPeaje(){
 document.querySelectorAll('#tab th').forEach(th=>th.addEventListener('click',()=>ordenar('cruce',th.dataset.k,render)));
 document.querySelectorAll('#tabD th').forEach(th=>th.addEventListener('click',()=>ordenar('desv',th.dataset.k,renderDesv)));
 document.querySelectorAll('#tabP th').forEach(th=>th.addEventListener('click',()=>ordenar('peaje',th.dataset.k,renderPeaje)));
+document.querySelectorAll('#tabV th').forEach(th=>th.addEventListener('click',()=>ordenar('viajes',th.dataset.k,renderViajes)));
 function ordenar(t,k,fn){ const st=SORT[t]; if(!k) return; if(st.k===k) st.dir*=-1; else { st.k=k; st.dir=1; } fn(); }
 function descargar(aoa, hoja, base){
   const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet(aoa);
@@ -720,7 +1020,6 @@ function descargar(aoa, hoja, base){
 }
 
 /* ---------- modal ---------- */
-let MODAL_XLS=null;
 function abrirModal(t,html,xls){ $('mTitle').innerHTML=t; $('mBody').innerHTML=html; MODAL_XLS=xls||null; $('mXls').style.display=MODAL_XLS?'':'none'; $('modalBg').classList.add('on'); $('modalBg').scrollTop=0; }
 function modalExcel(){ if(!MODAL_XLS) return; descargar(MODAL_XLS.aoa,'Detalle',MODAL_XLS.name.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'_').toLowerCase()); }
 function cerrarModal(){ $('modalBg').classList.remove('on'); }
@@ -728,6 +1027,29 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrarModal(); });
 function kv(pairs){ return `<div class="kv">${pairs.filter(p=>p[1]!==undefined&&p[1]!==null&&p[1]!=='').map(([k,v])=>`<div><b>${esc(k)}</b>${v}</div>`).join('')}</div>`; }
 function chipsDivs(recs, quiereSemi){ return `<div class="chips">${recs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=(quiereSemi===undefined)?estado(d):(isSemi(d.tipo)!==quiereSemi?{cls:'bad',txt:'Registrado como '+d.tipo.toLowerCase()}:estado(d)); return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')||'<span class="hint">No aparece en ninguna división.</span>'}</div>`; }
 function estItem(d){ if(d==null) return {cls:'na',txt:'Sin dato'}; if(d<=0) return {cls:'bad',txt:'Vencido'}; if(d<11) return {cls:'warn',txt:'Por vencer'}; return {cls:'ok',txt:'Vigente'}; }
+function modalKpi(k){
+  const d=KPI[k]; if(!d) return; const rows=d.rows; LAST.modal=rows;
+  let head='', body='', aoa=[];
+  const viajeTd=(r,i)=>`<td class="dbl" data-d="viaje" data-i="${i}" data-src="modal" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)} · ${esc(r.estV)}</span></td>`;
+  if(d.tipo==='cruce'){
+    head='<th>Viaje</th><th>División</th><th>Empresa</th><th>Conductor</th><th>Tracto / camión</th><th>Semirremolque</th>';
+    body=rows.map((r,i)=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">${viajeTd(r,i)}<td>${esc(r.divN)}</td><td>${esc(r.emp)}</td><td>${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}</span>${stHTML(r.condSt)}</td><td><span class="plate">${esc(r.tracto)||'—'}</span>${stHTML(r.tractoSt)}</td><td><span class="plate">${esc(r.semi)||'—'}</span>${stHTML(r.semiSt)}</td></tr>`).join('');
+    aoa=[['Id viaje','Id pedido','Estado viaje','División','Empresa','Conductor','RUT','Conductor habilitado','Motivo conductor','Patente tracto','Tracto habilitado','Motivo tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque'],...rows.map(r=>[r.viaje,r.id,r.estV,r.divN,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.tracto,r.tractoSt.txt,r.tractoSt.motivo,r.semi,r.semiSt.txt,r.semiSt.motivo])];
+  } else if(d.tipo==='desv'){
+    head='<th>Viaje</th><th>Fecha carga</th><th>Verificación</th><th>Categoría</th><th>Prioridad</th><th>Tipo vehículo plan</th><th>Empresa</th><th>Desviaciones</th>';
+    body=rows.map((r,i)=>`<tr class="r-bad">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(r.verif)}</td><td>${esc(r.cat)}</td><td>${esc(r.prio)}</td><td>${esc(r.tipoPlan)}</td><td>${esc(r.emp)}</td><td>${r.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}</td></tr>`).join('');
+    aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Verificación','Categoría','Prioridad','Tipo vehículo plan','Patente secundaria','Empresa','Desviaciones'],...rows.map(r=>[r.viaje,r.id,r.estV,r.fcar,r.verif,r.cat,r.prio,r.tipoPlan,r.semiRaw,r.emp,r.desv.map(x=>x.txt).join(' | ')])];
+  } else if(d.tipo==='peaje'){
+    head='<th>Viaje</th><th>Fecha carga</th><th>Origen</th><th>Destino</th><th>Empresa</th><th>Categoría</th><th>Alerta</th>';
+    body=rows.map((r,i)=>`<tr class="${r.peajeReg?'':'r-warn'}">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(r.origN)}<span class="sub">${esc(r.dirCarga)}</span></td><td>${esc(r.destN)}<span class="sub">${esc(r.dirDesc)}</span></td><td>${esc(r.emp)}</td><td>${esc(r.cat)}</td><td>${r.peajeReg?'<span class="sub">—</span>':'<span class="tag warn">Sin peaje registrado</span>'}</td></tr>`).join('');
+    aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Bodega destino','Dirección descarga','Empresa','Categoría','Origen','Motivo','Peaje registrado'],...rows.map(r=>[r.viaje,r.id,r.estV,r.fcar,r.origN,r.dirCarga,r.destN,r.dirDesc,r.emp,r.cat,r.zona,r.motivo,r.peajeReg?'Sí':'No'])];
+  } else {
+    head='<th>Viaje</th><th>Fecha carga</th><th>Origen</th><th>Destino</th><th>Empresa</th><th>Categoría</th><th>Estado</th><th>Alertas</th>';
+    body=rows.map((r,i)=>{ const al=alertasViaje(r); const nv=NIVEL[al.nivel]; const dv=divDe(r.dest); return `<tr class="${al.nivel<3?'r-'+nv.cls:''}">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(cap(comunaDe(r.dirCarga))||sinPrefijo(r.orig))}</td><td>${esc(dv?divLabel(dv):sinPrefijo(r.dest))}</td><td>${esc(r.emp)}</td><td>${esc(r.cat)}</td><td>${esc(r.estV)}<span class="sub">${esc(r.estCarga||'')}</span></td><td>${al.tags.map(t=>`<span class="tag ${t.cls}">${esc(t.txt)}</span>`).join('')||'<span class="sub">—</span>'}</td></tr>`; }).join('');
+    aoa=[['Id viaje','Id pedido','Estado viaje','Estado carga','Fecha plan carga','Origen','Destino','Empresa','Categoría','Alertas'],...rows.map(r=>{ const al=alertasViaje(r); const dv=divDe(r.dest); return [r.viaje,r.id,r.estV,r.estCarga||'',r.fcar,cap(comunaDe(r.dirCarga))||sinPrefijo(r.orig),dv?divLabel(dv):sinPrefijo(r.dest),r.emp,r.cat,al.tags.map(t=>t.txt).join(' | ')]; })];
+  }
+  abrirModal(`${esc(d.titulo)} <span class="sub">${rows.length} viaje${rows.length===1?'':'s'}</span>`, `<div class="tw" style="max-height:65vh;margin-top:0"><table><thead><tr>${head}</tr></thead><tbody>${body||'<tr><td class="empty" colspan="9">Sin viajes.</td></tr>'}</tbody></table></div><p class="hint">Doble clic en un viaje abre su detalle.</p>`, {name:d.titulo, aoa});
+}
 function modalConductor(div, rut, nomSrv){
   const rec=IDX.cond.get(div+'|'+rut); const todas=IDX.condByRut.get(rut)||[];
   const nom=rec?rec.nom:(todas[0]?todas[0].nom:(nomSrv||''));
@@ -747,8 +1069,7 @@ function modalEquipo(div, pat, quiereSemi){
   const rec=IDX.eq.get(div+'|'+pat); const todas=IDX.eqByPat.get(pat)||[];
   let html='';
   if(rec){
-    const st=estadoEquipo(div,pat,quiereSemi);
-    const rt=estItem(rec.revD);
+    const st=estadoEquipo(div,pat,quiereSemi); const rt=estItem(rec.revD);
     html+=kv([['División',esc(divLabel(div))],['Estado habilitación',stHTML(st)],['Tipo',esc(rec.tipo)],['Marca / modelo / año',esc([rec.marca,rec.modelo,rec.anio].filter(Boolean).join(' · '))],['Empresa',esc(rec.emp)],['Días de vigencia restantes',rec.dias??''],['Fecha expiración',esc(rec.fecha)],['Estado',esc(rec.estK)],['Estado credencial',esc(rec.estCr)],['Revisión técnica',`${esc(rec.revF)||'—'} · ${rec.revD??'—'} días <span class="tag ${rt.cls}">${rt.txt}</span>`]]);
   } else {
     html+=`<p><span class="tag bad">No registrado en ${esc(divLabel(div))}</span></p><p class="hint">Esta patente no aparece en la pestaña EQUIPOS para esta división.</p>`;
@@ -757,11 +1078,11 @@ function modalEquipo(div, pat, quiereSemi){
   abrirModal(`<span class="plate">${esc(pat)}</span> <span class="sub">${esc(rec?rec.tipo:(todas[0]?todas[0].tipo:''))}</span>`, html);
 }
 function modalViaje(s){
-  const pairs=[['Id viaje',esc(s.viaje)],['Id pedido',esc(s.id)],['Estado viaje',esc(s.estV)],['Estado pedido',esc(s.estP)],['Categoría',esc(s.cat)],['Verificación',esc(s.verif)],['Prioridad',esc(s.prio)],['Cliente',esc(s.cliente)],['Referencia externa',esc(s.refExt)],['Fecha creación',esc(s.fcre)],['Fecha plan carga',esc(s.fcar)],['Fecha plan descarga',esc(s.fdes)],['Bodega origen',esc(sinPrefijo(s.orig))],['Dirección carga',esc(s.dirCarga)],['Bodega destino',esc(sinPrefijo(s.dest))],['Dirección descarga',esc(s.dirDesc)],['Empresa de transporte',esc(s.emp)],['Tipo vehículo plan',esc(s.tipoPlan)],['Tipo vehículo principal',esc(s.tipo)],['Patente principal',`<span class="plate">${esc(s.tracto)}</span>`],['Tipo vehículo secundario',esc(s.tipoSec)],['Patente secundaria',`<span class="plate">${esc(s.semiRaw||s.semi)||'—'}</span>`],['Chofer',esc(s.chofer)],['RUT conductor',esc(fmtRut(s.rut))],['Coconductor',esc(s.cocond)],['Incidencias viaje',esc(s.incid)]];
+  const pairs=[['Id viaje',esc(s.viaje)],['Id pedido',esc(s.id)],['Estado viaje',esc(s.estV)],['Estado pedido',esc(s.estP)],['Estado carga',esc(s.estCarga)],['Estado descarga',esc(s.estDesc)],['Categoría',esc(s.cat)],['Verificación',esc(s.verif)],['Prioridad',esc(s.prio)],['Cliente',esc(s.cliente)],['Referencia externa',esc(s.refExt)],['Fecha creación',esc(s.fcre)],['Fecha plan carga',esc(s.fcar)],['Fecha plan descarga',esc(s.fdes)],['Bodega origen',esc(sinPrefijo(s.orig))],['Dirección carga',esc(s.dirCarga)],['Bodega destino',esc(sinPrefijo(s.dest))],['Dirección descarga',esc(s.dirDesc)],['Empresa de transporte',esc(s.emp)],['Tipo vehículo plan',esc(s.tipoPlan)],['Tipo vehículo principal',esc(s.tipo)],['Patente principal',`<span class="plate">${esc(s.tracto)}</span>`],['Tipo vehículo secundario',esc(s.tipoSec)],['Patente secundaria',`<span class="plate">${esc(s.semiRaw||s.semi)||'—'}</span>`],['Chofer',esc(s.chofer)],['RUT conductor',esc(fmtRut(s.rut))],['Coconductor',esc(s.cocond)],['Incidencias viaje',esc(s.incid)]];
   let html=kv(pairs);
-  const d=DESV.find(x=>x.viaje===s.viaje); if(d) html+=`<h4 style="margin:10px 0 4px">Desviaciones</h4>${d.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}`;
-  const p=PEAJES.find(x=>x.viaje===s.viaje); if(p) html+=`<h4 style="margin:10px 0 4px">Peajes</h4><span class="tag ${p.peajeReg?'ok':'warn'}">${esc(p.motivo)} · ${p.peajeReg?'peaje registrado':'sin peaje registrado'}</span>`;
-  const c=CRUCE.find(x=>x.viaje===s.viaje); if(c) html+=`<h4 style="margin:10px 0 4px">Habilitaciones en ${esc(c.divN)}</h4><div class="chips"><span class="chip"><span class="dot ${c.condSt.cls}"></span><b>Conductor</b> ${esc(c.condSt.txt)}</span><span class="chip"><span class="dot ${c.tractoSt.cls}"></span><b>Tracto</b> ${esc(c.tractoSt.txt)}</span><span class="chip"><span class="dot ${c.semiSt.cls}"></span><b>Semirremolque</b> ${esc(c.semiSt.txt)}</span></div>`;
+  const d=IDX.desvByViaje.get(s.viaje); if(d) html+=`<h4 style="margin:10px 0 4px">Desviaciones</h4>${d.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}`;
+  const p=IDX.peajeByViaje.get(s.viaje); if(p) html+=`<h4 style="margin:10px 0 4px">Peajes</h4><span class="tag ${p.peajeReg?'ok':'warn'}">${esc(p.motivo)} · ${p.peajeReg?'peaje registrado':'sin peaje registrado'}</span>`;
+  const c=IDX.cruceByViaje.get(s.viaje); if(c) html+=`<h4 style="margin:10px 0 4px">Habilitaciones en ${esc(c.divN)}</h4><div class="chips"><span class="chip" style="cursor:pointer" ondblclick="modalConductor('${c.div}','${c.rut}','')"><span class="dot ${c.condSt.cls}"></span><b>Conductor</b> ${esc(c.condSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.tracto}',false)"><span class="dot ${c.tractoSt.cls}"></span><b>Tracto</b> ${esc(c.tractoSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.semi}',true)"><span class="dot ${c.semiSt.cls}"></span><b>Semirremolque</b> ${esc(c.semiSt.txt)}</span></div><p class="hint">Doble clic en un chip abre el detalle del conductor o del equipo.</p>`;
   abrirModal(`Viaje ${esc(s.viaje)} <span class="sub">pedido ${esc(s.id)}</span>`, html);
 }
 document.addEventListener('dblclick', e=>{
@@ -798,11 +1119,13 @@ function buscar(){
   out.innerHTML=html||'<p class="hint">Sin resultados.</p>';
 }
 
-/* ---------- drag & drop e inicio ---------- */
+/* ---------- drag & drop, reloj e inicio ---------- */
 const dz=$('drop');
-['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over');}));
-['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over');}));
-dz.addEventListener('drop',e=>archivos(e.dataTransfer.files));
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{ if([...e.dataTransfer?.types||[]].includes('Files')){ e.preventDefault(); dz.classList.add('over'); } }));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{ if(ev==='drop') e.preventDefault(); if(ev==='dragleave' && e.relatedTarget) return; dz.classList.remove('over'); }));
+document.addEventListener('drop',e=>{ if(e.dataTransfer?.files?.length) archivos(e.dataTransfer.files); });
+function reloj(){ const f=new Date(); const s=f.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); $('pillFecha').textContent=s.charAt(0).toUpperCase()+s.slice(1); }
+reloj(); setInterval(reloj,60000);
 cargarGuardado(); refrescar();
 </script>
 </body>
