@@ -256,7 +256,7 @@
     <div class="content">
       <!-- barra de datos (siempre visible) -->
       <div class="datos">
-        <div class="f" id="fHab"><span class="st"></span><div><b>Informe Habilitados</b><span> · Sin cargar</span></div></div>
+        <div class="f" id="fHab"><span class="st"></span><div><b>Informe de Acreditados</b><span> · Sin cargar</span></div></div>
         <div class="f" id="fSrv"><span class="st"></span><div><b>Seguimiento Punto a Punto</b><span> · Sin cargar</span></div></div>
         <div class="acts">
           <button class="btn" onclick="document.getElementById('fi').click()">Cargar archivos</button>
@@ -268,13 +268,13 @@
       <!-- ===== INICIO ===== -->
       <section class="sec on" id="sInicio">
         <div class="ph">
-          <div><h1>Centro de Planificación Logística</h1><p>Monitoreo de viajes · Habilitación · Desviaciones · Peajes</p></div>
+          <div><h1>Centro de Planificación Logística</h1><p>Monitoreo de viajes · Acreditación · Desviaciones · Peajes</p></div>
           <div class="hint" style="margin:0;text-align:right">Planificación hoy,<br>operación segura mañana.</div>
         </div>
         <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
           <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div>
           <strong>Suelte aquí los archivos Excel o haga clic para elegirlos</strong>
-          Se aceptan los dos a la vez: <em>Informe Habilitados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
+          Se aceptan los dos a la vez: <em>Informe de Acreditados</em> (pestañas CONDUCTORES y EQUIPOS) y <em>Seguimiento Punto a Punto</em>.
           <div class="hint">Los archivos se procesan en su navegador y quedan guardados solo en este equipo. Nada se envía a internet.</div>
         </div>
         <div id="dash" style="display:none">
@@ -292,7 +292,7 @@
                   <div class="chart" id="chDiv"></div>
                 </div>
                 <div class="card" style="margin:0">
-                  <h2>Estado de Habilitación</h2>
+                  <h2>Estado de Acreditación</h2>
                   <div class="donut" id="donut"></div>
                 </div>
               </div>
@@ -317,14 +317,14 @@
 
       <!-- ===== ACREDITADOS ===== -->
       <section class="sec" id="sAcred">
-        <div class="ph"><div><h1>Revisión de Acreditados</h1><p>Conductores, tractos y semirremolques de los servicios activos frente al informe de habilitados por división.</p></div></div>
+        <div class="ph"><div><h1>Revisión de Acreditados</h1><p>Conductores, tractos y semirremolques de los servicios activos frente al informe de acreditados por división.</p></div></div>
         <div class="card" id="secRes" style="display:none">
           <h2>Resumen de servicios a divisiones</h2>
           <div class="kpis" id="kpis"></div>
           <div class="legend" style="margin-top:8px">
-            <span><span class="dot ok"></span>Habilitado</span>
-            <span><span class="dot warn"></span>Habilitado, vence en menos de 11 días</span>
-            <span><span class="dot bad"></span>No habilitado o no registrado en la división</span>
+            <span><span class="dot ok"></span>Acreditado</span>
+            <span><span class="dot warn"></span>Acreditado, vence en menos de 11 días</span>
+            <span><span class="dot bad"></span>No acreditado o sin registro en la división</span>
             <span><span class="dot na"></span>No aplica</span>
           </div>
         </div>
@@ -341,20 +341,20 @@
           <div class="tw"><table id="tab">
             <thead><tr>
               <th data-k="viaje">Id viaje</th><th data-k="cat">Categoría</th><th data-k="divN">Destino / división</th><th data-k="emp">Empresa de transporte</th>
-              <th data-k="cond">Conductor</th><th data-k="condSt">Habilitado</th><th data-k="tracto">Patente tracto / camión</th><th data-k="tractoSt">Habilitado</th>
-              <th data-k="semi">Patente semirremolque</th><th data-k="semiSt">Habilitado</th>
+              <th data-k="cond">Conductor</th><th data-k="condSt">Acreditado</th><th data-k="tracto">Patente tracto / camión</th><th data-k="tractoSt">Acreditado</th>
+              <th data-k="semi">Patente semirremolque</th><th data-k="semiSt">Acreditado</th>
             </tr></thead>
             <tbody id="tb"></tbody>
           </table></div>
           <p class="hint" id="tabHint"></p>
         </div>
         <div class="card" id="secBus" style="display:none">
-          <h2>Buscador de habilitaciones</h2>
+          <h2>Buscador de acreditaciones</h2>
           <div class="row"><div class="grow"><input type="text" id="bq" placeholder="Escriba un RUT, un nombre de conductor o una patente…" oninput="buscar()"></div></div>
-          <p class="hint">Busca directamente en el informe de habilitados y muestra en qué divisiones está habilitado, los días de vigencia y los servicios donde aparece. Doble clic en una división abre el detalle.</p>
+          <p class="hint">Busca directamente en el informe de acreditados y muestra en qué divisiones está acreditado, los días de vigencia y los servicios donde aparece. Doble clic en una división abre el detalle.</p>
           <div id="bres"></div>
         </div>
-        <div class="card" id="acredVacio"><p class="empty">Cargue el Informe Habilitados y el Seguimiento Punto a Punto para ver la revisión.</p></div>
+        <div class="card" id="acredVacio"><p class="empty">Cargue el Informe de Acreditados y el Seguimiento Punto a Punto para ver la revisión.</p></div>
       </section>
 
       <!-- ===== VIAJES ===== -->
@@ -616,7 +616,7 @@ async function ingestBuffer(name, buf){
   const wb = XLSX.read(buf,{type:'array',cellDates:false});
   const names = Object.keys(wb.Sheets);
   if(names.some(n=>/conductor/i.test(n)) && names.some(n=>/equipo/i.test(n))){
-    HAB = leerHabilitados(wb, name); guardar(KEY_HAB, HAB); toast(`Habilitados: ${HAB.cond.length} conductores y ${HAB.eq.length} equipos`);
+    HAB = leerHabilitados(wb, name); guardar(KEY_HAB, HAB); toast(`Acreditados: ${HAB.cond.length} conductores y ${HAB.eq.length} equipos`);
   } else {
     SRV = leerServicios(wb, name); guardar(KEY_SRV, SRV); toast(`Servicios: ${SRV.rows.length} filas`);
   }
@@ -638,7 +638,7 @@ function indexar(){
 function mejor(a,b){ const ha=isHab(a.est), hb=isHab(b.est); if(ha!==hb) return ha; return (a.dias??-1e9) > (b.dias??-1e9); }
 function itemsCond(rec){ return ITEMS_COND.map((it,i)=>({...it, dias:rec.it?.[i]?.[0] ?? null, fecha:rec.it?.[i]?.[1] ?? ''})); }
 function motivoCond(rec, st){
-  if(!rec){ const otras=(IDX.condByRut.get(st.rut)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No registrado en esta división. Habilitado en '+otras.join(', '):'No aparece en el informe de conductores'; }
+  if(!rec){ const otras=(IDX.condByRut.get(st.rut)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No hay registro en esta división. Acreditado en '+otras.join(', '):'No aparece en el informe de conductores'; }
   const its=itemsCond(rec); const venc=its.filter(i=>i.dias!=null&&i.dias<=0), porV=its.filter(i=>i.dias!=null&&i.dias>0&&i.dias<11);
   if(st.cls==='bad'){
     if(venc.length) return 'Vencido: '+venc.map(i=>i.short).join(', ');
@@ -649,23 +649,21 @@ function motivoCond(rec, st){
   return '';
 }
 function motivoEq(rec, st, pat, quiereSemi){
-  if(!rec){ if(!pat) return ''; const otras=(IDX.eqByPat.get(pat)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No registrado en esta división. Habilitado en '+otras.join(', '):'No aparece en el informe de equipos'; }
+  if(!rec){ if(!pat) return ''; const otras=(IDX.eqByPat.get(pat)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No hay registro en esta división. Acreditado en '+otras.join(', '):'No aparece en el informe de equipos'; }
   if(st.cls==='bad'){
     if(isSemi(rec.tipo)!==quiereSemi) return 'Tipo distinto al esperado';
-    const m=[];
-    if(rec.revD!=null&&rec.revD<=0) m.push('Revisión técnica vencida'+(rec.revF?' el '+rec.revF:''));
-    if(rec.venD!=null&&rec.venD<=0) m.push('Acreditación vencida'+(rec.fecha?' el '+rec.fecha:''));
-    if(rec.estK&&/caducado/i.test(rec.estK)) m.push('estado CADUCADO');
-    return m.length ? m.join(' · ') : 'Sin detalle en el informe';
+    if(rec.revD!=null&&rec.revD<=0) return 'Revisión técnica vencida'+(rec.revF?' el '+rec.revF:'');
+    if(rec.revF||rec.revD!=null) return 'Revisión técnica vence'+(rec.revF?' el '+rec.revF:'')+(rec.revD!=null?' ('+rec.revD+' días)':'');
+    return 'Sin fecha de revisión técnica en el informe';
   }
-  if(st.cls==='warn'){ if(rec.revD!=null&&rec.revD<11) return `Revisión técnica vence en ${rec.revD} d`+(rec.revF?' ('+rec.revF+')':''); return 'Vigencia por vencer'+(rec.fecha?' el '+rec.fecha:''); }
+  if(st.cls==='warn'){ return 'Revisión técnica vence'+(rec.revF?' el '+rec.revF:'')+(rec.revD!=null?' ('+rec.revD+' días)':''); }
   return '';
 }
 function estado(rec){
-  if(!rec) return {cls:'bad', txt:'No registrado', orden:0, dias:null};
-  if(!isHab(rec.est)) return {cls:'bad', txt:rec.est||'No habilitado', orden:0, dias:rec.dias};
-  if(rec.dias!=null && rec.dias<11) return {cls:'warn', txt:`Vence en ${rec.dias} día${rec.dias===1?'':'s'}`, orden:1, dias:rec.dias};
-  return {cls:'ok', txt: rec.dias!=null ? `OK · ${rec.dias} días` : 'OK', orden:2, dias:rec.dias};
+  if(!rec) return {cls:'bad', txt:'No hay registro', orden:0, dias:null};
+  if(!isHab(rec.est)) return {cls:'bad', txt:'No acreditado', orden:0, dias:rec.dias};
+  if(rec.dias!=null && rec.dias<11) return {cls:'warn', txt:`Acreditado · vence en ${rec.dias} día${rec.dias===1?'':'s'}`, orden:1, dias:rec.dias};
+  return {cls:'ok', txt: rec.dias!=null ? `Acreditado · ${rec.dias} días` : 'Acreditado', orden:2, dias:rec.dias};
 }
 function estadoEquipo(div, pat, quiereSemi){
   if(!pat) return {cls:'na', txt: quiereSemi?'Sin semirremolque':'Sin patente', orden:3, dias:null, rec:null, motivo:''};
@@ -716,9 +714,9 @@ function alertasViaje(s){
   const c=IDX.cruceByViaje.get(s.viaje), d=IDX.desvByViaje.get(s.viaje), p=IDX.peajeByViaje.get(s.viaje);
   const tags=[]; let nivel=3; // 0 desviación/no habilitado, 1 atención, 2 ok, 3 sin revisión
   if(c){ nivel=2;
-    if(c.condSt.cls==='bad'){ tags.push({cls:'bad',txt:'Conductor no habilitado'}); nivel=0; } else if(c.condSt.cls==='warn'){ tags.push({cls:'warn',txt:'Conductor por vencer'}); nivel=Math.min(nivel,1); }
-    if(c.tractoSt.cls==='bad'){ tags.push({cls:'bad',txt:'Tracto no habilitado'}); nivel=0; } else if(c.tractoSt.cls==='warn'){ tags.push({cls:'warn',txt:'Tracto por vencer'}); nivel=Math.min(nivel,1); }
-    if(c.semiSt.cls==='bad'){ tags.push({cls:'bad',txt:'Semirremolque no habilitado'}); nivel=0; } else if(c.semiSt.cls==='warn'){ tags.push({cls:'warn',txt:'Semirremolque por vencer'}); nivel=Math.min(nivel,1); }
+    if(c.condSt.cls==='bad'){ tags.push({cls:'bad',txt:'Conductor no acreditado'}); nivel=0; } else if(c.condSt.cls==='warn'){ tags.push({cls:'warn',txt:'Conductor por vencer'}); nivel=Math.min(nivel,1); }
+    if(c.tractoSt.cls==='bad'){ tags.push({cls:'bad',txt:'Tracto no acreditado'}); nivel=0; } else if(c.tractoSt.cls==='warn'){ tags.push({cls:'warn',txt:'Tracto por vencer'}); nivel=Math.min(nivel,1); }
+    if(c.semiSt.cls==='bad'){ tags.push({cls:'bad',txt:'Semirremolque no acreditado'}); nivel=0; } else if(c.semiSt.cls==='warn'){ tags.push({cls:'warn',txt:'Semirremolque por vencer'}); nivel=Math.min(nivel,1); }
   }
   if(d){ d.desv.forEach(x=>tags.push({cls:'bad',txt:x.txt})); nivel=0; }
   if(p && !p.excl && !p.peajeReg){ tags.push({cls:'warn',txt:'Peaje sin registrar'}); nivel=Math.min(nivel,1); }
@@ -774,7 +772,7 @@ function renderInicio(){
   // KPI grandes
   $('bigkpis').innerHTML=[
     {c:'g',ic:ICO.truck,t:'VIAJES',v:act.length,s:`${a.length} activos a división`,go:"ir('viajes')"},
-    {c:'g',ic:ICO.user,t:'HABILITADOS',v:pct+'%',s:`${okN+warnN} de ${aplic} revisiones habilitadas`,go:"ir('acred')"},
+    {c:'g',ic:ICO.user,t:'ACREDITADOS',v:pct+'%',s:`${okN+warnN} de ${aplic} revisiones acreditadas`,go:"ir('acred')"},
     {c:desvAct.length?'r':'g',ic:ICO.warn,t:'DESVIACIONES',v:DESV.length,s:desvAct.length?`${desvAct.length} en viajes activos`:'Ninguna en viajes activos',go:"ir('desv')"},
     {c:sinPeaje.length?'a':'g',ic:ICO.toll,t:'PEAJES',v:sinPeaje.length,s:`sin registrar de ${PV.length} viajes con peaje`,go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
   ].map(k=>`<div class="bk ${k.c}" onclick="${k.go}"><div class="ic">${k.ic}</div><div><div class="t">${k.t}</div><div class="v">${k.v}</div><div class="s"><span class="dot"></span>${esc(k.s)}</div></div></div>`).join('');
@@ -789,24 +787,24 @@ function renderInicio(){
   $('flowHint').textContent='Planificados = viajes inactivos pendientes de activar · Registrados = viajes activos · Validados = activos a división sin alertas · Con observación = activos a división con alertas · Cerrados = viajes finalizados. Doble clic en una etapa muestra sus viajes.';
   // Alertas del planificador
   const porVencer=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls==='warn'));
-  const incompl=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>/no registrado|no aparece/i.test(s.txt+' '+(s.motivo||''))));
+  const incompl=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>/no hay registro|no aparece/i.test(s.txt+' '+(s.motivo||''))));
   const noHab=a.filter(r=>[r.condSt,r.tractoSt,r.semiSt].some(s=>s.cls==='bad'));
   const al=[
-    {n:noHab.length,cls:'bad',t:'servicios con conductor o equipo no habilitado',s:'Revisar acreditación antes del ingreso a división.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:noHab.length,cls:'bad',t:'servicios con conductor o equipo no acreditado',s:'Revisar acreditación antes del ingreso a división.',go:"ir('acred');$('fAl').checked=true;render()"},
     {n:desvAct.length,cls:'bad',t:'viajes activos con desviación',s:'Revisar verificación, categoría, prioridad y vehículo.',go:"ir('desv');$('fEstD').value='activo';renderDesv()"},
-    {n:porVencer.length,cls:'warn',t:'servicios con habilitación próxima a vencer',s:'Menos de 11 días de vigencia. Gestionar renovación.',go:"ir('acred');$('fAl').checked=true;render()"},
-    {n:incompl.length,cls:'warn',t:'servicios con conductor o patente no registrados',s:'No aparecen en el informe para esa división.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:porVencer.length,cls:'warn',t:'servicios con acreditación próxima a vencer',s:'Menos de 11 días de vigencia. Gestionar renovación.',go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:incompl.length,cls:'warn',t:'servicios con conductor o patente sin registro',s:'No aparecen en el informe para esa división.',go:"ir('acred');$('fAl').checked=true;render()"},
     {n:sinPeaje.length,cls:'na',t:'viajes con peaje sin registrar',s:'Revisar y regularizar la incidencia de peaje.',go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
   ];
   $('alN').textContent=al.reduce((x,y)=>x+y.n,0);
   $('alertas').innerHTML=al.map(x=>`<button class="al ${x.n?x.cls:'ok'}" onclick="${x.go}"><span class="ic">${x.n?'!':'✓'}</span><span><b><em>${x.n}</em>${esc(x.t)}</b><span class="s">${esc(x.n?x.s:'Sin pendientes.')}</span></span><span class="chev">›</span></button>`).join('');
   // Dónde debo mirar ahora
   const acts=[
-    {n:noHab.length,ic:ICO.user,t:'Gestionar acreditaciones',s:`${noHab.length} servicios con equipo o conductor no habilitado`,go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:noHab.length,ic:ICO.user,t:'Gestionar acreditaciones',s:`${noHab.length} servicios con equipo o conductor no acreditado`,go:"ir('acred');$('fAl').checked=true;render()"},
     {n:desvAct.length,ic:ICO.warn,t:'Revisar viajes con desviación',s:`${desvAct.length} viajes activos · ${DESV.length} en total`,go:"ir('desv')"},
-    {n:porVencer.length,ic:ICO.cal,t:'Renovar habilitaciones por vencer',s:`${porVencer.length} servicios con vencimiento en menos de 11 días`,go:"ir('acred');$('fAl').checked=true;render()"},
+    {n:porVencer.length,ic:ICO.cal,t:'Renovar acreditaciones por vencer',s:`${porVencer.length} servicios con vencimiento en menos de 11 días`,go:"ir('acred');$('fAl').checked=true;render()"},
     {n:sinPeaje.length,ic:ICO.toll,t:'Consultar incidencias de peajes',s:`${sinPeaje.length} viajes sin peaje registrado`,go:"ir('peaje');$('fSinP').checked=true;renderPeaje()"},
-    {n:1,ic:ICO.search,t:'Buscar un conductor o patente',s:'Ver en qué divisiones está habilitado',go:"ir('acred');setTimeout(()=>$('bq').focus(),300)"},
+    {n:1,ic:ICO.search,t:'Buscar un conductor o patente',s:'Ver en qué divisiones está acreditado',go:"ir('acred');setTimeout(()=>$('bq').focus(),300)"},
   ].sort((x,y)=>(y.n>0)-(x.n>0));
   $('mirar').innerHTML=acts.map(x=>`<button class="act" onclick="${x.go}"><span class="ic">${x.ic}</span><span><b>${esc(x.t)}</b><span>${esc(x.s)}</span></span><span class="chev">›</span></button>`).join('');
   // Resumen por división (barras)
@@ -825,13 +823,13 @@ function renderInicio(){
   $('chDiv').innerHTML = data.length? svg : '<p class="empty">Sin servicios activos a división.</p>';
   // Donut estado de habilitación
   const naN=a.filter(r=>r.semiSt.cls==='na').length;
-  const segs=[['Habilitados',okN,'#0f7a3c','ok'],['Por vencer',warnN,'#e0a100','warn'],['No habilitados',badN,'#c62828','bad'],['No aplica',naN,'#b4bec6','na']];
+  const segs=[['Acreditados',okN,'#0f7a3c','ok'],['Por vencer',warnN,'#e0a100','warn'],['No acreditados',badN,'#c62828','bad'],['No aplica',naN,'#b4bec6','na']];
   const totS=segs.reduce((x,s)=>x+s[1],0)||1; let ang=-Math.PI/2; const R=70,r0=46,cx=85,cy=85;
   let d='';
   segs.forEach(s=>{ if(!s[1]) return; const a2=ang+2*Math.PI*s[1]/totS; const large=(a2-ang)>Math.PI?1:0; const p=(R,an)=>[cx+R*Math.cos(an),cy+R*Math.sin(an)];
     const [x1,y1]=p(R,ang),[x2,y2]=p(R,a2),[x3,y3]=p(r0,a2),[x4,y4]=p(r0,ang);
     d+=`<path d="M${x1} ${y1} A${R} ${R} 0 ${large} 1 ${x2} ${y2} L${x3} ${y3} A${r0} ${r0} 0 ${large} 0 ${x4} ${y4} Z" fill="${s[2]}"><title>${s[0]}: ${s[1]}</title></path>`; ang=a2; });
-  $('donut').innerHTML=`<svg viewBox="0 0 170 170">${d}<text x="85" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#172a1f">${pct}%</text><text x="85" y="100" text-anchor="middle" font-size="11" fill="#5f6f66">Habilitados</text></svg>
+  $('donut').innerHTML=`<svg viewBox="0 0 170 170">${d}<text x="85" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#172a1f">${pct}%</text><text x="85" y="100" text-anchor="middle" font-size="11" fill="#5f6f66">Acreditados</text></svg>
     <table>${segs.map(s=>`<tr><td><span class="dot" style="background:${s[2]}"></span>${s[0]}</td><td><b>${s[1]}</b></td></tr>`).join('')}</table>
     <p class="hint" style="flex-basis:100%">Revisiones de conductor, tracto y semirremolque en los ${a.length} servicios activos a división.</p>`;
   // Últimos viajes
@@ -888,16 +886,16 @@ function kpis(){
     K('cAct','','Servicios activos a división',a),
     K('cOk','ok','Servicios sin alertas',a.filter(r=>r.peor>=2)),
     K('cWarn','warn','Con vencimiento < 11 días',a.filter(r=>tiene(r,'warn'))),
-    K('cCond','bad','Conductores no habilitados',a.filter(r=>r.condSt.cls==='bad')),
-    K('cTracto','bad','Tractos / camiones no habilitados',a.filter(r=>r.tractoSt.cls==='bad')),
-    K('cSemi','bad','Semirremolques no habilitados',a.filter(r=>r.semiSt.cls==='bad')),
+    K('cCond','bad','Conductores no acreditados',a.filter(r=>r.condSt.cls==='bad')),
+    K('cTracto','bad','Tractos / camiones no acreditados',a.filter(r=>r.tractoSt.cls==='bad')),
+    K('cSemi','bad','Semirremolques no acreditados',a.filter(r=>r.semiSt.cls==='bad')),
     K('cSusp','','Viajes suspendidos',CRUCE.filter(r=>/suspendido/i.test(r.estV))),
     K('cFalso','','Falsos fletes',CRUCE.filter(r=>/falso\s*flete/i.test(r.estV))),
   ]);
 }
 function exportarCruce(rows){
   rows=rows||LAST.cruce;
-  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor habilitado','Motivo conductor','Vigencia conductor','Patente tracto/camión','Tipo','Tracto habilitado','Motivo tracto','Vence tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque','Vence semirremolque']];
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Categoría','División','Destino','Empresa de transporte','Conductor','RUT','Conductor acreditado','Motivo conductor','Vigencia conductor','Patente tracto/camión','Tipo','Tracto acreditado','Motivo tracto','Vence tracto','Patente semirremolque','Semirremolque acreditado','Motivo semirremolque','Vence semirremolque']];
   for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcar,r.cat,r.divN,r.dest,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.condRec?r.condRec.fecha:'',r.tracto,r.tipo,r.tractoSt.txt,r.tractoSt.motivo,r.tractoSt.rec?r.tractoSt.rec.fecha:'',r.semi,r.semiSt.txt,r.semiSt.motivo,r.semiSt.rec?r.semiSt.rec.fecha:'']);
   descargar(aoa,'Acreditados','revision_acreditados');
 }
@@ -1040,7 +1038,7 @@ function modalKpi(k){
   if(d.tipo==='cruce'){
     head='<th>Viaje</th><th>División</th><th>Empresa</th><th>Conductor</th><th>Tracto / camión</th><th>Semirremolque</th>';
     body=rows.map((r,i)=>`<tr class="r-${['bad','warn','ok','ok'][r.peor]||'ok'}">${viajeTd(r,i)}<td>${esc(r.divN)}</td><td>${esc(r.emp)}</td><td>${esc(r.cond)}<span class="sub">${esc(fmtRut(r.rut))}</span>${stHTML(r.condSt)}</td><td><span class="plate">${esc(r.tracto)||'—'}</span>${stHTML(r.tractoSt)}</td><td><span class="plate">${esc(r.semi)||'—'}</span>${stHTML(r.semiSt)}</td></tr>`).join('');
-    aoa=[['Id viaje','Id pedido','Estado viaje','División','Empresa','Conductor','RUT','Conductor habilitado','Motivo conductor','Patente tracto','Tracto habilitado','Motivo tracto','Patente semirremolque','Semirremolque habilitado','Motivo semirremolque'],...rows.map(r=>[r.viaje,r.id,r.estV,r.divN,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.tracto,r.tractoSt.txt,r.tractoSt.motivo,r.semi,r.semiSt.txt,r.semiSt.motivo])];
+    aoa=[['Id viaje','Id pedido','Estado viaje','División','Empresa','Conductor','RUT','Conductor acreditado','Motivo conductor','Patente tracto','Tracto acreditado','Motivo tracto','Patente semirremolque','Semirremolque acreditado','Motivo semirremolque'],...rows.map(r=>[r.viaje,r.id,r.estV,r.divN,r.emp,r.cond,fmtRut(r.rut),r.condSt.txt,r.condSt.motivo,r.tracto,r.tractoSt.txt,r.tractoSt.motivo,r.semi,r.semiSt.txt,r.semiSt.motivo])];
   } else if(d.tipo==='desv'){
     head='<th>Viaje</th><th>Fecha carga</th><th>Verificación</th><th>Categoría</th><th>Prioridad</th><th>Tipo vehículo plan</th><th>Empresa</th><th>Desviaciones</th>';
     body=rows.map((r,i)=>`<tr class="r-bad">${viajeTd(r,i)}<td>${esc(r.fcar)}</td><td>${esc(r.verif)}</td><td>${esc(r.cat)}</td><td>${esc(r.prio)}</td><td>${esc(r.tipoPlan)}</td><td>${esc(r.emp)}</td><td>${r.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}</td></tr>`).join('');
@@ -1062,10 +1060,10 @@ function modalConductor(div, rut, nomSrv){
   let html='';
   if(rec){
     const st=estado(rec); st.motivo=motivoCond(rec,st);
-    html+=kv([['División',esc(divLabel(div))],['Estado habilitación',stHTML(st)],['Días de vigencia restantes',rec.dias??''],['Fecha vigencia',esc(rec.fecha)],['Empresa',esc(rec.emp)],['Estado contrato',esc(rec.estC)],['Estado vigencia',esc(rec.estV)],['Estado credencial',esc(rec.estCr)],['Estado licencia interna',esc(rec.estL)]]);
+    html+=kv([['División',esc(divLabel(div))],['Estado acreditación',stHTML(st)],['Estado en el informe',esc(rec.est)],['Días de vigencia restantes',rec.dias??''],['Fecha vigencia',esc(rec.fecha)],['Empresa',esc(rec.emp)],['Estado contrato',esc(rec.estC)],['Estado vigencia',esc(rec.estV)],['Estado credencial',esc(rec.estCr)],['Estado licencia interna',esc(rec.estL)]]);
     html+=`<div class="tw" style="max-height:none"><table><thead><tr><th>Ítem</th><th>Fecha de vencimiento</th><th>Días</th><th>Estado</th></tr></thead><tbody>${itemsCond(rec).map(i=>{ const s=estItem(i.dias); return `<tr><td>${esc(i.label)}</td><td>${esc(i.fecha)||'—'}</td><td>${i.dias??'—'}</td><td><div class="st ${s.cls}"><span class="dot ${s.cls}"></span><span class="txt">${s.txt}</span></div></td></tr>`; }).join('')}</tbody></table></div>`;
   } else {
-    html+=`<p><span class="tag bad">No registrado en ${esc(divLabel(div))}</span></p><p class="hint">Este RUT no aparece en la pestaña CONDUCTORES para esta división.</p>`;
+    html+=`<p><span class="tag bad">No hay registro en ${esc(divLabel(div))}</span></p><p class="hint">Este RUT no aparece en la pestaña CONDUCTORES para esta división.</p>`;
   }
   html+=`<h4 style="margin:14px 0 4px">Todas las divisiones</h4>${chipsDivs(todas.slice())}`;
   abrirModal(`${esc(nom)} <span class="sub">RUT ${esc(fmtRut(rut))}</span>`, html);
@@ -1076,9 +1074,9 @@ function modalEquipo(div, pat, quiereSemi){
   let html='';
   if(rec){
     const st=estadoEquipo(div,pat,quiereSemi); const rt=estItem(rec.revD);
-    html+=kv([['División',esc(divLabel(div))],['Estado habilitación',stHTML(st)],['Tipo',esc(rec.tipo)],['Marca / modelo / año',esc([rec.marca,rec.modelo,rec.anio].filter(Boolean).join(' · '))],['Empresa',esc(rec.emp)],['Días de vigencia restantes',rec.dias??''],['Fecha expiración',esc(rec.fecha)],['Estado',esc(rec.estK)],['Estado credencial',esc(rec.estCr)],['Revisión técnica',`${esc(rec.revF)||'—'} · ${rec.revD??'—'} días <span class="tag ${rt.cls}">${rt.txt}</span>`]]);
+    html+=kv([['División',esc(divLabel(div))],['Estado acreditación',stHTML(st)],['Estado en el informe',esc(rec.est)],['Tipo',esc(rec.tipo)],['Marca / modelo / año',esc([rec.marca,rec.modelo,rec.anio].filter(Boolean).join(' · '))],['Empresa',esc(rec.emp)],['Días de vigencia restantes',rec.dias??''],['Fecha expiración',esc(rec.fecha)],['Estado',esc(rec.estK)],['Estado credencial',esc(rec.estCr)],['Revisión técnica',`${esc(rec.revF)||'—'} · ${rec.revD??'—'} días <span class="tag ${rt.cls}">${rt.txt}</span>`]]);
   } else {
-    html+=`<p><span class="tag bad">No registrado en ${esc(divLabel(div))}</span></p><p class="hint">Esta patente no aparece en la pestaña EQUIPOS para esta división.</p>`;
+    html+=`<p><span class="tag bad">No hay registro en ${esc(divLabel(div))}</span></p><p class="hint">Esta patente no aparece en la pestaña EQUIPOS para esta división.</p>`;
   }
   html+=`<h4 style="margin:14px 0 4px">Todas las divisiones</h4>${chipsDivs(todas.slice(), quiereSemi)}`;
   abrirModal(`<span class="plate">${esc(pat)}</span> <span class="sub">${esc(rec?rec.tipo:(todas[0]?todas[0].tipo:''))}</span>`, html);
@@ -1088,7 +1086,7 @@ function modalViaje(s){
   let html=kv(pairs);
   const d=IDX.desvByViaje.get(s.viaje); if(d) html+=`<h4 style="margin:10px 0 4px">Desviaciones</h4>${d.desv.map(x=>`<span class="tag bad">${esc(x.txt)}</span>`).join('')}`;
   const p=IDX.peajeByViaje.get(s.viaje); if(p) html+=`<h4 style="margin:10px 0 4px">Peajes</h4><span class="tag ${p.peajeReg?'ok':'warn'}">${esc(p.motivo)} · ${p.peajeReg?'peaje registrado':'sin peaje registrado'}</span>`;
-  const c=IDX.cruceByViaje.get(s.viaje); if(c) html+=`<h4 style="margin:10px 0 4px">Habilitaciones en ${esc(c.divN)}</h4><div class="chips"><span class="chip" style="cursor:pointer" ondblclick="modalConductor('${c.div}','${c.rut}','')"><span class="dot ${c.condSt.cls}"></span><b>Conductor</b> ${esc(c.condSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.tracto}',false)"><span class="dot ${c.tractoSt.cls}"></span><b>Tracto</b> ${esc(c.tractoSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.semi}',true)"><span class="dot ${c.semiSt.cls}"></span><b>Semirremolque</b> ${esc(c.semiSt.txt)}</span></div><p class="hint">Doble clic en un chip abre el detalle del conductor o del equipo.</p>`;
+  const c=IDX.cruceByViaje.get(s.viaje); if(c) html+=`<h4 style="margin:10px 0 4px">Acreditaciones en ${esc(c.divN)}</h4><div class="chips"><span class="chip" style="cursor:pointer" ondblclick="modalConductor('${c.div}','${c.rut}','')"><span class="dot ${c.condSt.cls}"></span><b>Conductor</b> ${esc(c.condSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.tracto}',false)"><span class="dot ${c.tractoSt.cls}"></span><b>Tracto</b> ${esc(c.tractoSt.txt)}</span><span class="chip" style="cursor:pointer" ondblclick="modalEquipo('${c.div}','${c.semi}',true)"><span class="dot ${c.semiSt.cls}"></span><b>Semirremolque</b> ${esc(c.semiSt.txt)}</span></div><p class="hint">Doble clic en un chip abre el detalle del conductor o del equipo.</p>`;
   abrirModal(`Viaje ${esc(s.viaje)} <span class="sub">pedido ${esc(s.id)}</span>`, html);
 }
 document.addEventListener('dblclick', e=>{
@@ -1114,13 +1112,13 @@ function buscar(){
   const conds=[...porRut.values()].slice(0,15), pats=[...porPat.values()].slice(0,15);
   const srvDe=fn=>(SRV?SRV.rows.filter(fn):[]).sort((a,b)=>(esActivo(b.estV)?1:0)-(esActivo(a.estV)?1:0)).slice(0,8);
   const chips=(divs,onclick)=>`<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=estado(d); return `<span class="chip" style="cursor:pointer" ondblclick="${onclick(d)}"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')}</div>`;
-  const tablaSrv=(rows,keyFn)=>rows.length?`<div class="tw" style="margin-top:8px;max-height:none"><table><thead><tr><th>Viaje</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Habilitado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st=div?keyFn(div,s):{cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.viaje)}</b><span class="sub">pedido ${esc(s.id)}</span></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):sinPrefijo(s.dest))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>`:'<p class="hint">No aparece en la planilla Punto a Punto.</p>';
+  const tablaSrv=(rows,keyFn)=>rows.length?`<div class="tw" style="margin-top:8px;max-height:none"><table><thead><tr><th>Viaje</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Acreditado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st=div?keyFn(div,s):{cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.viaje)}</b><span class="sub">pedido ${esc(s.id)}</span></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):sinPrefijo(s.dest))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>`:'<p class="hint">No aparece en la planilla Punto a Punto.</p>';
   let html='';
   for(const c of conds) html+=`<div class="res"><h3>${esc(c.nom)} <span class="sub">RUT ${esc(fmtRut(c.rut))}</span></h3>${chips(c.divs, d=>`modalConductor('${d.div}','${c.rut}','')`)}${tablaSrv(srvDe(s=>s.rut===c.rut),(div,s)=>{ const rc=IDX.cond.get(div+'|'+s.rut); const st=estado(rc); st.motivo=motivoCond(rc,{...st,rut:s.rut}); return st; })}</div>`;
   for(const p of pats) html+=`<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs, d=>`modalEquipo('${d.div}','${p.pat}',${isSemi(p.tipo)})`)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat),(div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
   if(!conds.length && !pats.length && SRV){
     const enSrv=SRV.rows.filter(s=>(qr.length>=5 && s.rut.includes(qr)) || norm(s.chofer).includes(q) || (qp.length>=3 && (s.tracto.includes(qp)||s.semi.includes(qp)))).slice(0,8);
-    if(enSrv.length) html+=`<div class="res"><h3>No está en el informe de habilitados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está habilitado en ninguna división.</p>${tablaSrv(enSrv,()=>({cls:'bad',txt:'No registrado'}))}</div>`;
+    if(enSrv.length) html+=`<div class="res"><h3>No está en el informe de acreditados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está acreditado en ninguna división.</p>${tablaSrv(enSrv,()=>({cls:'bad',txt:'No hay registro'}))}</div>`;
   }
   out.innerHTML=html||'<p class="hint">Sin resultados.</p>';
 }
