@@ -267,7 +267,7 @@
         <tbody id="tbP"></tbody>
       </table></div>
       <p class="hint" id="hintP"></p>
-      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
+      <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Los viajes suspendidos y los falsos fletes no se listan en la tabla; solo se cuentan en sus cuadros, donde el doble clic muestra cuáles son. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
     </section>
   </div>
 
@@ -527,7 +527,8 @@ function calcular(){
     if(hacia||desde){
       const motivo = hacia ? `Desde ${zona}${comOrig&&norm(zona)!==comOrig?' ('+comOrig.replace(/\b\w/g,c=>c.toUpperCase())+')':''} hacia ${divLabel(div)}` : `Desde ${divLabel(origDiv)} a Antofagasta`;
       const peajeReg=/peaje/i.test(s.incid);
-      PEAJES.push({...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
+      const excl = /suspendido/i.test(s.estV) ? 'Suspendido' : (/falso\s*flete/i.test(s.estV) ? 'Falso flete' : '');
+      PEAJES.push({...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, excl, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)});
     }
   }
 }
@@ -542,7 +543,7 @@ function refrescar(){
   const listo=!!(HAB&&SRV);
   $('tabs').style.display = SRV?'':'none';
   $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none'; $('secBus').style.display = HAB?'':'none';
-  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.length;
+  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.filter(r=>!r.excl).length;
   if(listo){ llenarFiltros(); render(); }
   if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); }
   if(HAB) buscar();
@@ -671,7 +672,7 @@ function exportarDesv(){
 /* ---------- PEAJES ---------- */
 function filasPeaje(){
   const q=norm($('qp').value), fe=$('fEstP').value, fm=$('fMotP').value, sin=$('fSinP').checked;
-  let rows=PEAJES.filter(r=>(fe==='todos'||r.activo)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
+  let rows=PEAJES.filter(r=>!r.excl&&(fe==='todos'||r.activo)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
   if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV].join(' ')).includes(q));
   const st=SORT.peaje;
   if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(k==='peajeReg'?(r.peajeReg?1:0):(r[k]??'')));
@@ -693,10 +694,11 @@ function renderPeaje(){
     <td>${r.peajeReg?'<span class="sub">—</span>':'<span class="tag warn">Sin peaje registrado</span>'}</td>
   </tr>`).join('');
   thArrows('tabP', SORT.peaje);
-  $('hintP').textContent=`Mostrando ${rows.length} de ${PEAJES.length} viajes con incidencia de peajes (${PEAJES.filter(r=>r.activo).length} activos).`;
+  const V=PEAJES.filter(r=>!r.excl), susp=PEAJES.filter(r=>r.excl==='Suspendido'), falso=PEAJES.filter(r=>r.excl==='Falso flete');
+  $('hintP').textContent=`Mostrando ${rows.length} de ${V.length} viajes con incidencia de peajes (${V.filter(r=>r.activo).length} activos). Los ${susp.length} suspendidos y ${falso.length} falsos fletes no se listan; solo se cuentan en los cuadros de arriba.`;
   const K=(k,c,l,rows)=>{ defKpi(k,l,'peaje',rows); return [c,rows.length,l,k]; };
-  const z=n=>PEAJES.filter(r=>r.zona===n);
-  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',PEAJES),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',PEAJES.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',PEAJES.filter(r=>!r.peajeReg))]);
+  const z=n=>V.filter(r=>r.zona===n);
+  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',V),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',V.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',V.filter(r=>!r.peajeReg)),K('pSusp','','Viajes suspendidos',susp),K('pFalso','','Falsos fletes',falso)]);
 }
 function exportarPeaje(){
   const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha plan carga','Bodega origen','Dirección carga','Comuna origen','Bodega destino','Dirección descarga','Comuna destino','Empresa','Patente principal','Patente secundaria','Origen','Motivo','Peaje registrado','Incidencias viaje']];
