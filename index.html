@@ -118,8 +118,15 @@
   .step.w{background:#fff8e8} .step.w .l svg{stroke:var(--warn)}
   .step.c{background:#f2f4f6} .step.c .l svg{stroke:#475569}
   .grid2{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
-  .grid2b{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start;margin-top:14px}
+  .grid2b{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.9fr);gap:14px;align-items:start;margin-top:14px}
+  @media (max-width:1300px){ .grid2b{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)} }
   @media (max-width:1100px){ .grid2,.grid2b{grid-template-columns:1fr} }
+  .catl{display:flex;flex-direction:column;gap:6px}
+  .cat{display:grid;grid-template-columns:minmax(90px,1fr) 2fr auto;gap:8px;align-items:center;font-size:.86rem;cursor:pointer;padding:3px 4px;border-radius:6px}
+  .cat:hover{background:var(--green-soft2)}
+  .cat .bar{height:9px;border-radius:999px;background:var(--green-soft);overflow:hidden}
+  .cat .bar i{display:block;height:100%;background:var(--green)}
+  .cat b{font-weight:700;min-width:24px;text-align:right}
 
   /* ===== paneles verdes ===== */
   .panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
@@ -243,6 +250,7 @@
       <button data-s="viajes" onclick="ir('viajes')"><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>Viajes<span class="n" id="nViajes">0</span></button>
       <button data-s="desv" onclick="ir('desv')"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>Desviaciones<span class="n" id="nDesv">0</span></button>
       <button data-s="peaje" onclick="ir('peaje')"><svg viewBox="0 0 24 24"><path d="M4 20 10 4h4l6 16"/><path d="M6.5 14h11"/><path d="M8.5 9h7"/></svg>Peajes<span class="n" id="nPeaje">0</span></button>
+      <button data-s="cierre" onclick="ir('cierre')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Cierre<span class="n" id="nCierre">0</span></button>
       <button data-s="rep" onclick="ir('rep')"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></svg>Reportes</button>
     </nav>
     <div class="foot">
@@ -295,6 +303,11 @@
                   <h2>Estado de Acreditación</h2>
                   <div class="donut" id="donut"></div>
                 </div>
+                <div class="card" style="margin:0">
+                  <div class="ch"><h2>Categorías activas</h2><span class="hint" style="margin:0" id="catsTot"></span></div>
+                  <div id="cats"></div>
+                  <p class="hint">Viajes activos por categoría. Doble clic en una categoría muestra sus viajes.</p>
+                </div>
               </div>
               <div class="card" style="margin-top:14px">
                 <div class="ch"><h2>Últimos Viajes</h2><button class="link" onclick="ir('viajes')">Ver todos</button></div>
@@ -334,7 +347,7 @@
             <div class="grow"><input type="text" id="q" placeholder="Filtrar: viaje, pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
             <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
             <select id="fEmp" onchange="render()"><option value="">Todas las empresas</option></select>
-            <select id="fEst" onchange="render()"><option value="activo">Solo viajes activos</option><option value="todos">Todos los estados</option></select>
+            <select id="fEst" onchange="render()"><option value="activo">Solo viajes activos</option><option value="todos">Todos los estados</option></select><span class="hint" style="margin:0">(los viajes anulados no se consideran)</span>
             <label class="chk"><input type="checkbox" id="fAl" onchange="render()"> Solo con alertas</label>
             <button class="btn sec" onclick="exportarCruce()">Descargar Excel</button>
           </div>
@@ -399,7 +412,18 @@
             <tbody id="tbD"></tbody>
           </table></div>
           <p class="hint" id="hintD"></p>
-          <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO", salvo en camiones rígidos (15, 10, 5, 3/4 t) y camionetas, que no llevan semirremolque. Doble clic en un viaje o en un cuadro abre su detalle.</p>
+          <p class="hint">Reglas: (1) la combinación Verificación y Categoría debe estar en el patrón autorizado; (2) prioridad Urgencia exige categoría URGENCIA; (3) tractos 6X4, 6X2 y cama baja deben llevar patente de semirremolque; (4) ninguna columna puede decir "NO DETERMINADO", salvo en camiones rígidos (15, 10, 5, 3/4 t) y camionetas, que no llevan semirremolque. Los viajes anulados no se consideran. Doble clic en un viaje o en un cuadro abre su detalle.</p>
+        </div>
+        <div class="card">
+          <div class="ch"><h2>Servicios activos con fecha fuera de período</h2><button class="btn sec" onclick="exportarFechas()">Descargar Excel</button></div>
+          <div class="tw" style="margin-top:0"><table id="tabF">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="fcre">Fecha creación</th><th data-k="fcar">Fecha plan carga</th><th data-k="estV">Estado viaje</th><th data-k="cat">Categoría</th><th data-k="emp">Empresa</th><th data-k="destN">Destino</th><th data-k="motivo">Observación</th>
+            </tr></thead>
+            <tbody id="tbF"></tbody>
+          </table></div>
+          <p class="hint" id="hintF"></p>
+          <p class="hint">Se revisan las columnas Fecha Creación y Fecha Plan Carga de los servicios activos. Una fecha corresponde al período cuando está en el año y mes actuales o en los últimos 4 días del mes anterior; cualquier otra fecha se marca como fuera de período.</p>
         </div>
       </section>
 
@@ -418,6 +442,7 @@
               <option value="Salvador">Desde Salvador hacia DCH / DRT / DMH</option>
               <option value="Andina">Desde Andina hacia DCH / DRT / DMH</option>
               <option value="Rancagua">Desde Rancagua / Requínoa hacia DCH / DRT / DMH</option>
+              <option value="Mejillones">Desde Mejillones hacia DCH / DRT / DMH</option>
               <option value="Concepción">Desde Concepción hacia DCH / DRT / DMH</option>
               <option value="Copiapó">Desde Copiapó hacia DCH / DRT / DMH</option>
               <option value="Coquimbo">Desde Coquimbo hacia DCH / DRT / DMH</option>
@@ -434,7 +459,35 @@
             <tbody id="tbP"></tbody>
           </table></div>
           <p class="hint" id="hintP"></p>
-          <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Los viajes suspendidos y los falsos fletes no se listan en la tabla; solo se cuentan en sus cuadros, donde el doble clic muestra cuáles son. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
+          <p class="hint">Se incluyen los viajes que salen desde comunas de Santiago, Antofagasta, Mejillones, Salvador, Andina, Rancagua, Requínoa, Concepción, Copiapó o Coquimbo hacia Chuquicamata, Radomiro Tomic o Ministro Hales, y los viajes de categoría Retorno Dedicado que salen desde esas tres divisiones hacia Antofagasta. Los orígenes en Calama no se consideran. La comuna se toma del final de la dirección de carga o descarga. La alerta "Sin peaje registrado" aparece cuando la columna Incidencias Viaje no trae Cobro o Pago de Peaje. Los viajes suspendidos y los falsos fletes no se listan en la tabla; solo se cuentan en sus cuadros, donde el doble clic muestra cuáles son. Los viajes anulados no se consideran. Doble clic en un cuadro de resumen o en un viaje abre el detalle.</p>
+        </div>
+      </section>
+
+      <!-- ===== CIERRE ===== -->
+      <section class="sec" id="sCierre">
+        <div class="ph"><div><h1>Cierre</h1><p>Viajes activos o finalizados por rendir guía cuya carga o descarga aún no figura completada.</p></div></div>
+        <div class="card">
+          <div class="kpis" id="kpisCierre"></div>
+          <div class="row" style="margin-top:12px">
+            <div class="grow"><input type="text" id="qc" placeholder="Filtrar: viaje, pedido, conductor, patente, empresa, origen, destino…" oninput="renderCierre()"></div>
+            <select id="fScopeC" onchange="renderCierre()">
+              <option value="pend">Carga o descarga sin completar</option>
+              <option value="carga">Carga sin salida de punto de carga</option>
+              <option value="desc">Descarga sin entrega finalizada</option>
+              <option value="todos">Todos los activos y por rendir</option>
+            </select>
+            <select id="fEstC" onchange="renderCierre()"></select>
+            <button class="btn sec" onclick="exportarCierre()">Descargar Excel</button>
+          </div>
+          <div class="tw"><table id="tabC">
+            <thead><tr>
+              <th data-k="viaje">Id viaje</th><th data-k="origN">Origen</th><th data-k="destN">Destino</th><th data-k="chofer">Conductor</th><th data-k="tracto">Tracto</th><th data-k="semi">Semirremolque</th>
+              <th data-k="estV">Estado</th><th data-k="estCarga">Estado carga</th><th data-k="estDesc">Estado descarga</th><th data-k="ffin">Viaje fecha fin</th>
+            </tr></thead>
+            <tbody id="tbC"></tbody>
+          </table></div>
+          <p class="hint" id="hintC"></p>
+          <p class="hint">Se consideran los viajes en estado Activo o Finalizado por Rendir Guía Física. Un viaje queda pendiente de cierre cuando la columna Estado Carga no dice "Salida Punto Carga" o la columna Estado Descarga no dice "Entrega Finalizada". "Viaje fecha fin" es la fecha fin plan del viaje; se marca atrasado cuando ya pasó. Doble clic en un viaje abre su detalle.</p>
         </div>
       </section>
 
@@ -446,6 +499,8 @@
           <div class="rep"><h3>Desviaciones</h3><p>Viajes con desviación y el detalle de cada regla incumplida.</p><button class="btn" onclick="exportarDesv(DESV)">Descargar Excel</button></div>
           <div class="rep"><h3>Incidencia de peajes</h3><p>Viajes que deben llevar peaje, su origen y si la incidencia está registrada.</p><button class="btn" onclick="exportarPeaje(PEAJES.filter(r=>!r.excl))">Descargar Excel</button></div>
           <div class="rep"><h3>Viajes</h3><p>Todos los viajes de la planilla con su estado y las alertas detectadas.</p><button class="btn" onclick="exportarViajes(SRV?SRV.rows:[])">Descargar Excel</button></div>
+          <div class="rep"><h3>Cierre</h3><p>Viajes activos o por rendir con carga o descarga sin completar.</p><button class="btn" onclick="exportarCierre(CIERRE.filter(r=>r.pend))">Descargar Excel</button></div>
+          <div class="rep"><h3>Fechas fuera de período</h3><p>Servicios activos con fecha de creación o de plan de carga fuera del período actual.</p><button class="btn" onclick="exportarFechas(FECHAS)">Descargar Excel</button></div>
           <div class="rep"><h3>Suspendidos y falsos fletes</h3><p>Viajes a división en estado Suspendido o Falso flete.</p><button class="btn" onclick="exportarCruce(CRUCE.filter(r=>/suspendido|falso\s*flete/i.test(r.estV)))">Descargar Excel</button></div>
         </div>
         <p class="hint" id="repHint"></p>
@@ -473,7 +528,7 @@ const PEAJE_DIVS = ['DCH','DRT','DMH'];
 const SANTIAGO = new Set(['santiago','cerrillos','cerro navia','conchali','el bosque','estacion central','huechuraba','independencia','la cisterna','la florida','la granja','la pintana','la reina','las condes','lo barnechea','lo espejo','lo prado','macul','maipu','nunoa','pedro aguirre cerda','penalolen','providencia','pudahuel','quilicura','quinta normal','recoleta','renca','san joaquin','san miguel','san ramon','vitacura','puente alto','pirque','san jose de maipo','colina','lampa','tiltil','til til','san bernardo','buin','calera de tango','paine','melipilla','alhue','curacavi','maria pinto','san pedro','talagante','el monte','isla de maipo','padre hurtado','penaflor']);
 const SALVADOR = new Set(['el salvador','diego de almagro','salvador']);
 const ANDINA = new Set(['los andes','saladillo','andina','san felipe','calle larga','rinconada']);
-const OTRAS_ZONAS = { 'Rancagua':['rancagua','requinoa'], 'Concepción':['concepcion'], 'Copiapó':['copiapo'], 'Coquimbo':['coquimbo'] };
+const OTRAS_ZONAS = { 'Rancagua':['rancagua','requinoa'], 'Mejillones':['mejillones'], 'Concepción':['concepcion'], 'Copiapó':['copiapo'], 'Coquimbo':['coquimbo'] };
 const KEY_HAB = 'yuli_hab2', KEY_SRV = 'yuli_srv2';
 const ITEMS_COND = [
   {id:'credencial', label:'Credencial',                     short:'Credencial',    dias:'dias por vencer credencial',           fecha:'fecha vigencia'},
@@ -538,9 +593,15 @@ function zonaOrigen(s){
 }
 
 /* ---------- estado ---------- */
-let HAB=null, SRV=null, CRUCE=[], DESV=[], PEAJES=[];
-let SORT={cruce:{k:'',dir:1}, desv:{k:'',dir:1}, peaje:{k:'',dir:1}, viajes:{k:'',dir:1}};
-let LAST={cruce:[], desv:[], peaje:[], viajes:[], modal:[], ult:[]};
+let HAB=null, SRV=null, CRUCE=[], DESV=[], PEAJES=[], FECHAS=[], CIERRE=[];
+let SORT={cruce:{k:'',dir:1}, desv:{k:'',dir:1}, peaje:{k:'',dir:1}, viajes:{k:'',dir:1}, cierre:{k:'',dir:1}, fechas:{k:'',dir:1}};
+let LAST={cruce:[], desv:[], peaje:[], viajes:[], modal:[], ult:[], cierre:[], fechas:[]};
+// fechas de la planilla: dd/mm/yyyy [hh:mm]
+function parseFecha(s){ const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String(s||'').trim()); return m?new Date(+m[3],+m[2]-1,+m[1]):null; }
+// período válido: año y mes actuales, o los últimos 4 días del mes anterior
+function periodoOk(d){ const hoy=new Date(); if(d.getFullYear()===hoy.getFullYear()&&d.getMonth()===hoy.getMonth()) return true; const fin=new Date(hoy.getFullYear(),hoy.getMonth(),0); const ini=new Date(fin.getFullYear(),fin.getMonth(),fin.getDate()-3); return d>=ini && d<=fin; }
+const estadoPasa=(r,v)=> v==='todos' ? true : (v==='activo' ? r.activo : r.estV===v);
+function llenarEstados(sel, rows, defecto){ const v=sel.value||defecto; const ests=[...new Set(rows.map(r=>r.estV).filter(Boolean))].sort(); sel.innerHTML=`<option value="activo">Solo viajes activos</option><option value="todos">Todos los estados</option>`+ests.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join(''); sel.value=[...sel.options].some(o=>o.value===v)?v:defecto; }
 let IDX={cond:new Map(), eq:new Map(), condByRut:new Map(), eqByPat:new Map(), srvByViaje:new Map(), cruceByViaje:new Map(), desvByViaje:new Map(), peajeByViaje:new Map()};
 let KPI={}, MODAL_XLS=null;
 
@@ -592,7 +653,8 @@ function leerServicios(wb, name){
     emp:colExact(hn,'Proveedor TTE','Proveedor'), tracto:colExact(hn,'Patente Principal'), semi:colExact(hn,'Patente Secundaria'), chofer:colExact(hn,'Chofer'), cocond:colExact(hn,'Coconductor'),
     rut:colExact(hn,'Rut Conductor','RUT Conductor'), tipo:colExact(hn,'Tipo Vehiculo Principal'), tipoSec:colExact(hn,'Tipo Vehiculo Secundario'),
     fcar:colExact(hn,'Fecha Plan Carga'), fdes:colExact(hn,'Fecha Plan Descarga'), fcre:colExact(hn,'Fecha Creacion','Fecha Creación'), incid:colExact(hn,'Incidencias Viaje'),
-    cliente:colExact(hn,'Cliente'), refExt:colExact(hn,'Referencia Externa'), estCarga:colExact(hn,'Estado Carga'), estDesc:colExact(hn,'Estado Descarga')
+    cliente:colExact(hn,'Cliente'), refExt:colExact(hn,'Referencia Externa'), estCarga:colExact(hn,'Estado Carga'), estDesc:colExact(hn,'Estado Descarga'),
+    ffin:colExact(hn,'Viaje Fecha Fin Plan'), finRendir:colExact(hn,'Viaje FH Finalizado Rendir')
   };
   const falta = ['id','viaje','dest','estV','tracto','rut'].filter(k=>c[k]<0);
   if(falta.length) throw new Error('Punto a Punto: faltan columnas: '+falta.join(', '));
@@ -603,7 +665,7 @@ function leerServicios(wb, name){
     rows.push({ id:g(r,c.id), viaje:g(r,c.viaje), cat:g(r,c.cat), verif:g(r,c.verif), dest:g(r,c.dest), dirDesc:g(r,c.dirDesc), orig:g(r,c.orig), dirCarga:g(r,c.dirCarga),
       estV:g(r,c.estV), estP:g(r,c.estP), prio:g(r,c.prio), tipoPlan:g(r,c.tipoPlan), emp:g(r,c.emp), tracto:normPat(g(r,c.tracto)), semi:normPat(g(r,c.semi)), semiRaw:g(r,c.semi),
       chofer:g(r,c.chofer), cocond:g(r,c.cocond), rut:normRut(g(r,c.rut)), tipo:g(r,c.tipo), tipoSec:g(r,c.tipoSec), fcar:g(r,c.fcar), fdes:g(r,c.fdes), fcre:g(r,c.fcre),
-      incid:g(r,c.incid), cliente:g(r,c.cliente), refExt:g(r,c.refExt), estCarga:g(r,c.estCarga), estDesc:g(r,c.estDesc), noDet }); }
+      incid:g(r,c.incid), cliente:g(r,c.cliente), refExt:g(r,c.refExt), estCarga:g(r,c.estCarga), estDesc:g(r,c.estDesc), ffin:g(r,c.ffin), finRendir:g(r,c.finRendir), noDet }); }
   return {file:name, fecha:new Date().toISOString(), rows};
 }
 
@@ -679,12 +741,13 @@ function estadoEquipo(div, pat, quiereSemi){
 
 /* ---------- cálculo ---------- */
 function calcular(){
-  CRUCE=[]; DESV=[]; PEAJES=[]; indexar();
+  CRUCE=[]; DESV=[]; PEAJES=[]; FECHAS=[]; CIERRE=[]; indexar();
   if(!SRV) return;
   for(const s of SRV.rows){
     const activo=esActivo(s.estV);
+    const anulado=/anulado/i.test(s.estV)||/anulado/i.test(s.estP);
     const div=divDe(s.dest);
-    if(div && HAB){
+    if(div && HAB && !anulado){
       const rc=IDX.cond.get(div+'|'+s.rut);
       const condSt=estado(rc); condSt.rec=rc; condSt.rut=s.rut; condSt.motivo=motivoCond(rc,condSt);
       const tractoSt=estadoEquipo(div,s.tracto,false), semiSt=estadoEquipo(div,s.semi,true);
@@ -699,16 +762,28 @@ function calcular(){
     if(/6X4|6X2|CAMA\s*BAJA/i.test(s.tipoPlan) && (!s.semi || /no determinado/i.test(s.semiRaw))) d.push({t:'semi', txt:`${s.tipoPlan} sin patente de semirremolque`});
     const rigido=/^(CAMION|CAMIONETA|FURG)/i.test(s.tipoPlan);
     if(s.noDet&&s.noDet.length&&!rigido) d.push({t:'nodet', txt:'NO DETERMINADO en: '+s.noDet.join(', ')});
-    if(d.length){ const row={...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)}; DESV.push(row); IDX.desvByViaje.set(s.viaje,row); }
+    if(d.length && !anulado){ const row={...s, activo, desv:d, ndesv:d.length, tipos:d.map(x=>x.t)}; DESV.push(row); IDX.desvByViaje.set(s.viaje,row); }
     const origDiv=divDe(s.orig), zona=zonaOrigen(s), comOrig=comunaDe(s.dirCarga), comDest=comunaDe(s.dirDesc);
     const hacia=PEAJE_DIVS.includes(div) && !!zona;
     const desde=PEAJE_DIVS.includes(origDiv) && (comDest==='antofagasta' || (!comDest && norm(s.dirDesc).includes('antofagasta'))) && /dedicado/i.test(s.cat);
-    if(hacia||desde){
+    if((hacia||desde) && !anulado){
       const motivo = hacia ? `Desde ${zona}${comOrig&&norm(zona)!==comOrig?' ('+cap(comOrig)+')':''} hacia ${divLabel(div)}` : `Desde ${divLabel(origDiv)} a Antofagasta`;
       const peajeReg=/peaje/i.test(s.incid);
       const excl = /suspendido/i.test(s.estV) ? 'Suspendido' : (/falso\s*flete/i.test(s.estV) ? 'Falso flete' : '');
       const row={...s, activo, motivo, zona: hacia?zona:'Hacia Antofagasta', tipoMot: hacia?'hacia':'desde', peajeReg, excl, origN:sinPrefijo(s.orig), destN:sinPrefijo(s.dest)};
       PEAJES.push(row); IDX.peajeByViaje.set(s.viaje,row);
+    }
+    // fechas fuera de período (solo servicios activos): columnas Fecha Creacion (F) y Fecha Plan Carga (Q)
+    if(activo && !anulado){
+      const fc=parseFecha(s.fcre), fq=parseFecha(s.fcar); const m=[];
+      if(fc && !periodoOk(fc)) m.push('Fecha creación '+String(s.fcre).split(' ')[0]);
+      if(fq && !periodoOk(fq)) m.push('Fecha plan carga '+s.fcar);
+      if(m.length) FECHAS.push({...s, activo, motivosF:m, fcreOk:!(fc&&!periodoOk(fc)), fcarOk:!(fq&&!periodoOk(fq)), destN:div?divLabel(div):sinPrefijo(s.dest)});
+    }
+    // cierre: activos y finalizados por rendir guía, con carga o descarga sin completar
+    if(activo || /finalizado por rendir/i.test(s.estV)){
+      const cargaOk=/salida punto carga/i.test(s.estCarga||''), descOk=/entrega finalizada/i.test(s.estDesc||'');
+      CIERRE.push({...s, activo, cargaOk, descOk, pend:!(cargaOk&&descOk), origN:cap(comunaDe(s.dirCarga))||sinPrefijo(s.orig), destN:div?divLabel(div):sinPrefijo(s.dest), ffinD:parseFecha(s.ffin)});
     }
   }
 }
@@ -728,7 +803,7 @@ function alertasViaje(s){
 const NIVEL=[{cls:'bad',txt:'Desviación'},{cls:'warn',txt:'Atención'},{cls:'ok',txt:'OK'},{cls:'na',txt:'Sin revisión'}];
 
 /* ---------- navegación y render general ---------- */
-const SECS={inicio:'sInicio', acred:'sAcred', viajes:'sViajes', desv:'sDesv', peaje:'sPeaje', rep:'sRep'};
+const SECS={inicio:'sInicio', acred:'sAcred', viajes:'sViajes', desv:'sDesv', peaje:'sPeaje', cierre:'sCierre', rep:'sRep'};
 function ir(s){ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===s)); Object.entries(SECS).forEach(([k,id])=>$(id).classList.toggle('on',k===s)); window.scrollTo({top:0,behavior:'smooth'}); }
 function verTab(t){ ir(t==='cruce'?'acred':t); }
 function refrescar(){
@@ -742,9 +817,10 @@ function refrescar(){
   $('pillOp').className='pill'+(listo?' on':''); $('pillOp').querySelector('span:last-child').textContent = listo?'Operación activa · datos cargados':(SRV||HAB?'Falta un archivo':'Sin datos cargados');
   $('drop').style.display = listo?'none':''; $('dash').style.display = listo?'':'none';
   $('secRes').style.display = listo?'':'none'; $('secTab').style.display = listo?'':'none'; $('secBus').style.display = HAB?'':'none'; $('acredVacio').style.display = listo?'none':'';
-  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nViajes').textContent = SRV?SRV.rows.filter(r=>esActivo(r.estV)).length:0; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.filter(r=>!r.excl).length;
+  $('nCruce').textContent = CRUCE.filter(r=>r.activo).length; $('nViajes').textContent = SRV?SRV.rows.filter(r=>esActivo(r.estV)).length:0; $('nDesv').textContent = DESV.length; $('nPeaje').textContent = PEAJES.filter(r=>!r.excl).length; $('nCierre').textContent = CIERRE.filter(r=>r.pend).length;
+  if(SRV){ llenarEstados($('fEst'), CRUCE, 'activo'); llenarEstados($('fEstD'), DESV, 'todos'); llenarEstados($('fEstP'), PEAJES.filter(r=>!r.excl), 'todos'); llenarEstados($('fEstC'), CIERRE, 'todos'); }
   if(listo){ llenarFiltros(); render(); }
-  if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); llenarFiltrosViajes(); renderViajes(); }
+  if(SRV){ llenarFiltrosDesv(); renderDesv(); renderPeaje(); llenarFiltrosViajes(); renderViajes(); renderCierre(); }
   if(HAB) buscar();
   if(listo) renderInicio();
   $('repHint').textContent = listo ? `Datos cargados: ${SRV.rows.length} viajes, ${HAB.cond.length} conductores y ${HAB.eq.length} equipos.` : 'Cargue los dos archivos para habilitar las descargas.';
@@ -835,6 +911,12 @@ function renderInicio(){
   $('donut').innerHTML=`<svg viewBox="0 0 170 170">${d}<text x="85" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#172a1f">${pct}%</text><text x="85" y="100" text-anchor="middle" font-size="11" fill="#5f6f66">Acreditados</text></svg>
     <table>${segs.map(s=>`<tr><td><span class="dot" style="background:${s[2]}"></span>${s[0]}</td><td><b>${s[1]}</b></td></tr>`).join('')}</table>
     <p class="hint" style="flex-basis:100%">Revisiones de conductor, tracto y semirremolque en los ${a.length} servicios activos a división.</p>`;
+  // Categorías activas
+  const catMap=new Map(); for(const r of act){ const k=r.cat||'(sin categoría)'; (catMap.get(k)||catMap.set(k,[]).get(k)).push(r); }
+  const cats=[...catMap.entries()].sort((x,y)=>y[1].length-x[1].length); const maxC=Math.max(1,...cats.map(c=>c[1].length));
+  cats.forEach(([k,rows],i)=>defKpi('cat'+i,'Viajes activos · categoría '+k,'viajes',rows));
+  $('catsTot').textContent=`${cats.length} categorías · ${act.length} viajes activos`;
+  $('cats').innerHTML=cats.length?`<div class="catl">${cats.map(([k,rows],i)=>`<div class="cat" ondblclick="modalKpi('cat${i}')" title="Doble clic: ver los viajes"><span>${esc(k)}</span><span class="bar"><i style="width:${Math.round(rows.length/maxC*100)}%"></i></span><b>${rows.length}</b></div>`).join('')}</div>`:'<p class="empty">Sin viajes activos.</p>';
   // Últimos viajes
   const ult=[...S].sort((x,y)=>(esActivo(y.estV)-esActivo(x.estV))||fechaKey(y.fcar).localeCompare(fechaKey(x.fcar))||String(y.viaje).localeCompare(String(x.viaje))).slice(0,8);
   LAST.ult=ult;
@@ -853,7 +935,7 @@ function llenarFiltros(){
 }
 function filasCruce(){
   const q=norm($('q').value), fd=$('fDiv').value, fe=$('fEmp').value, fe2=$('fEst').value, al=$('fAl').checked;
-  let rows=CRUCE.filter(r=>(fe2==='todos'||r.activo)&&(!fd||r.div===fd)&&(!fe||r.emp===fe)&&(!al||r.peor<2));
+  let rows=CRUCE.filter(r=>estadoPasa(r,fe2)&&(!fd||r.div===fd)&&(!fe||r.emp===fe)&&(!al||r.peor<2));
   if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.cat,r.divN,r.emp,r.cond,r.chofer,fmtRut(r.rut),r.rut,r.tracto,r.semi,r.dest].join(' ')).includes(q));
   const st=SORT.cruce;
   if(st.k) sortRows(rows, st, (r,k)=> k.endsWith('St') ? r[k].orden : (r[k]??''));
@@ -945,7 +1027,7 @@ function exportarViajes(src){
 function llenarFiltrosDesv(){ const s=$('fTipoD'); const v=s.value; s.innerHTML='<option value="">Todas las desviaciones</option>'+Object.entries(DESV_NOM).map(([k,l])=>`<option value="${k}">${l}</option>`).join(''); s.value=v; }
 function filasDesv(){
   const q=norm($('qd').value), fe=$('fEstD').value, ft=$('fTipoD').value;
-  let rows=DESV.filter(r=>(fe==='todos'||r.activo)&&(!ft||r.tipos.includes(ft)));
+  let rows=DESV.filter(r=>estadoPasa(r,fe)&&(!ft||r.tipos.includes(ft)));
   if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.cat,r.verif,r.prio,r.emp,r.tipoPlan,r.semi,r.dest,r.desv.map(d=>d.txt).join(' ')].join(' ')).includes(q));
   const st=SORT.desv;
   if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(r[k]??''));
@@ -967,7 +1049,69 @@ function renderDesv(){
   $('hintD').textContent=`Mostrando ${rows.length} viajes con desviación de ${DESV.length} detectados en ${tot} viajes de la planilla (${DESV.filter(r=>r.activo).length} de los ${act} activos).`;
   const K=(k,c,l,rows)=>{ defKpi(k,l,'desv',rows); return [c,rows.length,l,k]; };
   const t=x=>DESV.filter(r=>r.tipos.includes(x));
-  $('kpisDesv').innerHTML=kpiHTML([K('dAll','bad','Viajes con desviación',DESV),K('dAct','bad','De ellos, activos',DESV.filter(r=>r.activo)),K('dPatron','','Fuera del patrón Verificación / Categoría',t('patron')),K('dUrg','','Urgencia sin categoría URGENCIA',t('urgencia')),K('dSemi','','Tracto sin semirremolque',t('semi')),K('dNodet','','Con NO DETERMINADO',t('nodet'))]);
+  defKpi('dFechas','Servicios activos con fecha fuera de período','viajes',FECHAS);
+  $('kpisDesv').innerHTML=kpiHTML([K('dAll','bad','Viajes con desviación',DESV),K('dAct','bad','De ellos, activos',DESV.filter(r=>r.activo)),K('dPatron','','Fuera del patrón Verificación / Categoría',t('patron')),K('dUrg','','Urgencia sin categoría URGENCIA',t('urgencia')),K('dSemi','','Tracto sin semirremolque',t('semi')),K('dNodet','','Con NO DETERMINADO',t('nodet')),['warn',FECHAS.length,'Activos con fecha fuera de período','dFechas']]);
+  renderFechas();
+}
+function filasFechas(){
+  const rows=FECHAS.slice(); const st=SORT.fechas;
+  if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'||k==='fcre'?fechaKey(r[k]):(k==='motivo'?r.motivosF.join(' '):(r[k]??'')));
+  else rows.sort((a,b)=>fechaKey(a.fcar).localeCompare(fechaKey(b.fcar))||String(a.viaje).localeCompare(String(b.viaje)));
+  return rows;
+}
+function renderFechas(){
+  const rows=filasFechas(); LAST.fechas=rows;
+  const tb=$('tbF');
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="8" class="empty">Todos los servicios activos tienen fechas dentro del período.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>`<tr class="r-warn">
+    <td class="dbl" data-d="viaje" data-i="${i}" data-src="fechas" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)}</span></td>
+    <td>${r.fcreOk?esc(r.fcre):`<span class="tag warn">${esc(r.fcre)}</span>`}</td><td>${r.fcarOk?esc(r.fcar):`<span class="tag warn">${esc(r.fcar)}</span>`}</td>
+    <td>${esc(r.estV)}</td><td>${esc(r.cat)}</td><td>${esc(r.emp)}</td><td>${esc(r.destN)}</td>
+    <td>${r.motivosF.map(m=>`<span class="tag warn">${esc(m)} fuera de período</span>`).join('')}</td></tr>`).join('');
+  thArrows('tabF', SORT.fechas);
+  const hoy=new Date(); const fin=new Date(hoy.getFullYear(),hoy.getMonth(),0); const ini=new Date(fin.getFullYear(),fin.getMonth(),fin.getDate()-3);
+  $('hintF').textContent=`${rows.length} de ${SRV.rows.filter(r=>esActivo(r.estV)).length} servicios activos con alguna fecha fuera de período. Período válido hoy: ${hoy.toLocaleDateString('es-CL',{month:'long',year:'numeric'})} y del ${ini.toLocaleDateString('es-CL')} al ${fin.toLocaleDateString('es-CL')}.`;
+}
+function exportarFechas(rows){
+  rows=rows||LAST.fechas;
+  const aoa=[['Id viaje','Id pedido','Estado viaje','Fecha creación','Fecha plan carga','Categoría','Empresa','Destino','Observación']];
+  for(const r of rows) aoa.push([r.viaje,r.id,r.estV,r.fcre,r.fcar,r.cat,r.emp,r.destN,r.motivosF.map(m=>m+' fuera de período').join(' | ')]);
+  descargar(aoa,'Fechas','fechas_fuera_periodo');
+}
+
+/* ---------- CIERRE ---------- */
+function filasCierre(){
+  const q=norm($('qc').value), sc=$('fScopeC').value, fe=$('fEstC').value;
+  let rows=CIERRE.filter(r=>(sc==='todos'||(sc==='pend'&&r.pend)||(sc==='carga'&&!r.cargaOk)||(sc==='desc'&&!r.descOk))&&estadoPasa(r,fe));
+  if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.chofer,r.rut,r.tracto,r.semi,r.emp,r.origN,r.destN,r.estV,r.estCarga,r.estDesc].join(' ')).includes(q));
+  const st=SORT.cierre;
+  if(st.k) sortRows(rows, st, (r,k)=> k==='ffin'?fechaKey(r.ffin):(r[k]??''));
+  else rows.sort((a,b)=>fechaKey(a.ffin).localeCompare(fechaKey(b.ffin))||String(a.viaje).localeCompare(String(b.viaje)));
+  return rows;
+}
+function renderCierre(){
+  const rows=filasCierre(); LAST.cierre=rows;
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const tb=$('tbC');
+  if(!rows.length) tb.innerHTML=`<tr><td colspan="10" class="empty">No hay viajes para este filtro.</td></tr>`;
+  else tb.innerHTML=rows.map((r,i)=>{ const atr=r.pend&&r.ffinD&&r.ffinD<hoy; return `<tr class="${r.pend?(atr?'r-bad':'r-warn'):''}">
+    <td class="dbl" data-d="viaje" data-i="${i}" data-src="cierre" title="Doble clic: detalle del viaje"><b>${esc(r.viaje)}</b><span class="sub">pedido ${esc(r.id)}${r.fcar?' · carga '+esc(r.fcar):''}</span></td>
+    <td>${esc(r.origN)}<span class="sub">${esc(sinPrefijo(r.orig))}</span></td><td>${esc(r.destN)}</td>
+    <td>${esc(r.chofer)}<span class="sub">${esc(fmtRut(r.rut))}</span></td><td><span class="plate">${esc(r.tracto)||'—'}</span></td><td><span class="plate">${esc(r.semiRaw||r.semi)||'—'}</span></td>
+    <td>${esc(r.estV)}</td><td><span class="tag ${r.cargaOk?'ok':'warn'}">${esc(r.estCarga||'Sin dato')}</span></td><td><span class="tag ${r.descOk?'ok':'warn'}">${esc(r.estDesc||'Sin dato')}</span></td>
+    <td>${esc(r.ffin)||'<span class="sub">—</span>'}${atr?'<span class="tag bad">Atrasado</span>':''}</td></tr>`; }).join('');
+  thArrows('tabC', SORT.cierre);
+  const pend=CIERRE.filter(r=>r.pend), atras=pend.filter(r=>r.ffinD&&r.ffinD<hoy);
+  const K=(k,c,l,rows)=>{ defKpi(k,l,'viajes',rows); return [c,rows.length,l,k]; };
+  $('kpisCierre').innerHTML=kpiHTML([K('cPend','warn','Pendientes de cierre',pend),K('cAtr','bad','Con fecha fin ya pasada',atras),K('cCarga','','Carga sin salida',CIERRE.filter(r=>!r.cargaOk)),K('cDesc','','Descarga sin finalizar',CIERRE.filter(r=>!r.descOk)),K('cRend','','Finalizados por rendir guía',CIERRE.filter(r=>!r.activo)),K('cTodos','','Activos y por rendir',CIERRE)]);
+  const sinFfin=CIERRE.some(r=>r.ffin===undefined);
+  $('hintC').textContent=`Mostrando ${rows.length} de ${CIERRE.length} viajes activos o por rendir guía (${pend.length} pendientes de cierre).`+(sinFfin?' Vuelva a cargar la planilla Punto a Punto para ver la columna Viaje fecha fin.':'');
+}
+function exportarCierre(rows){
+  rows=rows||LAST.cierre;
+  const aoa=[['Id viaje','Id pedido','Origen','Bodega origen','Destino','Conductor','RUT','Tracto','Semirremolque','Estado viaje','Estado carga','Estado descarga','Viaje fecha fin','Pendiente de cierre']];
+  for(const r of rows) aoa.push([r.viaje,r.id,r.origN,r.orig,r.destN,r.chofer,fmtRut(r.rut),r.tracto,r.semiRaw||r.semi,r.estV,r.estCarga,r.estDesc,r.ffin||'',r.pend?'Sí':'No']);
+  descargar(aoa,'Cierre','cierre');
 }
 function exportarDesv(rows){
   rows=rows||LAST.desv;
@@ -979,7 +1123,7 @@ function exportarDesv(rows){
 /* ---------- PEAJES ---------- */
 function filasPeaje(){
   const q=norm($('qp').value), fe=$('fEstP').value, fm=$('fMotP').value, sin=$('fSinP').checked;
-  let rows=PEAJES.filter(r=>!r.excl&&(fe==='todos'||r.activo)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
+  let rows=PEAJES.filter(r=>!r.excl&&estadoPasa(r,fe)&&(!fm||r.zona===fm)&&(!sin||!r.peajeReg));
   if(q) rows=rows.filter(r=>norm([r.viaje,r.id,r.emp,r.tracto,r.semi,r.origN,r.dirCarga,r.destN,r.dirDesc,r.motivo,r.estV,r.cat].join(' ')).includes(q));
   const st=SORT.peaje;
   if(st.k) sortRows(rows, st, (r,k)=> k==='fcar'?fechaKey(r.fcar):(k==='peajeReg'?(r.peajeReg?1:0):(r[k]??'')));
@@ -1005,7 +1149,7 @@ function renderPeaje(){
   $('hintP').textContent=`Mostrando ${rows.length} de ${V.length} viajes con incidencia de peajes (${V.filter(r=>r.activo).length} activos). Los ${susp.length} suspendidos y ${falso.length} falsos fletes no se listan; solo se cuentan en los cuadros de arriba.`;
   const K=(k,c,l,rows)=>{ defKpi(k,l,'peaje',rows); return [c,rows.length,l,k]; };
   const z=n=>V.filter(r=>r.zona===n);
-  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',V),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',V.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',V.filter(r=>!r.peajeReg)),K('pSusp','','Viajes suspendidos',susp),K('pFalso','','Falsos fletes',falso)]);
+  $('kpisPeaje').innerHTML=kpiHTML([K('pAll','','Viajes con peaje',V),K('pStgo','','Desde Santiago',z('Santiago')),K('pAnto','','Desde Antofagasta',z('Antofagasta')),K('pSalAnd','','Desde Salvador / Andina',[...z('Salvador'),...z('Andina')]),K('pRanc','','Desde Rancagua / Requínoa',z('Rancagua')),K('pMej','','Desde Mejillones',z('Mejillones')),K('pOtras','','Desde Concepción / Copiapó / Coquimbo',[...z('Concepción'),...z('Copiapó'),...z('Coquimbo')]),K('pHacia','','Desde DCH / DRT / DMH a Antofagasta',z('Hacia Antofagasta')),K('pReg','ok','Con peaje registrado',V.filter(r=>r.peajeReg)),K('pNoReg','warn','Sin peaje registrado',V.filter(r=>!r.peajeReg)),K('pSusp','','Viajes suspendidos',susp),K('pFalso','','Falsos fletes',falso)]);
 }
 function exportarPeaje(rows){
   rows=rows||LAST.peaje;
@@ -1019,6 +1163,8 @@ document.querySelectorAll('#tab th').forEach(th=>th.addEventListener('click',()=
 document.querySelectorAll('#tabD th').forEach(th=>th.addEventListener('click',()=>ordenar('desv',th.dataset.k,renderDesv)));
 document.querySelectorAll('#tabP th').forEach(th=>th.addEventListener('click',()=>ordenar('peaje',th.dataset.k,renderPeaje)));
 document.querySelectorAll('#tabV th').forEach(th=>th.addEventListener('click',()=>ordenar('viajes',th.dataset.k,renderViajes)));
+document.querySelectorAll('#tabC th').forEach(th=>th.addEventListener('click',()=>ordenar('cierre',th.dataset.k,renderCierre)));
+document.querySelectorAll('#tabF th').forEach(th=>th.addEventListener('click',()=>ordenar('fechas',th.dataset.k,renderFechas)));
 function ordenar(t,k,fn){ const st=SORT[t]; if(!k) return; if(st.k===k) st.dir*=-1; else { st.k=k; st.dir=1; } fn(); }
 function descargar(aoa, hoja, base){
   const wb=XLSX.utils.book_new(); const ws=XLSX.utils.aoa_to_sheet(aoa);
