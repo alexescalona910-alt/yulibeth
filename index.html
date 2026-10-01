@@ -135,7 +135,7 @@
   </section>
 
   <div class="tabs" id="tabs" style="display:none">
-    <button class="tab on" data-t="cruce" onclick="verTab('cruce')">Cruce de habilitaciones<span class="n" id="nCruce">0</span></button>
+    <button class="tab on" data-t="cruce" onclick="verTab('cruce')">Revisión de Acreditados<span class="n" id="nCruce">0</span></button>
     <button class="tab" data-t="desv" onclick="verTab('desv')">Desviaciones<span class="n" id="nDesv">0</span></button>
     <button class="tab" data-t="peaje" onclick="verTab('peaje')">Incidencia de peajes<span class="n" id="nPeaje">0</span></button>
   </div>
@@ -143,7 +143,7 @@
   <!-- ===== CRUCE ===== -->
   <div class="panel on" id="pCruce">
     <section class="card" id="secRes" style="display:none">
-      <h2>Resumen de servicios activos a divisiones</h2>
+      <h2>Resumen de servicios a divisiones</h2>
       <div class="kpis" id="kpis"></div>
       <div class="legend">
         <span><span class="dot ok"></span>Habilitado</span>
@@ -154,7 +154,7 @@
     </section>
 
     <section class="card" id="secTab" style="display:none">
-      <h2>Cruce por servicio</h2>
+      <h2>Revisión de Acreditados por servicio</h2>
       <div class="row">
         <div class="grow"><input type="text" id="q" placeholder="Filtrar: viaje, pedido, conductor, RUT, patente, empresa…" oninput="render()"></div>
         <select id="fDiv" onchange="render()"><option value="">Todas las divisiones</option></select>
@@ -625,6 +625,8 @@ function kpis(){
     K('cCond','bad','Conductores no habilitados',a.filter(r=>r.condSt.cls==='bad')),
     K('cTracto','bad','Tractos / camiones no habilitados',a.filter(r=>r.tractoSt.cls==='bad')),
     K('cSemi','bad','Semirremolques no habilitados',a.filter(r=>r.semiSt.cls==='bad')),
+    K('cSusp','','Viajes suspendidos',CRUCE.filter(r=>/suspendido/i.test(r.estV))),
+    K('cFalso','','Falsos fletes',CRUCE.filter(r=>/falso\s*flete/i.test(r.estV))),
   ]);
 }
 function exportarCruce(){
