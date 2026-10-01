@@ -324,7 +324,7 @@
           <div class="legend" style="margin-top:8px">
             <span><span class="dot ok"></span>Acreditado</span>
             <span><span class="dot warn"></span>Acreditado, vence en menos de 11 días</span>
-            <span><span class="dot bad"></span>No acreditado o sin registro en la división</span>
+            <span><span class="dot bad"></span>No acreditado (conductor según el informe; tracto o semirremolque con revisión técnica vencida) o sin registro en la división</span>
             <span><span class="dot na"></span>No aplica</span>
           </div>
         </div>
@@ -648,16 +648,18 @@ function motivoCond(rec, st){
   if(st.cls==='warn') return porV.length ? 'Por vencer: '+porV.map(i=>`${i.short} (${i.dias} d)`).join(', ') : 'Vigencia general por vencer';
   return '';
 }
+// equipos: el estado sale SOLO de los días de revisión técnica (columna O del informe)
+function estadoRevTec(rec){
+  const d=rec.revD, f=rec.revF?' el '+rec.revF:'';
+  if(d==null){ return isHab(rec.est) ? {cls:'ok', txt:'Acreditado', orden:2, dias:null, motivo:'Sin fecha de revisión técnica en el informe'} : {cls:'bad', txt:'No acreditado', orden:0, dias:null, motivo:'Sin fecha de revisión técnica en el informe'}; }
+  if(d<=0) return {cls:'bad', txt:'No acreditado', orden:0, dias:d, motivo:'Revisión técnica vencida'+f};
+  if(d<11) return {cls:'warn', txt:`Acreditado · vence en ${d} día${d===1?'':'s'}`, orden:1, dias:d, motivo:'Revisión técnica vence'+f+` (${d} días)`};
+  return {cls:'ok', txt:`Acreditado · ${d} días`, orden:2, dias:d, motivo:''};
+}
 function motivoEq(rec, st, pat, quiereSemi){
-  if(!rec){ if(!pat) return ''; const otras=(IDX.eqByPat.get(pat)||[]).filter(r=>isHab(r.est)).map(r=>r.div); return otras.length?'No hay registro en esta división. Acreditado en '+otras.join(', '):'No aparece en el informe de equipos'; }
-  if(st.cls==='bad'){
-    if(isSemi(rec.tipo)!==quiereSemi) return 'Tipo distinto al esperado';
-    if(rec.revD!=null&&rec.revD<=0) return 'Revisión técnica vencida'+(rec.revF?' el '+rec.revF:'');
-    if(rec.revF||rec.revD!=null) return 'Revisión técnica vence'+(rec.revF?' el '+rec.revF:'')+(rec.revD!=null?' ('+rec.revD+' días)':'');
-    return 'Sin fecha de revisión técnica en el informe';
-  }
-  if(st.cls==='warn'){ return 'Revisión técnica vence'+(rec.revF?' el '+rec.revF:'')+(rec.revD!=null?' ('+rec.revD+' días)':''); }
-  return '';
+  if(!rec){ if(!pat) return ''; const otras=(IDX.eqByPat.get(pat)||[]).filter(r=>r.revD==null?isHab(r.est):r.revD>0).map(r=>r.div); return otras.length?'No hay registro en esta división. Acreditado en '+otras.join(', '):'No aparece en el informe de equipos'; }
+  if(isSemi(rec.tipo)!==quiereSemi) return 'Tipo distinto al esperado';
+  return st.motivo||'';
 }
 function estado(rec){
   if(!rec) return {cls:'bad', txt:'No hay registro', orden:0, dias:null};
@@ -670,7 +672,8 @@ function estadoEquipo(div, pat, quiereSemi){
   const rec = IDX.eq.get(div+'|'+pat);
   let s;
   if(rec && isSemi(rec.tipo)!==quiereSemi) s={cls:'bad', txt:'Registrado como '+rec.tipo.toLowerCase(), orden:0, dias:rec.dias};
-  else s=estado(rec);
+  else if(!rec) s=estado(null);
+  else s=estadoRevTec(rec);
   s.rec=rec; s.motivo=motivoEq(rec,s,pat,quiereSemi); return s;
 }
 
@@ -1029,7 +1032,7 @@ function modalExcel(){ if(!MODAL_XLS) return; descargar(MODAL_XLS.aoa,'Detalle',
 function cerrarModal(){ $('modalBg').classList.remove('on'); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrarModal(); });
 function kv(pairs){ return `<div class="kv">${pairs.filter(p=>p[1]!==undefined&&p[1]!==null&&p[1]!=='').map(([k,v])=>`<div><b>${esc(k)}</b>${v}</div>`).join('')}</div>`; }
-function chipsDivs(recs, quiereSemi){ return `<div class="chips">${recs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=(quiereSemi===undefined)?estado(d):(isSemi(d.tipo)!==quiereSemi?{cls:'bad',txt:'Registrado como '+d.tipo.toLowerCase()}:estado(d)); return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')||'<span class="hint">No aparece en ninguna división.</span>'}</div>`; }
+function chipsDivs(recs, quiereSemi){ return `<div class="chips">${recs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=(quiereSemi===undefined)?estado(d):(isSemi(d.tipo)!==quiereSemi?{cls:'bad',txt:'Registrado como '+d.tipo.toLowerCase()}:estadoRevTec(d)); const f=(quiereSemi===undefined)?d.fecha:d.revF; return `<span class="chip"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${f?' · '+esc(f):''}</span>`; }).join('')||'<span class="hint">No aparece en ninguna división.</span>'}</div>`; }
 function estItem(d){ if(d==null) return {cls:'na',txt:'Sin dato'}; if(d<=0) return {cls:'bad',txt:'Vencido'}; if(d<11) return {cls:'warn',txt:'Por vencer'}; return {cls:'ok',txt:'Vigente'}; }
 function modalKpi(k){
   const d=KPI[k]; if(!d) return; const rows=d.rows; LAST.modal=rows;
@@ -1111,11 +1114,11 @@ function buscar(){
   for(const r of HAB.eq){ if(qp.length>=3 && r.pat.includes(qp)){ if(!porPat.has(r.pat)) porPat.set(r.pat,{pat:r.pat, tipo:r.tipo, divs:[]}); porPat.get(r.pat).divs.push(r); } }
   const conds=[...porRut.values()].slice(0,15), pats=[...porPat.values()].slice(0,15);
   const srvDe=fn=>(SRV?SRV.rows.filter(fn):[]).sort((a,b)=>(esActivo(b.estV)?1:0)-(esActivo(a.estV)?1:0)).slice(0,8);
-  const chips=(divs,onclick)=>`<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=estado(d); return `<span class="chip" style="cursor:pointer" ondblclick="${onclick(d)}"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${d.fecha?' · '+esc(d.fecha):''}</span>`; }).join('')}</div>`;
+  const chips=(divs,onclick,eq)=>`<div class="chips">${divs.sort((a,b)=>a.div.localeCompare(b.div)).map(d=>{ const s=eq?estadoRevTec(d):estado(d); const f=eq?d.revF:d.fecha; return `<span class="chip" style="cursor:pointer" ondblclick="${onclick(d)}"><span class="dot ${s.cls}"></span><b>${esc(divLabel(d.div))}</b> ${esc(s.txt)}${f?' · '+esc(f):''}</span>`; }).join('')}</div>`;
   const tablaSrv=(rows,keyFn)=>rows.length?`<div class="tw" style="margin-top:8px;max-height:none"><table><thead><tr><th>Viaje</th><th>Estado</th><th>Destino</th><th>Empresa</th><th>Acreditado en esa división</th></tr></thead><tbody>${rows.map(s=>{ const div=divDe(s.dest); const st=div?keyFn(div,s):{cls:'na',txt:'Destino sin división'}; return `<tr><td><b>${esc(s.viaje)}</b><span class="sub">pedido ${esc(s.id)}</span></td><td>${esc(s.estV)}</td><td>${esc(div?divLabel(div):sinPrefijo(s.dest))}</td><td>${esc(s.emp)}</td><td>${stHTML(st)}</td></tr>`; }).join('')}</tbody></table></div>`:'<p class="hint">No aparece en la planilla Punto a Punto.</p>';
   let html='';
   for(const c of conds) html+=`<div class="res"><h3>${esc(c.nom)} <span class="sub">RUT ${esc(fmtRut(c.rut))}</span></h3>${chips(c.divs, d=>`modalConductor('${d.div}','${c.rut}','')`)}${tablaSrv(srvDe(s=>s.rut===c.rut),(div,s)=>{ const rc=IDX.cond.get(div+'|'+s.rut); const st=estado(rc); st.motivo=motivoCond(rc,{...st,rut:s.rut}); return st; })}</div>`;
-  for(const p of pats) html+=`<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs, d=>`modalEquipo('${d.div}','${p.pat}',${isSemi(p.tipo)})`)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat),(div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
+  for(const p of pats) html+=`<div class="res"><h3><span class="plate">${esc(p.pat)}</span> <span class="sub">${esc(p.tipo)}</span></h3>${chips(p.divs, d=>`modalEquipo('${d.div}','${p.pat}',${isSemi(p.tipo)})`, true)}${tablaSrv(srvDe(s=>s.tracto===p.pat||s.semi===p.pat),(div,s)=>estadoEquipo(div,p.pat,s.semi===p.pat))}</div>`;
   if(!conds.length && !pats.length && SRV){
     const enSrv=SRV.rows.filter(s=>(qr.length>=5 && s.rut.includes(qr)) || norm(s.chofer).includes(q) || (qp.length>=3 && (s.tracto.includes(qp)||s.semi.includes(qp)))).slice(0,8);
     if(enSrv.length) html+=`<div class="res"><h3>No está en el informe de acreditados</h3><p class="hint">Sí aparece en la planilla Punto a Punto, por lo tanto no está acreditado en ninguna división.</p>${tablaSrv(enSrv,()=>({cls:'bad',txt:'No hay registro'}))}</div>`;
